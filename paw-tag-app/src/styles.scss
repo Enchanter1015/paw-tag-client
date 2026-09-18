@@ -1,1 +1,65 @@
 /* You can add global styles to this file, and also import other style files */
+
+// PawTag design system tokens — see docs/design-system.md for usage rules.
+:root {
+  --pt-surface-50: #F5F9F7;
+  --pt-surface-100: #FFFFFF;
+  --pt-surface-200: #EAF1EE;
+  --pt-surface-raised: #FFFFFF;
+  --pt-border: #DEE9E4;
+  --pt-border-strong: #C4D5CD;
+
+  --pt-ink: #132420;
+  --pt-ink-muted: #57685F;
+  --pt-ink-faint: #93A69D;
+
+  --pt-brand: #D9503C;
+  --pt-brand-tint: #FFE3D9;
+  --pt-sun: #F2A33D;
+  --pt-sun-tint: #FDEACB;
+
+  --pt-accent: #0B8073;
+  --pt-accent-strong: #08655B;
+  --pt-accent-tint: #DFF3EE;
+  --pt-on-accent: #FFFFFF;
+  --pt-on-brand: #FFFFFF;
+
+  --pt-success: #0C7A4E;
+  --pt-success-surface: #DEF3E7;
+  --pt-warning: #A66300;
+  --pt-warning-surface: #FBECD2;
+  --pt-danger: #C4342A;
+  --pt-danger-surface: #FAE3E0;
+  --pt-info: #2E6FCC;
+  --pt-info-surface: #E1ECFB;
+
+  --pt-focus-ring: #0B8073;
+
+  --pt-space-1: 4px;
+  --pt-space-2: 8px;
+  --pt-space-3: 12px;
+  --pt-space-4: 16px;
+  --pt-space-5: 20px;
+  --pt-space-6: 24px;
+  --pt-space-8: 32px;
+
+  --pt-radius-sm: 6px;
+  --pt-radius-md: 10px;
+  --pt-radius-lg: 16px;
+  --pt-radius-full: 999px;
+
+  --pt-shadow-sm: 0 1px 3px rgba(19, 36, 32, 0.08);
+  --pt-shadow-md: 0 4px 16px rgba(19, 36, 32, 0.16);
+
+  --pt-content-narrow: 640px;
+  --pt-content-wide: 960px;
+
+  color-scheme: light;
+}
+
+body {
+  margin: 0;
+  background: var(--pt-surface-50);
+  color: var(--pt-ink);
+}
+

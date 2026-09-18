@@ -196,3 +196,12 @@ export interface RefreshInput {
 export interface LogoutInput {
   refreshToken: string;
 }
+
+// Decoded claims from the JWT access token, used to drive auth state/role checks
+export interface AuthUser {
+  sub: string;
+  email?: string;
+  role?: string;
+  exp?: number;
+}
+
