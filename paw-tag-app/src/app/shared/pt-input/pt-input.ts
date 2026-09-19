@@ -1,4 +1,4 @@
-import { Component, Input, forwardRef } from '@angular/core';
+import { Component, Input, forwardRef, signal } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 let nextId = 0;
@@ -25,14 +25,14 @@ export class PtInput implements ControlValueAccessor {
 
   readonly inputId = `pt-input-${nextId++}`;
 
-  value = '';
-  disabled = false;
+  readonly value = signal('');
+  readonly disabled = signal(false);
 
   private onChange: (value: string) => void = () => {};
   private onTouched: () => void = () => {};
 
   writeValue(value: string): void {
-    this.value = value ?? '';
+    this.value.set(value ?? '');
   }
 
   registerOnChange(fn: (value: string) => void): void {
@@ -44,11 +44,11 @@ export class PtInput implements ControlValueAccessor {
   }
 
   setDisabledState(isDisabled: boolean): void {
-    this.disabled = isDisabled;
+    this.disabled.set(isDisabled);
   }
 
   handleInput(value: string): void {
-    this.value = value;
+    this.value.set(value);
     this.onChange(value);
   }
 

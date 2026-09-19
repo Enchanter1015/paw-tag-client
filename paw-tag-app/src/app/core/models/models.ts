@@ -1,10 +1,16 @@
 // Types generated from the Paw Tag API OpenAPI spec (http://localhost:3000/api/docs)
 
+export interface ApiErrorDetail {
+  path: string;
+  message: string;
+}
+
 export interface ApiError {
   error: {
     code: string;
     message: string;
     requestId?: string;
+    details?: ApiErrorDetail[];
   };
 }
 

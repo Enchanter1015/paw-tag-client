@@ -7,8 +7,8 @@
     [type]="type"
     [placeholder]="placeholder"
     [autocomplete]="autocomplete"
-    [disabled]="disabled"
-    [value]="value"
+    [disabled]="disabled()"
+    [value]="value()"
     (input)="handleInput($any($event.target).value)"
     (blur)="handleBlur()"
   />
