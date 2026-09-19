@@ -185,6 +185,9 @@ describe('AnimalProfile', () => {
     const link = fixture.nativeElement.querySelector('a.animal-profile-link');
     expect(link.textContent).toContain('View all medical records');
     expect(link.getAttribute('href')).toBe(`/animals/${animal.id}/medical-records`);
+
+    const recordLink = fixture.nativeElement.querySelector('a.medical-record-link') as HTMLAnchorElement;
+    expect(recordLink.getAttribute('href')).toBe(`/animals/${animal.id}/medical-records/rec-6`);
   });
 
   it('lists a vaccination-type record with a future next due date as an upcoming vaccination', () => {

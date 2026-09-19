@@ -37,13 +37,15 @@
           <ul class="medical-records-list">
             @for (record of upcomingVaccinations(); track record.id) {
               <li class="medical-record-row">
-                <div class="medical-record-info">
-                  <span class="medical-record-title">{{ record.title }}</span>
-                  <span class="medical-record-meta">{{ medicalRecordTypeName(record.medicalRecordTypeId) }}</span>
-                </div>
-                @if (medicalRecordDueStatus(record); as status) {
-                  <pt-tag [variant]="status.variant">{{ status.label }}</pt-tag>
-                }
+                <a class="medical-record-link" [routerLink]="['/animals', animal.id, 'medical-records', record.id]">
+                  <div class="medical-record-info">
+                    <span class="medical-record-title">{{ record.title }}</span>
+                    <span class="medical-record-meta">{{ medicalRecordTypeName(record.medicalRecordTypeId) }}</span>
+                  </div>
+                  @if (medicalRecordDueStatus(record); as status) {
+                    <pt-tag [variant]="status.variant">{{ status.label }}</pt-tag>
+                  }
+                </a>
               </li>
             }
           </ul>
@@ -59,15 +61,17 @@
             <ul class="medical-records-list">
               @for (record of recentMedicalRecords(); track record.id) {
                 <li class="medical-record-row">
-                  <div class="medical-record-info">
-                    <span class="medical-record-title">{{ record.title }}</span>
-                    <span class="medical-record-meta">
-                      {{ medicalRecordTypeName(record.medicalRecordTypeId) }} · {{ formatAdministeredAt(record) }}
-                    </span>
-                  </div>
-                  @if (medicalRecordDueStatus(record); as status) {
-                    <pt-tag [variant]="status.variant">{{ status.label }}</pt-tag>
-                  }
+                  <a class="medical-record-link" [routerLink]="['/animals', animal.id, 'medical-records', record.id]">
+                    <div class="medical-record-info">
+                      <span class="medical-record-title">{{ record.title }}</span>
+                      <span class="medical-record-meta">
+                        {{ medicalRecordTypeName(record.medicalRecordTypeId) }} · {{ formatAdministeredAt(record) }}
+                      </span>
+                    </div>
+                    @if (medicalRecordDueStatus(record); as status) {
+                      <pt-tag [variant]="status.variant">{{ status.label }}</pt-tag>
+                    }
+                  </a>
                 </li>
               }
             </ul>

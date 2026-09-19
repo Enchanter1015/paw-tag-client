@@ -123,6 +123,14 @@ describe('MedicalHistory', () => {
     expect(pageHeader.config().left).toEqual({ kind: 'back' });
   });
 
+  it('links each record row to its detail view', () => {
+    const fixture = createComponent([overdueRecord]);
+
+    const link = fixture.nativeElement.querySelector('a.medical-record-link') as HTMLAnchorElement;
+    expect(link).toBeTruthy();
+    expect(link.getAttribute('href')).toBe(`/animals/${animalId}/medical-records/${overdueRecord.id}`);
+  });
+
   it('hides the add-record control for a guest', () => {
     const fixture = createComponent([]);
     expect(fixture.nativeElement.querySelector('app-medical-form')).toBeNull();
