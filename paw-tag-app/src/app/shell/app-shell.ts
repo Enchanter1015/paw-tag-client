@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AuthService } from '../core/services/auth.service';
 import { AuthStateService } from '../core/services/auth-state.service';
 import { TokenStorageService } from '../core/services/token-storage.service';
@@ -15,7 +15,8 @@ export class AppShell {
   constructor(
     protected readonly authState: AuthStateService,
     private readonly authService: AuthService,
-    private readonly tokenStorage: TokenStorageService
+    private readonly tokenStorage: TokenStorageService,
+    private readonly router: Router
   ) {}
 
   logout(): void {
@@ -23,6 +24,8 @@ export class AppShell {
     if (!refreshToken) {
       return;
     }
-    this.authService.logout({ refreshToken }).subscribe();
+    this.authService.logout({ refreshToken }).subscribe(() => {
+      this.router.navigateByUrl('/login');
+    });
   }
 }

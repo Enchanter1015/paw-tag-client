@@ -1,5 +1,6 @@
 import { TestBed } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
+import { vi } from 'vitest';
+import { Router, provideRouter } from '@angular/router';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting, HttpTestingController } from '@angular/common/http/testing';
 import { AppShell } from './app-shell';
@@ -22,7 +23,7 @@ describe('AppShell', () => {
     TestBed.configureTestingModule({
       imports: [AppShell],
       providers: [
-        provideRouter([]),
+        provideRouter([{ path: '**', children: [] }]),
         provideHttpClient(),
         provideHttpClientTesting(),
         { provide: API_BASE_URL, useValue: baseUrl }
@@ -44,9 +45,11 @@ describe('AppShell', () => {
     expect(button).toBeNull();
   });
 
-  it('shows the sign-out button and logs out when logged in', () => {
+  it('shows the sign-out button, logs out and navigates to /login when logged in', () => {
     const tokenStorage = TestBed.inject(TokenStorageService);
     const authState = TestBed.inject(AuthStateService);
+    const router = TestBed.inject(Router);
+    const navigateSpy = vi.spyOn(router, 'navigateByUrl');
     tokenStorage.setTokens(makeToken(), 'refresh-1');
     authState.refresh();
 
@@ -62,5 +65,6 @@ describe('AppShell', () => {
     req.flush(null);
 
     expect(tokenStorage.getAccessToken()).toBeNull();
+    expect(navigateSpy).toHaveBeenCalledWith('/login');
   });
 });

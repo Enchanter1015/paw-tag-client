@@ -1,0 +1,18 @@
+<div class="pt-input-group">
+  <label class="pt-input-label" [for]="inputId">{{ label }}</label>
+  <input
+    class="pt-input"
+    [class.pt-input--error]="!!error"
+    [id]="inputId"
+    [type]="type"
+    [placeholder]="placeholder"
+    [autocomplete]="autocomplete"
+    [disabled]="disabled"
+    [value]="value"
+    (input)="handleInput($any($event.target).value)"
+    (blur)="handleBlur()"
+  />
+  @if (error) {
+    <p class="pt-input-help">{{ error }}</p>
+  }
+</div>
