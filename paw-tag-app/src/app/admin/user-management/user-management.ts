@@ -1,6 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { PageHeaderService } from '../../core/services/page-header.service';
 import { UsersService } from '../../core/services/users.service';
 import { ApiError, User } from '../../core/models/models';
 import { PtAvatar } from '../../shared/pt-avatar/pt-avatar';
@@ -24,6 +25,10 @@ export class UserManagement {
   readonly searchForm = this.fb.group({
     email: this.fb.control('', [Validators.required, Validators.email]),
   });
+
+  constructor() {
+    inject(PageHeaderService).set({ title: () => 'User management', left: { kind: 'back' } });
+  }
 
   readonly user = signal<User | null>(null);
   readonly searching = signal(false);

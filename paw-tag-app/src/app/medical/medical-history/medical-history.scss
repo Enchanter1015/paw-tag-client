@@ -10,29 +10,6 @@
   gap: var(--pt-space-4);
 }
 
-.medical-history-header {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: var(--pt-space-3);
-}
-
-.medical-history-title {
-  margin: 0;
-  font-size: 20px;
-  line-height: 26px;
-  font-weight: 700;
-  color: var(--pt-ink);
-}
-
-.medical-history-back {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--pt-accent);
-  text-decoration: none;
-  white-space: nowrap;
-}
-
 .medical-history-status {
   padding: var(--pt-space-4);
   text-align: center;

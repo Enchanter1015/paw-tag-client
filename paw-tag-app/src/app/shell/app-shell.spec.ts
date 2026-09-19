@@ -5,6 +5,7 @@ import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting, HttpTestingController } from '@angular/common/http/testing';
 import { AppShell } from './app-shell';
 import { AuthStateService } from '../core/services/auth-state.service';
+import { PageHeaderService } from '../core/services/page-header.service';
 import { TokenStorageService } from '../core/services/token-storage.service';
 import { API_BASE_URL } from '../core/services/api-config';
 
@@ -108,5 +109,78 @@ describe('AppShell', () => {
     expect(adminNav).toBeTruthy();
     const adminLinks = Array.from(adminNav.querySelectorAll('a')).map((a) => (a as HTMLAnchorElement).textContent);
     expect(adminLinks).toEqual(['Animal records', 'User management', 'Record verification']);
+  });
+
+  it('shows the default PawTag title with no back chevron until a page sets its own header', () => {
+    const fixture = TestBed.createComponent(AppShell);
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.querySelector('.pt-topbar-title').textContent).toBe('PawTag');
+    expect(fixture.nativeElement.querySelector('.pt-topbar-back')).toBeNull();
+  });
+
+  it("renders a page's title and back chevron once it sets the page header, and goBack() navigates back", () => {
+    const fixture = TestBed.createComponent(AppShell);
+    fixture.detectChanges();
+    const pageHeader = TestBed.inject(PageHeaderService);
+
+    pageHeader.set({ title: () => 'Kalu', left: { kind: 'back' } });
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.querySelector('.pt-topbar-title').textContent).toBe('Kalu');
+
+    const backButton = fixture.nativeElement.querySelector('.pt-topbar-back') as HTMLButtonElement;
+    expect(backButton).toBeTruthy();
+
+    const goBackSpy = vi.spyOn(fixture.componentInstance, 'goBack');
+    backButton.click();
+    expect(goBackSpy).toHaveBeenCalled();
+  });
+
+  it('shows a close icon for a "close" left mode and calls its onClick handler', () => {
+    const fixture = TestBed.createComponent(AppShell);
+    fixture.detectChanges();
+    const pageHeader = TestBed.inject(PageHeaderService);
+    const onClick = vi.fn();
+
+    pageHeader.set({ title: () => 'Edit Kalu', left: { kind: 'close', onClick } });
+    fixture.detectChanges();
+
+    const closeButton = fixture.nativeElement.querySelector('.pt-topbar-back') as HTMLButtonElement;
+    expect(closeButton.getAttribute('aria-label')).toBe('Close');
+
+    closeButton.click();
+    expect(onClick).toHaveBeenCalled();
+  });
+
+  it('renders a save action and falls back to no action once the config omits one', () => {
+    const fixture = TestBed.createComponent(AppShell);
+    fixture.detectChanges();
+    const pageHeader = TestBed.inject(PageHeaderService);
+    const onClick = vi.fn();
+
+    pageHeader.set({
+      title: () => 'Edit Kalu',
+      left: { kind: 'close', onClick: () => {} },
+      action: { kind: 'save', label: () => 'Save', disabled: () => false, onClick },
+    });
+    fixture.detectChanges();
+
+    const saveButton = fixture.nativeElement.querySelector('.pt-topbar-save') as HTMLButtonElement;
+    expect(saveButton.textContent?.trim()).toBe('Save');
+
+    saveButton.click();
+    expect(onClick).toHaveBeenCalled();
+  });
+
+  it('renders an "Admin" tag action', () => {
+    const fixture = TestBed.createComponent(AppShell);
+    fixture.detectChanges();
+    const pageHeader = TestBed.inject(PageHeaderService);
+
+    pageHeader.set({ title: () => 'Add animal', left: { kind: 'back' }, action: { kind: 'tag', label: 'Admin' } });
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.querySelector('.pt-topbar-tag')?.textContent).toBe('Admin');
   });
 });

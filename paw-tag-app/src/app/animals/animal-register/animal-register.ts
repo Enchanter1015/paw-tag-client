@@ -4,7 +4,9 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 import { AnimalsService } from '../../core/services/animals.service';
+import { AuthStateService } from '../../core/services/auth-state.service';
 import { LookupsService } from '../../core/services/lookups.service';
+import { PageHeaderService } from '../../core/services/page-header.service';
 import { ApiError, Lookup } from '../../core/models/models';
 import { PtButton } from '../../shared/pt-button/pt-button';
 import { PtInput } from '../../shared/pt-input/pt-input';
@@ -23,7 +25,9 @@ const MAX_NAME_GENERATION_ATTEMPTS = 5;
 export class AnimalRegister {
   private readonly fb = inject(FormBuilder);
   private readonly animalsService = inject(AnimalsService);
+  private readonly authState = inject(AuthStateService);
   private readonly lookupsService = inject(LookupsService);
+  private readonly pageHeader = inject(PageHeaderService);
   private readonly router = inject(Router);
 
   readonly form = this.fb.group({
@@ -41,6 +45,12 @@ export class AnimalRegister {
   readonly generatingName = signal(false);
 
   constructor() {
+    this.pageHeader.set({
+      title: () => 'Add animal',
+      left: { kind: 'back' },
+      action: this.authState.isAdministrator() ? { kind: 'tag', label: 'Admin' } : undefined,
+    });
+
     this.lookupsService.getAnimalTypes().subscribe((types) => this.animalTypes.set(types));
 
     // Street animals are registered with no known owner to ask, so auto-fill a placeholder

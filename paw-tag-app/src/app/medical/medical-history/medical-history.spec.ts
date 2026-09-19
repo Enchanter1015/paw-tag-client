@@ -5,7 +5,8 @@ import { provideHttpClientTesting, HttpTestingController } from '@angular/common
 import { MedicalHistory } from './medical-history';
 import { API_BASE_URL } from '../../core/services/api-config';
 import { AuthStateService } from '../../core/services/auth-state.service';
-import { MedicalRecord } from '../../core/models/models';
+import { PageHeaderService } from '../../core/services/page-header.service';
+import { Animal, MedicalRecord } from '../../core/models/models';
 
 describe('MedicalHistory', () => {
   const baseUrl = 'http://localhost:3000/api/v1';
@@ -37,6 +38,15 @@ describe('MedicalHistory', () => {
     updatedAt: '2026-01-01T00:00:00Z',
   };
 
+  const animal: Animal = {
+    id: animalId,
+    name: 'Kalu',
+    animalTypeId: 1,
+    isStreet: true,
+    createdAt: '2026-01-01T00:00:00Z',
+    updatedAt: '2026-01-01T00:00:00Z',
+  };
+
   let httpMock: HttpTestingController;
   let authState: { isGuest: () => boolean };
   let queryParams: Record<string, string>;
@@ -44,6 +54,7 @@ describe('MedicalHistory', () => {
   function createComponent(records: MedicalRecord[]) {
     const fixture = TestBed.createComponent(MedicalHistory);
     fixture.detectChanges();
+    httpMock.expectOne(`${baseUrl}/animals/${animalId}`).flush(animal);
     httpMock.expectOne(`${baseUrl}/animals/${animalId}/medical-records`).flush(records);
     fixture.detectChanges();
     return fixture;
@@ -102,6 +113,14 @@ describe('MedicalHistory', () => {
     const fixture = createComponent([overdueRecord, upcomingRecord]);
     const ids = fixture.componentInstance.records().map((r) => r.id);
     expect(ids).toEqual(['rec-upcoming', 'rec-overdue']);
+  });
+
+  it("sets the page header title to \"Records · \" plus the animal's name once loaded", () => {
+    createComponent([]);
+    const pageHeader = TestBed.inject(PageHeaderService);
+
+    expect(pageHeader.config().title()).toBe('Records · Kalu');
+    expect(pageHeader.config().left).toEqual({ kind: 'back' });
   });
 
   it('hides the add-record control for a guest', () => {

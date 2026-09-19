@@ -1,6 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { AnimalsService } from '../../core/services/animals.service';
+import { PageHeaderService } from '../../core/services/page-header.service';
 import { QrCodeService } from '../../core/services/qr-code.service';
 import { Animal } from '../../core/models/models';
 import { PtAvatar } from '../../shared/pt-avatar/pt-avatar';
@@ -18,6 +19,7 @@ export class AnimalQr {
   private readonly route = inject(ActivatedRoute);
   private readonly animalsService = inject(AnimalsService);
   private readonly qrCodeService = inject(QrCodeService);
+  private readonly pageHeader = inject(PageHeaderService);
 
   readonly animal = signal<Animal | null>(null);
   readonly qrDataUrl = signal<string | null>(null);
@@ -25,6 +27,8 @@ export class AnimalQr {
   readonly notFound = signal(false);
 
   constructor() {
+    this.pageHeader.set({ title: () => 'QR code', left: { kind: 'back' } });
+
     const id = this.route.snapshot.paramMap.get('id');
     if (!id) {
       this.notFound.set(true);
@@ -36,6 +40,7 @@ export class AnimalQr {
       next: (animal) => {
         this.animal.set(animal);
         this.loading.set(false);
+        this.pageHeader.set({ title: () => animal.name, left: { kind: 'back' } });
         this.qrCodeService.generateDataUrl(animal.id).then((dataUrl) => this.qrDataUrl.set(dataUrl));
       },
       error: () => {

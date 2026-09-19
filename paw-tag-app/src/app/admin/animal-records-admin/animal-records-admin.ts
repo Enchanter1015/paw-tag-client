@@ -4,6 +4,7 @@ import { RouterLink } from '@angular/router';
 import { debounceTime } from 'rxjs';
 import { AnimalsService } from '../../core/services/animals.service';
 import { LookupsService } from '../../core/services/lookups.service';
+import { PageHeaderService } from '../../core/services/page-header.service';
 import { Animal, ApiError, Lookup } from '../../core/models/models';
 import { PtButton } from '../../shared/pt-button/pt-button';
 import { PtInput } from '../../shared/pt-input/pt-input';
@@ -25,6 +26,7 @@ export class AnimalRecordsAdmin {
   private readonly fb = inject(FormBuilder);
   private readonly animalsService = inject(AnimalsService);
   private readonly lookupsService = inject(LookupsService);
+  private readonly pageHeader = inject(PageHeaderService);
 
   readonly filterForm = this.fb.group({
     query: this.fb.control(''),
@@ -46,6 +48,7 @@ export class AnimalRecordsAdmin {
   readonly actionInFlight = signal(false);
 
   constructor() {
+    this.pageHeader.set({ title: () => 'Animal records', left: { kind: 'back' } });
     this.lookupsService.getAnimalTypes().subscribe((types) => this.animalTypes.set(types));
     this.runSearch();
     this.filterForm.valueChanges.pipe(debounceTime(300)).subscribe(() => this.runSearch());

@@ -4,6 +4,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { debounceTime } from 'rxjs';
 import { AnimalsService } from '../../core/services/animals.service';
 import { LookupsService } from '../../core/services/lookups.service';
+import { PageHeaderService } from '../../core/services/page-header.service';
 import { Animal, Lookup } from '../../core/models/models';
 import { PtAvatar } from '../../shared/pt-avatar/pt-avatar';
 import { PtInput } from '../../shared/pt-input/pt-input';
@@ -22,6 +23,7 @@ export class AnimalSearch {
   private readonly lookupsService = inject(LookupsService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  private readonly pageHeader = inject(PageHeaderService);
 
   readonly filterForm = this.fb.group({
     query: this.fb.control(''),
@@ -35,6 +37,7 @@ export class AnimalSearch {
   readonly loadError = signal<string | null>(null);
 
   constructor() {
+    this.pageHeader.set({ title: () => 'Animals', left: { kind: 'none' } });
     this.lookupsService.getAnimalTypes().subscribe((types) => this.animalTypes.set(types));
 
     // The URL query params are the source of truth: a filter change updates them, and this

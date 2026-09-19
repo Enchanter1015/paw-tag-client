@@ -16,7 +16,10 @@ describe('Login', () => {
     TestBed.configureTestingModule({
       imports: [Login],
       providers: [
-        provideRouter([{ path: '', component: Login }]),
+        provideRouter([
+          { path: '', component: Login },
+          { path: 'scan', component: Login },
+        ]),
         provideHttpClient(),
         provideHttpClientTesting(),
         { provide: API_BASE_URL, useValue: baseUrl }
@@ -95,5 +98,18 @@ describe('Login', () => {
 
     expect(component.submitting()).toBe(false);
     expect(component.formError()).toBe('Incorrect email or password.');
+  });
+
+  it('navigates to the public scan page from "Scan a collar instead"', async () => {
+    const fixture = TestBed.createComponent(Login);
+    fixture.detectChanges();
+
+    const buttons: HTMLElement[] = Array.from(fixture.nativeElement.querySelectorAll('pt-button'));
+    const scanButton = buttons.find((b) => b.textContent?.includes('Scan a collar instead'));
+    scanButton?.querySelector('button')?.click();
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    expect(router.url).toBe('/scan');
   });
 });

@@ -5,6 +5,7 @@ import { provideHttpClientTesting, HttpTestingController } from '@angular/common
 import { AnimalProfile } from './animal-profile';
 import { API_BASE_URL } from '../../core/services/api-config';
 import { AuthStateService } from '../../core/services/auth-state.service';
+import { PageHeaderService } from '../../core/services/page-header.service';
 import { Animal, Lookup, MedicalRecord } from '../../core/models/models';
 
 describe('AnimalProfile', () => {
@@ -100,6 +101,45 @@ describe('AnimalProfile', () => {
 
     expect(addLink).toBeTruthy();
     expect(addLink!.getAttribute('href')).toBe(`/animals/${animal.id}/medical-records?add=true`);
+  });
+
+  it('points the header at an edit action once an authenticated user\'s animal has loaded', () => {
+    authState.isGuest = () => false;
+    createComponent();
+    const pageHeader = TestBed.inject(PageHeaderService);
+
+    expect(pageHeader.config().title()).toBe('Rex');
+    expect(pageHeader.config().left).toEqual({ kind: 'back' });
+    expect(pageHeader.config().action?.kind).toBe('edit');
+  });
+
+  it('omits the header edit action for a guest', () => {
+    createComponent();
+    const pageHeader = TestBed.inject(PageHeaderService);
+
+    expect(pageHeader.config().action).toBeUndefined();
+  });
+
+  it('switches the header to a close+save action while editing, then back to edit after saving', () => {
+    authState.isGuest = () => false;
+    const fixture = createComponent();
+    const component = fixture.componentInstance;
+    const pageHeader = TestBed.inject(PageHeaderService);
+
+    component.startEditing();
+    fixture.detectChanges();
+
+    expect(pageHeader.config().left.kind).toBe('close');
+    expect(pageHeader.config().title()).toBe('Edit Rex');
+    expect(pageHeader.config().action?.kind).toBe('save');
+
+    component.form.controls.name.setValue('Rex Updated');
+    component.save();
+    httpMock.expectOne(`${baseUrl}/animals/${animal.id}`).flush({ ...animal, name: 'Rex Updated' });
+
+    expect(pageHeader.config().left).toEqual({ kind: 'back' });
+    expect(pageHeader.config().title()).toBe('Rex Updated');
+    expect(pageHeader.config().action?.kind).toBe('edit');
   });
 
   it('shows a not-found message when the animal does not exist', () => {
