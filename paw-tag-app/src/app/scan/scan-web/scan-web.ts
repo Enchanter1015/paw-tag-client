@@ -2,6 +2,7 @@ import { Component, ViewChild, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AnimalsService } from '../../core/services/animals.service';
+import { PageHeaderService } from '../../core/services/page-header.service';
 import { PtButton } from '../../shared/pt-button/pt-button';
 import { PtInput } from '../../shared/pt-input/pt-input';
 import { QrScanner } from '../qr-scanner/qr-scanner';
@@ -23,6 +24,10 @@ export class ScanWeb {
   readonly form = this.fb.group({
     animalId: this.fb.control('', [Validators.required]),
   });
+
+  constructor() {
+    inject(PageHeaderService).set({ title: () => 'Scan a collar', left: { kind: 'none' } });
+  }
 
   readonly cameraOpen = signal(false);
   readonly resolving = signal(false);

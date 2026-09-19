@@ -5,7 +5,16 @@ import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting, HttpTestingController } from '@angular/common/http/testing';
 import { AnimalRegister } from './animal-register';
 import { API_BASE_URL } from '../../core/services/api-config';
+import { AuthStateService } from '../../core/services/auth-state.service';
+import { PageHeaderService } from '../../core/services/page-header.service';
+import { TokenStorageService } from '../../core/services/token-storage.service';
 import { Animal, Lookup } from '../../core/models/models';
+
+function makeToken(role: string): string {
+  const encode = (obj: object) => btoa(JSON.stringify(obj)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  const payload = { sub: 'user-1', role, exp: Math.floor(Date.now() / 1000) + 3600 };
+  return `${encode({ alg: 'none' })}.${encode(payload)}.signature`;
+}
 
 describe('AnimalRegister', () => {
   const baseUrl = 'http://localhost:3000/api/v1';
@@ -37,7 +46,31 @@ describe('AnimalRegister', () => {
     router = TestBed.inject(Router);
   });
 
-  afterEach(() => httpMock.verify());
+  afterEach(() => {
+    httpMock.verify();
+    localStorage.clear();
+  });
+
+  it('sets the page header title with a back chevron and no admin tag for a non-admin', () => {
+    createComponent();
+    const pageHeader = TestBed.inject(PageHeaderService);
+
+    expect(pageHeader.config().title()).toBe('Add animal');
+    expect(pageHeader.config().left).toEqual({ kind: 'back' });
+    expect(pageHeader.config().action).toBeUndefined();
+  });
+
+  it('shows an "Admin" tag in the header for an administrator', () => {
+    const tokenStorage = TestBed.inject(TokenStorageService);
+    const authState = TestBed.inject(AuthStateService);
+    tokenStorage.setTokens(makeToken('Administrator'), 'refresh-1');
+    authState.refresh();
+
+    createComponent();
+    const pageHeader = TestBed.inject(PageHeaderService);
+
+    expect(pageHeader.config().action).toEqual({ kind: 'tag', label: 'Admin' });
+  });
 
   async function waitForSearchRequest() {
     let request: ReturnType<HttpTestingController['match']>[number] | undefined;

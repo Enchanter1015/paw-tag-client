@@ -1,9 +1,4 @@
 <div class="medical-history-screen">
-  <div class="medical-history-header">
-    <h1 class="medical-history-title">Medical history</h1>
-    <a class="medical-history-back" [routerLink]="['/animals', animalId]">Back to animal profile</a>
-  </div>
-
   @if (!authState.isGuest() && !showForm()) {
     <pt-button variant="secondary" type="button" (click)="showForm.set(true)">
       Add medical record

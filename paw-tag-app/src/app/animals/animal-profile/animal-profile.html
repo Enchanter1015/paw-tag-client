@@ -8,7 +8,7 @@
       <div class="animal-profile-header">
         <pt-avatar size="lg" [name]="animal.name"></pt-avatar>
         <div class="animal-profile-heading">
-          <h1 class="animal-profile-name">{{ animal.name }}</h1>
+          <h3 class="animal-profile-name">{{ animal.name }}</h3>
           <span class="animal-profile-id">{{ animal.id }}</span>
         </div>
         <pt-tag [variant]="animal.isStreet ? 'info' : 'neutral'">
@@ -91,14 +91,9 @@
 
       <div class="animal-profile-actions">
         <pt-button variant="secondary" [routerLink]="['/animals', animal.id, 'qr']">View QR code</pt-button>
-        @if (!authState.isGuest()) {
-          <pt-button variant="secondary" (click)="startEditing()">Edit animal</pt-button>
-        }
       </div>
     } @else {
       <form class="animal-profile-form" [formGroup]="form" (ngSubmit)="save()">
-        <h1 class="animal-profile-name">Edit animal</h1>
-
         <pt-input label="Name" formControlName="name" [error]="nameError()"></pt-input>
 
         <pt-input label="Date of birth (optional)" type="text" placeholder="YYYY-MM-DD" formControlName="dob"></pt-input>
@@ -127,12 +122,7 @@
           <p class="animal-profile-error">{{ formError() }}</p>
         }
 
-        <div class="animal-profile-actions">
-          <pt-button variant="secondary" type="button" (click)="cancelEditing()">Cancel</pt-button>
-          <pt-button type="submit" [disabled]="saving()">
-            {{ saving() ? 'Saving…' : 'Save changes' }}
-          </pt-button>
-        </div>
+        <button type="submit" hidden [disabled]="saving()"></button>
       </form>
     }
   }

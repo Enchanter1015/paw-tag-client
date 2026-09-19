@@ -6,6 +6,7 @@ import { AnimalsService } from '../../core/services/animals.service';
 import { LookupsService } from '../../core/services/lookups.service';
 import { MedicalRecordsService } from '../../core/services/medical-records.service';
 import { AuthStateService } from '../../core/services/auth-state.service';
+import { PageHeaderService } from '../../core/services/page-header.service';
 import { Animal, ApiError, Lookup, MedicalRecord } from '../../core/models/models';
 import { DueStatus, formatDate, getDueStatus, sortByAdministeredAtDesc } from '../../core/utils/medical-record-status.util';
 import { PtAvatar } from '../../shared/pt-avatar/pt-avatar';
@@ -28,6 +29,7 @@ export class AnimalProfile {
   private readonly lookupsService = inject(LookupsService);
   private readonly medicalRecordsService = inject(MedicalRecordsService);
   protected readonly authState = inject(AuthStateService);
+  private readonly pageHeader = inject(PageHeaderService);
   private readonly route = inject(ActivatedRoute);
 
   readonly animal = signal<Animal | null>(null);
@@ -64,6 +66,8 @@ export class AnimalProfile {
   });
 
   constructor() {
+    this.updateHeader();
+
     this.lookupsService.getAnimalTypes().subscribe((types) => this.animalTypes.set(types));
     this.lookupsService.getMedicalRecordTypes().subscribe((types) => this.medicalRecordTypes.set(types));
 
@@ -78,6 +82,7 @@ export class AnimalProfile {
       next: (animal) => {
         this.animal.set(animal);
         this.loading.set(false);
+        this.updateHeader();
       },
       error: () => {
         this.notFound.set(true);
@@ -163,11 +168,13 @@ export class AnimalProfile {
     });
     this.formError.set(null);
     this.editing.set(true);
+    this.updateHeader();
   }
 
   cancelEditing(): void {
     this.editing.set(false);
     this.formError.set(null);
+    this.updateHeader();
   }
 
   save(): void {
@@ -198,12 +205,36 @@ export class AnimalProfile {
           this.saving.set(false);
           this.animal.set(updated);
           this.editing.set(false);
+          this.updateHeader();
         },
         error: (response: HttpErrorResponse) => {
           this.saving.set(false);
           this.applyServerError(response);
         },
       });
+  }
+
+  private updateHeader(): void {
+    if (this.editing()) {
+      this.pageHeader.set({
+        title: () => `Edit ${this.animal()?.name ?? ''}`.trim(),
+        left: { kind: 'close', onClick: () => this.cancelEditing() },
+        action: {
+          kind: 'save',
+          label: () => (this.saving() ? 'Saving…' : 'Save'),
+          disabled: () => this.saving(),
+          onClick: () => this.save(),
+        },
+      });
+      return;
+    }
+
+    this.pageHeader.set({
+      title: () => this.animal()?.name ?? 'Animal profile',
+      left: { kind: 'back' },
+      action:
+        !this.authState.isGuest() && this.animal() ? { kind: 'edit', onClick: () => this.startEditing() } : undefined,
+    });
   }
 
   private applyServerError(response: HttpErrorResponse): void {

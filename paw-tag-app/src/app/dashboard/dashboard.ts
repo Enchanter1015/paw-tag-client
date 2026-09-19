@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
+import { PageHeaderService } from '../core/services/page-header.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -7,4 +8,8 @@ import { Component } from '@angular/core';
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',
 })
-export class Dashboard {}
+export class Dashboard {
+  constructor() {
+    inject(PageHeaderService).set({ title: () => 'Home', left: { kind: 'none' } });
+  }
+}
