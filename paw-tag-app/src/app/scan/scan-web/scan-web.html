@@ -1,0 +1,33 @@
+<div class="scan-screen">
+  <h1 class="scan-title">Scan a PawTag</h1>
+  <p class="scan-subtitle">Tap the tag with an NFC-enabled phone, use the camera, or enter the animal ID manually.</p>
+
+  @if (cameraOpen()) {
+    <app-qr-scanner (scanned)="onScanned($event)" (cameraError)="onCameraError($event)"></app-qr-scanner>
+    <pt-button variant="secondary" [full]="true" (click)="closeCamera()">Cancel scan</pt-button>
+  } @else {
+    <pt-button [full]="true" (click)="toggleCamera()">Scan with camera</pt-button>
+  }
+
+  <div class="scan-divider">or</div>
+
+  <form class="scan-form" [formGroup]="form" (ngSubmit)="submit()">
+    <pt-input
+      label="Animal ID"
+      placeholder="Enter animal ID manually"
+      formControlName="animalId"
+      [error]="animalId.touched && animalId.hasError('required') ? 'Enter an animal ID.' : null"
+    ></pt-input>
+
+    @if (lookupError()) {
+      <p class="scan-error">
+        {{ lookupError() }}
+        <button type="button" class="scan-retry" (click)="retry()">Try again</button>
+      </p>
+    }
+
+    <pt-button type="submit" [full]="true" [disabled]="resolving()">
+      {{ resolving() ? 'Looking up…' : 'Find animal' }}
+    </pt-button>
+  </form>
+</div>

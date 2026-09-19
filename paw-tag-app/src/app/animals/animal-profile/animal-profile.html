@@ -89,11 +89,12 @@
         </section>
       }
 
-      @if (!authState.isGuest()) {
-        <div class="animal-profile-actions">
+      <div class="animal-profile-actions">
+        <pt-button variant="secondary" [routerLink]="['/animals', animal.id, 'qr']">View QR code</pt-button>
+        @if (!authState.isGuest()) {
           <pt-button variant="secondary" (click)="startEditing()">Edit animal</pt-button>
-        </div>
-      }
+        }
+      </div>
     } @else {
       <form class="animal-profile-form" [formGroup]="form" (ngSubmit)="save()">
         <h1 class="animal-profile-name">Edit animal</h1>

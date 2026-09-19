@@ -1,0 +1,34 @@
+<div class="animal-qr-screen">
+  @if (loading()) {
+    <p class="animal-qr-status">Loading…</p>
+  } @else if (notFound()) {
+    <p class="animal-qr-status animal-qr-status--error">Animal not found.</p>
+  } @else if (animal(); as animal) {
+    <pt-card>
+      <div class="animal-qr-header">
+        <pt-avatar size="lg" [name]="animal.name"></pt-avatar>
+        <div class="animal-qr-heading">
+          <h1 class="animal-qr-name">{{ animal.name }}</h1>
+          <span class="animal-qr-id">{{ animal.id }}</span>
+        </div>
+      </div>
+
+      <div class="animal-qr-image-wrap">
+        @if (qrDataUrl(); as qrDataUrl) {
+          <img class="animal-qr-image" [src]="qrDataUrl" [alt]="'QR code for ' + animal.name" />
+        } @else {
+          <p class="animal-qr-status">Generating QR code…</p>
+        }
+      </div>
+
+      <p class="animal-qr-hint">
+        Scan this tag with a phone camera or the PawTag scanner to open {{ animal.name }}'s profile.
+      </p>
+
+      <div class="animal-qr-actions">
+        <pt-button variant="secondary" [routerLink]="['/animals', animal.id]">Back to profile</pt-button>
+        <pt-button [disabled]="!qrDataUrl()" (click)="download()">Download QR code</pt-button>
+      </div>
+    </pt-card>
+  }
+</div>

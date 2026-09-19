@@ -1,0 +1,61 @@
+:host {
+  display: block;
+}
+
+.scan-screen {
+  max-width: var(--pt-content-narrow);
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--pt-space-4);
+}
+
+.scan-title {
+  margin: 0;
+  font-size: 20px;
+  line-height: 26px;
+  font-weight: 700;
+  color: var(--pt-ink);
+}
+
+.scan-subtitle {
+  margin: 0;
+  font-size: 14px;
+  color: var(--pt-ink-muted);
+}
+
+.scan-divider {
+  text-align: center;
+  font-size: 13px;
+  color: var(--pt-ink-muted);
+}
+
+.scan-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pt-space-4);
+}
+
+.scan-error {
+  margin: 0;
+  padding: var(--pt-space-3);
+  border-radius: var(--pt-radius-md);
+  background: var(--pt-danger-surface);
+  color: var(--pt-danger);
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--pt-space-3);
+}
+
+.scan-retry {
+  border: none;
+  background: none;
+  color: inherit;
+  font-weight: 600;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 0;
+  font-size: 14px;
+}
