@@ -1,0 +1,558 @@
+<?xml version="1.0" ?>
+<backlog project="SCRUM" filter="labels = frontend" exportedAt="2026-09-18" count="22">
+  <issue key="SCRUM-18" id="10017">
+    <url>https://shaanu1016.atlassian.net/browse/SCRUM-18</url>
+    <summary>[Frontend] Frontend application scaffold and API integration layer</summary>
+    <issueType>Story</issueType>
+    <status>Done</status>
+    <statusCategory>Done</statusCategory>
+    <priority>Medium</priority>
+    <labels>
+      <label>P1</label>
+      <label>frontend</label>
+      <label>sprint-1</label>
+    </labels>
+    <storyPoints>5</storyPoints>
+    <sprints>
+      <sprint>SCRUM Sprint 2</sprint>
+    </sprints>
+    <epic key="SCRUM-5">Foundation &amp; Architecture</epic>
+    <assignee/>
+    <reporter>Nishan Shan</reporter>
+    <created>2026-09-15T16:09:35.523+0530</created>
+    <updated>2026-09-18T23:14:43.542+0530</updated>
+    <description>As a frontend developer, I want a responsive web application scaffold (routing, base layout, and a typed API client) so that feature screens can be built on a consistent, connected foundation.
+Acceptance Criteria:
+* Given the scaffold, when a new screen is added, then it can call the backend REST API through a single shared client with consistent error handling.
+* Given the app is opened on a phone-sized viewport, when the base layout renders, then navigation and content remain usable without horizontal scrolling.
+</description>
+  </issue>
+  <issue key="SCRUM-23" id="10022">
+    <url>https://shaanu1016.atlassian.net/browse/SCRUM-23</url>
+    <summary>[Frontend] Registration and login screens</summary>
+    <issueType>Story</issueType>
+    <status>In Progress</status>
+    <statusCategory>In Progress</statusCategory>
+    <priority>Medium</priority>
+    <labels>
+      <label>P1</label>
+      <label>frontend</label>
+      <label>sprint-1</label>
+    </labels>
+    <storyPoints>5</storyPoints>
+    <sprints>
+      <sprint>SCRUM Sprint 2</sprint>
+    </sprints>
+    <epic key="SCRUM-6">Authentication &amp; Access Control</epic>
+    <assignee/>
+    <reporter>Nishan Shan</reporter>
+    <created>2026-09-15T16:09:52.412+0530</created>
+    <updated>2026-09-18T23:14:55.454+0530</updated>
+    <description>As a new or returning user, I want clear registration and login screens so that I can create an account or sign in without confusion.
+Acceptance Criteria:
+* Given the registration screen, when I submit invalid data (e.g. weak password, duplicate email), then I see an inline, field-specific error.
+* Given valid credentials on the login screen, when I submit, then I am redirected to the screen appropriate to my role.
+</description>
+  </issue>
+  <issue key="SCRUM-24" id="10023">
+    <url>https://shaanu1016.atlassian.net/browse/SCRUM-24</url>
+    <summary>[Frontend] Logout control and protected route handling</summary>
+    <issueType>Story</issueType>
+    <status>To Do</status>
+    <statusCategory>To Do</statusCategory>
+    <priority>Medium</priority>
+    <labels>
+      <label>P2</label>
+      <label>frontend</label>
+      <label>sprint-1</label>
+    </labels>
+    <storyPoints>3</storyPoints>
+    <sprints>
+      <sprint>SCRUM Sprint 2</sprint>
+    </sprints>
+    <epic key="SCRUM-6">Authentication &amp; Access Control</epic>
+    <assignee/>
+    <reporter>Nishan Shan</reporter>
+    <created>2026-09-15T16:09:56.085+0530</created>
+    <updated>2026-09-18T22:47:19.676+0530</updated>
+    <description>As a logged-in user, I want a visible logout control and to be redirected away from protected screens once logged out so that my session ends cleanly.
+Acceptance Criteria:
+* Given I am logged in, when I select &quot;Log out&quot;, then my session is cleared and I am returned to a public screen.
+* Given I am logged out, when I try to navigate directly to a protected URL, then I am redirected to the login screen.
+</description>
+  </issue>
+  <issue key="SCRUM-25" id="10024">
+    <url>https://shaanu1016.atlassian.net/browse/SCRUM-25</url>
+    <summary>[Frontend] Role-based UI (Guest, Registered User, Administrator views)</summary>
+    <issueType>Story</issueType>
+    <status>To Do</status>
+    <statusCategory>To Do</statusCategory>
+    <priority>Medium</priority>
+    <labels>
+      <label>P1</label>
+      <label>frontend</label>
+      <label>sprint-1</label>
+    </labels>
+    <storyPoints>5</storyPoints>
+    <sprints>
+      <sprint>SCRUM Sprint 2</sprint>
+    </sprints>
+    <epic key="SCRUM-6">Authentication &amp; Access Control</epic>
+    <assignee/>
+    <reporter>Nishan Shan</reporter>
+    <created>2026-09-15T16:09:59.685+0530</created>
+    <updated>2026-09-18T22:47:24.625+0530</updated>
+    <description>As a user of a given role, I want to see only the navigation and actions permitted to me so that the interface matches what I am allowed to do.
+Acceptance Criteria:
+* Given I am a Guest, when I open the app, then I can view dog profiles via QR but cannot see edit or admin controls.
+* Given I am an Administrator, when I open the app, then I see the user-management and record-moderation sections in addition to standard features.
+</description>
+  </issue>
+  <issue key="SCRUM-31" id="10030">
+    <url>https://shaanu1016.atlassian.net/browse/SCRUM-31</url>
+    <summary>[Frontend] Dog registration form</summary>
+    <issueType>Story</issueType>
+    <status>To Do</status>
+    <statusCategory>To Do</statusCategory>
+    <priority>Medium</priority>
+    <labels>
+      <label>P1</label>
+      <label>frontend</label>
+      <label>sprint-2</label>
+    </labels>
+    <storyPoints>8</storyPoints>
+    <sprints>
+      <sprint>SCRUM Sprint 2</sprint>
+    </sprints>
+    <epic key="SCRUM-7">Dog Profile Management</epic>
+    <assignee/>
+    <reporter>Nishan Shan</reporter>
+    <created>2026-09-15T16:10:25.747+0530</created>
+    <updated>2026-09-18T22:48:13.990+0530</updated>
+    <description>As an animal welfare worker, I want a mobile-friendly registration form so that I can register a street dog on-site quickly and accurately.
+Acceptance Criteria:
+* Given I am filling the form on a phone, when I attach a photograph, then it is captured or uploaded and shown as a preview before I submit.
+* Given I submit incomplete required fields, when the form validates, then I am shown exactly which fields need attention.
+</description>
+  </issue>
+  <issue key="SCRUM-32" id="10031">
+    <url>https://shaanu1016.atlassian.net/browse/SCRUM-32</url>
+    <summary>[Frontend] Dog profile view and edit screens</summary>
+    <issueType>Story</issueType>
+    <status>To Do</status>
+    <statusCategory>To Do</statusCategory>
+    <priority>Medium</priority>
+    <labels>
+      <label>P1</label>
+      <label>frontend</label>
+      <label>sprint-2</label>
+    </labels>
+    <storyPoints>5</storyPoints>
+    <sprints>
+      <sprint>SCRUM Sprint 2</sprint>
+    </sprints>
+    <epic key="SCRUM-7">Dog Profile Management</epic>
+    <assignee/>
+    <reporter>Nishan Shan</reporter>
+    <created>2026-09-15T16:10:29.223+0530</created>
+    <updated>2026-09-18T22:48:16.678+0530</updated>
+    <description>As a user, I want to view a dog's profile and, if permitted, edit it so that I can check or correct its details.
+Acceptance Criteria:
+* Given I open a dog's profile as a Guest, when the screen renders, then only publicly permitted information is shown and no edit controls appear.
+* Given I open a dog's profile as an authorised role, when I edit and save, then the updated information is reflected immediately.
+</description>
+  </issue>
+  <issue key="SCRUM-33" id="10032">
+    <url>https://shaanu1016.atlassian.net/browse/SCRUM-33</url>
+    <summary>[Frontend] Dog search screen (by ID)</summary>
+    <issueType>Story</issueType>
+    <status>To Do</status>
+    <statusCategory>To Do</statusCategory>
+    <priority>Medium</priority>
+    <labels>
+      <label>P2</label>
+      <label>frontend</label>
+      <label>sprint-2</label>
+    </labels>
+    <storyPoints>5</storyPoints>
+    <sprints>
+      <sprint>SCRUM Sprint 2</sprint>
+    </sprints>
+    <epic key="SCRUM-7">Dog Profile Management</epic>
+    <assignee/>
+    <reporter>Nishan Shan</reporter>
+    <created>2026-09-15T16:10:32.227+0530</created>
+    <updated>2026-09-18T22:48:44.412+0530</updated>
+    <description>As a user, I want to search for dogs by keyword or location so that I can find the dog I'm looking for without scrolling a full list.
+Acceptance Criteria:
+* Given I enter a search term, when results load, then matching dogs are shown with enough detail (photo, ID, status) to identify the right one.
+* Given I search by location, when results load, then they are shown ordered by distance, with the option to view on a map if available.
+</description>
+  </issue>
+  <issue key="SCRUM-34" id="10033">
+    <url>https://shaanu1016.atlassian.net/browse/SCRUM-34</url>
+    <summary>[Frontend] Mobile-responsive layout across dog management screens</summary>
+    <issueType>Story</issueType>
+    <status>To Do</status>
+    <statusCategory>To Do</statusCategory>
+    <priority>Medium</priority>
+    <labels>
+      <label>P2</label>
+      <label>frontend</label>
+      <label>sprint-2</label>
+    </labels>
+    <storyPoints>5</storyPoints>
+    <sprints/>
+    <epic key="SCRUM-7">Dog Profile Management</epic>
+    <assignee/>
+    <reporter>Nishan Shan</reporter>
+    <created>2026-09-15T16:10:35.414+0530</created>
+    <updated>2026-09-15T16:27:05.202+0530</updated>
+    <description>As a field worker using a phone, I want the registration, profile and search screens to adapt to small screens so that I can use them comfortably in the field.
+Acceptance Criteria:
+* Given a screen width of 360-420px, when any dog-management screen renders, then all controls are reachable without horizontal scrolling and touch targets are appropriately sized.
+</description>
+  </issue>
+  <issue key="SCRUM-35" id="10034">
+    <url>https://shaanu1016.atlassian.net/browse/SCRUM-35</url>
+    <summary>[Frontend] Administrator dog records management screen</summary>
+    <issueType>Story</issueType>
+    <status>To Do</status>
+    <statusCategory>To Do</statusCategory>
+    <priority>Medium</priority>
+    <labels>
+      <label>P2</label>
+      <label>frontend</label>
+      <label>sprint-2</label>
+    </labels>
+    <storyPoints>5</storyPoints>
+    <sprints/>
+    <epic key="SCRUM-7">Dog Profile Management</epic>
+    <assignee/>
+    <reporter>Nishan Shan</reporter>
+    <created>2026-09-15T16:10:38.834+0530</created>
+    <updated>2026-09-15T16:27:08.244+0530</updated>
+    <description>As an administrator, I want a screen listing all dog records with edit/merge/remove actions so that I can maintain data quality.
+Acceptance Criteria:
+* Given I am an administrator, when I open the records-management screen, then I can filter, edit, merge or remove records, with a confirmation step before any destructive action.
+</description>
+  </issue>
+  <issue key="SCRUM-37" id="10036">
+    <url>https://shaanu1016.atlassian.net/browse/SCRUM-37</url>
+    <summary>[Frontend] Vaccination record entry and history screens</summary>
+    <issueType>Story</issueType>
+    <status>To Do</status>
+    <statusCategory>To Do</statusCategory>
+    <priority>Medium</priority>
+    <labels>
+      <label>P1</label>
+      <label>frontend</label>
+      <label>sprint-3</label>
+    </labels>
+    <storyPoints>5</storyPoints>
+    <sprints/>
+    <epic key="SCRUM-8">Vaccination Tracking</epic>
+    <assignee/>
+    <reporter>Nishan Shan</reporter>
+    <created>2026-09-15T16:10:50.914+0530</created>
+    <updated>2026-09-15T16:27:18.370+0530</updated>
+    <description>As a veterinarian or animal welfare worker, I want to add a vaccination record and view a dog's vaccination history so that I can keep and check its rabies/vaccine status at a glance.
+Acceptance Criteria:
+* Given I open a dog's profile, when I add a vaccination record, then it appears immediately at the top of the vaccination history list.
+* Given a dog has overdue vaccinations, when I view its history, then overdue entries are visually flagged.
+</description>
+  </issue>
+  <issue key="SCRUM-39" id="10038">
+    <url>https://shaanu1016.atlassian.net/browse/SCRUM-39</url>
+    <summary>[Frontend] Sterilisation record entry and status screens</summary>
+    <issueType>Story</issueType>
+    <status>To Do</status>
+    <statusCategory>To Do</statusCategory>
+    <priority>Medium</priority>
+    <labels>
+      <label>P2</label>
+      <label>frontend</label>
+      <label>sprint-3</label>
+    </labels>
+    <storyPoints>3</storyPoints>
+    <sprints/>
+    <epic key="SCRUM-9">Sterilisation Tracking</epic>
+    <assignee/>
+    <reporter>Nishan Shan</reporter>
+    <created>2026-09-15T16:10:58.123+0530</created>
+    <updated>2026-09-15T16:27:25.098+0530</updated>
+    <description>As a veterinarian, I want to record and view a dog's sterilisation status so that I can quickly confirm whether a dog still needs the procedure.
+Acceptance Criteria:
+* Given I open a dog's profile, when sterilisation status is set, then it is shown clearly (e.g. a status badge) on the profile summary.
+</description>
+  </issue>
+  <issue key="SCRUM-42" id="10041">
+    <url>https://shaanu1016.atlassian.net/browse/SCRUM-42</url>
+    <summary>[Frontend] Medical treatment entry and history screens</summary>
+    <issueType>Story</issueType>
+    <status>To Do</status>
+    <statusCategory>To Do</statusCategory>
+    <priority>Medium</priority>
+    <labels>
+      <label>P1</label>
+      <label>frontend</label>
+      <label>sprint-3</label>
+    </labels>
+    <storyPoints>5</storyPoints>
+    <sprints/>
+    <epic key="SCRUM-10">Medical Treatment Tracking</epic>
+    <assignee/>
+    <reporter>Nishan Shan</reporter>
+    <created>2026-09-15T16:11:09.664+0530</created>
+    <updated>2026-09-15T16:27:34.268+0530</updated>
+    <description>As a veterinarian or animal welfare worker, I want to record a treatment and view a dog's treatment history so that ongoing care for wounds or illness is coordinated between everyone involved.
+Acceptance Criteria:
+* Given I add a treatment record, when I save it, then it appears in the dog's treatment history with my identity and the date.
+* Given a treatment record is unverified, when a veterinarian views it, then a &quot;verify&quot; action is available.
+</description>
+  </issue>
+  <issue key="SCRUM-43" id="10042">
+    <url>https://shaanu1016.atlassian.net/browse/SCRUM-43</url>
+    <summary>[Frontend] Dog health summary view</summary>
+    <issueType>Story</issueType>
+    <status>To Do</status>
+    <statusCategory>To Do</statusCategory>
+    <priority>Medium</priority>
+    <labels>
+      <label>P2</label>
+      <label>frontend</label>
+      <label>sprint-3</label>
+    </labels>
+    <storyPoints>3</storyPoints>
+    <sprints/>
+    <epic key="SCRUM-10">Medical Treatment Tracking</epic>
+    <assignee/>
+    <reporter>Nishan Shan</reporter>
+    <created>2026-09-15T16:11:12.815+0530</created>
+    <updated>2026-09-15T16:27:37.397+0530</updated>
+    <description>As any user, I want a health summary section on a dog's profile so that I can immediately see whether it's vaccinated, sterilised and free of unresolved treatments.
+Acceptance Criteria:
+* Given a dog's profile is open, when the health summary loads, then vaccination, sterilisation and treatment status are each shown with a clear up-to-date/overdue indicator.
+</description>
+  </issue>
+  <issue key="SCRUM-46" id="10045">
+    <url>https://shaanu1016.atlassian.net/browse/SCRUM-46</url>
+    <summary>[Frontend] QR code display and download for dog profile</summary>
+    <issueType>Story</issueType>
+    <status>To Do</status>
+    <statusCategory>To Do</statusCategory>
+    <priority>Medium</priority>
+    <labels>
+      <label>P2</label>
+      <label>frontend</label>
+      <label>sprint-4</label>
+    </labels>
+    <storyPoints>3</storyPoints>
+    <sprints/>
+    <epic key="SCRUM-11">QR Code Identification</epic>
+    <assignee/>
+    <reporter>Nishan Shan</reporter>
+    <created>2026-09-15T16:11:28.547+0530</created>
+    <updated>2026-09-15T16:27:49.375+0530</updated>
+    <description>As an animal welfare worker, I want to view and download/print a dog's QR code so that it can be attached to the dog's collar band.
+Acceptance Criteria:
+* Given a dog's profile is open, when I select &quot;View QR code&quot;, then the code is displayed and can be downloaded as an image.
+</description>
+  </issue>
+  <issue key="SCRUM-47" id="10046">
+    <url>https://shaanu1016.atlassian.net/browse/SCRUM-47</url>
+    <summary>[Frontend] QR scanning workflow and invalid-code handling</summary>
+    <issueType>Story</issueType>
+    <status>To Do</status>
+    <statusCategory>To Do</statusCategory>
+    <priority>Medium</priority>
+    <labels>
+      <label>P1</label>
+      <label>frontend</label>
+      <label>sprint-4</label>
+    </labels>
+    <storyPoints>8</storyPoints>
+    <sprints/>
+    <epic key="SCRUM-11">QR Code Identification</epic>
+    <assignee/>
+    <reporter>Nishan Shan</reporter>
+    <created>2026-09-15T16:11:32.075+0530</created>
+    <updated>2026-09-15T16:27:51.917+0530</updated>
+    <description>As any user with a phone, I want to scan a dog's QR code and be taken straight to its profile, with a clear message if the code isn't recognised, so that I can quickly check on a dog I've found.
+Acceptance Criteria:
+* Given I scan a valid QR code, when the camera recognises it, then I am taken directly to that dog's profile without extra steps.
+* Given I scan an invalid or damaged code, when resolution fails, then I see a plain-language error explaining the code wasn't recognised, with an option to try again.
+</description>
+  </issue>
+  <issue key="SCRUM-50" id="10049">
+    <url>https://shaanu1016.atlassian.net/browse/SCRUM-50</url>
+    <summary>[Frontend] Record verification screen</summary>
+    <issueType>Story</issueType>
+    <status>To Do</status>
+    <statusCategory>To Do</statusCategory>
+    <priority>Medium</priority>
+    <labels>
+      <label>P2</label>
+      <label>frontend</label>
+      <label>sprint-4</label>
+    </labels>
+    <storyPoints>5</storyPoints>
+    <sprints/>
+    <epic key="SCRUM-12">Record Verification &amp; User Administration</epic>
+    <assignee/>
+    <reporter>Nishan Shan</reporter>
+    <created>2026-09-15T16:11:42.480+0530</created>
+    <updated>2026-09-15T16:28:01.507+0530</updated>
+    <description>As a veterinarian, I want a screen listing unverified records so that I can review and verify or reject them efficiently.
+Acceptance Criteria:
+* Given unverified records exist, when I open the verification screen, then they are listed with enough context (dog, submitter, date, details) to make a decision without navigating away.
+</description>
+  </issue>
+  <issue key="SCRUM-51" id="10050">
+    <url>https://shaanu1016.atlassian.net/browse/SCRUM-51</url>
+    <summary>[Frontend] User management screen (administrator)</summary>
+    <issueType>Story</issueType>
+    <status>To Do</status>
+    <statusCategory>To Do</statusCategory>
+    <priority>Medium</priority>
+    <labels>
+      <label>P2</label>
+      <label>frontend</label>
+      <label>sprint-4</label>
+    </labels>
+    <storyPoints>5</storyPoints>
+    <sprints/>
+    <epic key="SCRUM-12">Record Verification &amp; User Administration</epic>
+    <assignee/>
+    <reporter>Nishan Shan</reporter>
+    <created>2026-09-15T16:11:46.257+0530</created>
+    <updated>2026-09-15T16:28:04.945+0530</updated>
+    <description>As an administrator, I want a screen to view and manage registered users so that I can adjust roles and deactivate accounts when needed.
+Acceptance Criteria:
+* Given the user list is open, when I change a user's role or deactivate them, then the change is confirmed before being applied and reflected immediately in the list.
+</description>
+  </issue>
+  <issue key="SCRUM-53" id="10052">
+    <url>https://shaanu1016.atlassian.net/browse/SCRUM-53</url>
+    <summary>[Frontend] Dashboard screen with KPI cards and charts</summary>
+    <issueType>Story</issueType>
+    <status>To Do</status>
+    <statusCategory>To Do</statusCategory>
+    <priority>Medium</priority>
+    <labels>
+      <label>P2</label>
+      <label>frontend</label>
+      <label>sprint-5</label>
+    </labels>
+    <storyPoints>8</storyPoints>
+    <sprints/>
+    <epic key="SCRUM-13">Reporting Dashboard</epic>
+    <assignee/>
+    <reporter>Nishan Shan</reporter>
+    <created>2026-09-15T16:11:58.594+0530</created>
+    <updated>2026-09-15T16:28:14.188+0530</updated>
+    <description>As an administrator or stakeholder, I want a dashboard showing key statistics and charts so that I can understand programme coverage and progress at a glance.
+Acceptance Criteria:
+* Given the dashboard loads, when statistics are displayed, then total dogs, vaccination coverage and sterilisation coverage are each shown as a KPI card and reflected in at least one chart.
+* Given the underlying data changes, when the dashboard is refreshed, then the figures update to match.
+</description>
+  </issue>
+  <issue key="SCRUM-55" id="10054">
+    <url>https://shaanu1016.atlassian.net/browse/SCRUM-55</url>
+    <summary>[Frontend] Offline access support</summary>
+    <issueType>Story</issueType>
+    <status>To Do</status>
+    <statusCategory>To Do</statusCategory>
+    <priority>Medium</priority>
+    <labels>
+      <label>P2</label>
+      <label>frontend</label>
+      <label>sprint-5</label>
+    </labels>
+    <storyPoints>8</storyPoints>
+    <sprints/>
+    <epic key="SCRUM-14">Mobile, Offline &amp; Theming</epic>
+    <assignee/>
+    <reporter>Nishan Shan</reporter>
+    <created>2026-09-15T16:12:05.928+0530</created>
+    <updated>2026-09-15T16:28:21.255+0530</updated>
+    <description>As a field worker in an area with poor connectivity, I want to view previously loaded dog information while offline so that I can still work without a signal.
+Acceptance Criteria:
+* Given dog data was loaded while online, when the device loses connectivity, then previously viewed profiles remain accessible from local cache.
+* Given I am offline, when I attempt an action requiring the network, then I see a clear indicator that I am offline rather than a silent failure.
+</description>
+  </issue>
+  <issue key="SCRUM-56" id="10055">
+    <url>https://shaanu1016.atlassian.net/browse/SCRUM-56</url>
+    <summary>[Frontend] GPS location capture in registration and search</summary>
+    <issueType>Story</issueType>
+    <status>To Do</status>
+    <statusCategory>To Do</statusCategory>
+    <priority>Medium</priority>
+    <labels>
+      <label>P3</label>
+      <label>frontend</label>
+      <label>sprint-5</label>
+    </labels>
+    <storyPoints>5</storyPoints>
+    <sprints/>
+    <epic key="SCRUM-14">Mobile, Offline &amp; Theming</epic>
+    <assignee/>
+    <reporter>Nishan Shan</reporter>
+    <created>2026-09-15T16:12:08.750+0530</created>
+    <updated>2026-09-15T16:28:24.088+0530</updated>
+    <description>As an animal welfare worker, I want to capture my current GPS location when registering a dog so that its location is recorded automatically and accurately.
+Acceptance Criteria:
+* Given location permission is granted, when I register a dog, then my current coordinates are attached to the record automatically, with the option to adjust manually.
+</description>
+  </issue>
+  <issue key="SCRUM-57" id="10056">
+    <url>https://shaanu1016.atlassian.net/browse/SCRUM-57</url>
+    <summary>[Frontend] Dark and light theme support</summary>
+    <issueType>Story</issueType>
+    <status>To Do</status>
+    <statusCategory>To Do</statusCategory>
+    <priority>Medium</priority>
+    <labels>
+      <label>P3</label>
+      <label>frontend</label>
+      <label>sprint-5</label>
+    </labels>
+    <storyPoints>3</storyPoints>
+    <sprints/>
+    <epic key="SCRUM-14">Mobile, Offline &amp; Theming</epic>
+    <assignee/>
+    <reporter>Nishan Shan</reporter>
+    <created>2026-09-15T16:12:12.571+0530</created>
+    <updated>2026-09-15T16:28:27.685+0530</updated>
+    <description>As a user, I want the app to support both dark and light themes so that it's comfortable to use in different lighting conditions.
+Acceptance Criteria:
+* Given I switch between dark and light mode, when either theme is active, then all screens remain fully legible and usable, matching the selected theme.
+</description>
+  </issue>
+  <issue key="SCRUM-60" id="10059">
+    <url>https://shaanu1016.atlassian.net/browse/SCRUM-60</url>
+    <summary>[Frontend] Offline changes queue and sync status UI</summary>
+    <issueType>Story</issueType>
+    <status>To Do</status>
+    <statusCategory>To Do</statusCategory>
+    <priority>Medium</priority>
+    <labels>
+      <label>P2</label>
+      <label>frontend</label>
+      <label>sprint-6</label>
+    </labels>
+    <storyPoints>5</storyPoints>
+    <sprints/>
+    <epic key="SCRUM-15">Data Synchronisation &amp; Backup</epic>
+    <assignee/>
+    <reporter>Nishan Shan</reporter>
+    <created>2026-09-15T16:12:22.396+0530</created>
+    <updated>2026-09-15T16:28:37.943+0530</updated>
+    <description>As a field worker, I want to see which of my offline changes are pending sync and which have succeeded or conflicted so that I trust the data I entered was saved.
+Acceptance Criteria:
+* Given I made changes while offline, when connectivity returns, then I see a sync status indicator progress from &quot;pending&quot; to &quot;synced&quot; for each change.
+* Given a change conflicts during sync, when this occurs, then I am shown which record conflicted and prompted to resolve it.
+</description>
+  </issue>
+</backlog>

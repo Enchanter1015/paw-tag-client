@@ -1,0 +1,20 @@
+<div class="pt-shell">
+  <header class="pt-topbar">
+    <span class="pt-topbar-title">PawTag</span>
+    @if (authState.isAuthenticated()) {
+      <button type="button" class="pt-btn pt-btn-ghost" (click)="logout()">Sign out</button>
+    }
+  </header>
+
+  <nav class="pt-nav">
+    <a routerLink="/" routerLinkActive="is-active" [routerLinkActiveOptions]="{ exact: true }">Home</a>
+    <a routerLink="/animals" routerLinkActive="is-active">Animals</a>
+    <a routerLink="/scan" routerLinkActive="is-active">Scan</a>
+    <a routerLink="/records" routerLinkActive="is-active">Records</a>
+    <a routerLink="/profile" routerLinkActive="is-active">Profile</a>
+  </nav>
+
+  <main class="pt-content">
+    <router-outlet />
+  </main>
+</div>

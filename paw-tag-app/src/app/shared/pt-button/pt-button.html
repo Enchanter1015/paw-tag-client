@@ -1,0 +1,12 @@
+<button
+  class="pt-btn"
+  [class.pt-btn--primary]="variant === 'primary'"
+  [class.pt-btn--secondary]="variant === 'secondary'"
+  [class.pt-btn--danger]="variant === 'danger'"
+  [class.pt-btn--ghost]="variant === 'ghost'"
+  [class.pt-btn--full]="full"
+  [type]="type"
+  [disabled]="disabled"
+>
+  <ng-content></ng-content>
+</button>
