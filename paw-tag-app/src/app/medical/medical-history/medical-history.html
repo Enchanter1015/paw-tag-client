@@ -1,0 +1,44 @@
+<div class="medical-history-screen">
+  <div class="medical-history-header">
+    <h1 class="medical-history-title">Medical history</h1>
+    <a class="medical-history-back" [routerLink]="['/animals', animalId]">Back to animal profile</a>
+  </div>
+
+  @if (!authState.isGuest() && !showForm()) {
+    <pt-button variant="secondary" type="button" (click)="showForm.set(true)">
+      Add medical record
+    </pt-button>
+  }
+
+  @if (showForm()) {
+    <app-medical-form
+      [animalId]="animalId"
+      (created)="onRecordCreated($event)"
+      (cancelled)="showForm.set(false)"
+    ></app-medical-form>
+  }
+
+  @if (loading()) {
+    <p class="medical-history-status">Loading…</p>
+  } @else if (loadError()) {
+    <p class="medical-history-status medical-history-status--error">{{ loadError() }}</p>
+  } @else if (records().length === 0) {
+    <p class="medical-history-status">No medical records yet.</p>
+  } @else {
+    <ul class="medical-history-list">
+      @for (record of records(); track record.id) {
+        <li class="medical-record">
+          <div class="medical-record-main">
+            <span class="medical-record-title">{{ record.title }}</span>
+            <span class="medical-record-meta">
+              Administered {{ formatAdministeredAt(record) }}
+            </span>
+          </div>
+          @if (dueStatus(record); as status) {
+            <pt-tag [variant]="status.variant">{{ status.label }}</pt-tag>
+          }
+        </li>
+      }
+    </ul>
+  }
+</div>

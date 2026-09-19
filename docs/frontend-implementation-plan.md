@@ -82,14 +82,14 @@ Commits:
 
 ---
 
-## PR 7 — Vaccination record entry & history
+## PR 7 — Medical record entry & history
 **Ticket:** SCRUM-37
 
 Commits:
-1. `feat(medical): add VaccinationHistoryComponent (MedicalRecordsService.listForAnimal), overdue entries flagged from nextDueDate`
-2. `feat(medical): add VaccinationFormComponent (MedicalRecordsService.addForAnimal), prepend to history on success`
+1. `feat(medical): add MedicalHistoryComponent (MedicalRecordsService.listForAnimal), overdue entries flagged from nextDueDate`
+2. `feat(medical): add MedicalFormComponent (MedicalRecordsService.addForAnimal), prepend to history on success`
 3. `feat(medical): use LookupsService.getMedicalRecordTypes for type select`
-4. `test: VaccinationHistoryComponent (overdue flag logic), VaccinationFormComponent (submit success/validation error)`
+4. `test: MedicalHistoryComponent (overdue flag logic), MedicalFormComponent (submit success/validation error)`
 
 ---
 

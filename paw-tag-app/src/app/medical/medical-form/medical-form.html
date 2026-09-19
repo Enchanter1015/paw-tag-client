@@ -1,0 +1,52 @@
+<form class="medical-form" [formGroup]="form" (ngSubmit)="submit()">
+
+  <div class="field-group">
+    <label class="field-label" for="medicalRecordTypeId">Record type</label>
+    <select id="medicalRecordTypeId" class="field-select" formControlName="medicalRecordTypeId">
+      <option value="" disabled>Select a record type</option>
+      @for (type of medicalRecordTypes(); track type.id) {
+        <option [value]="type.id">{{ type.name }}</option>
+      }
+    </select>
+    @if (medicalRecordTypeError()) {
+      <p class="field-error">{{ medicalRecordTypeError() }}</p>
+    }
+  </div>
+  
+  <pt-input label="Title" placeholder="e.g. Rabies vaccination" formControlName="title" [error]="titleError()"></pt-input>
+
+  <pt-input label="Description (optional)" formControlName="description"></pt-input>
+
+  
+
+  <pt-input
+    label="Prescribed by (vet user ID)"
+    formControlName="prescribedBy"
+    [error]="prescribedByError()"
+  ></pt-input>
+
+  <pt-input
+    label="Administered on"
+    type="text"
+    placeholder="YYYY-MM-DD"
+    formControlName="administeredAt"
+  ></pt-input>
+
+  <pt-input
+    label="Next due date (optional)"
+    type="text"
+    placeholder="YYYY-MM-DD"
+    formControlName="nextDueDate"
+  ></pt-input>
+
+  @if (formError()) {
+    <p class="medical-form-error">{{ formError() }}</p>
+  }
+
+  <div class="medical-form-actions">
+    <pt-button variant="secondary" type="button" (click)="cancelled.emit()">Cancel</pt-button>
+    <pt-button type="submit" [disabled]="submitting()">
+      {{ submitting() ? 'Saving…' : 'Save record' }}
+    </pt-button>
+  </div>
+</form>
