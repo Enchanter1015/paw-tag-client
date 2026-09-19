@@ -1,11 +1,11 @@
 import { Routes } from '@angular/router';
 import { Dashboard } from './dashboard/dashboard';
 import { AppShell } from './shell/app-shell';
-import { LoginPlaceholder } from './auth/login-placeholder';
 import { authGuard } from './core/guards/auth.guard';
+import { authRoutes } from './auth/auth.routes';
 
 export const routes: Routes = [
-  { path: 'login', component: LoginPlaceholder },
+  ...authRoutes,
   {
     path: '',
     component: AppShell,

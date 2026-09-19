@@ -1,0 +1,45 @@
+<div class="auth-screen">
+  <div class="auth-header">
+    <h1 class="auth-title">Create your account</h1>
+    <p class="auth-subtitle">Register to record and track animal health.</p>
+  </div>
+
+  <pt-card>
+    <form class="auth-form" [formGroup]="form" (ngSubmit)="submit()">
+      <pt-input
+        label="Name"
+        autocomplete="name"
+        formControlName="name"
+        [error]="nameError()"
+      ></pt-input>
+
+      <pt-input
+        label="Email"
+        type="email"
+        autocomplete="email"
+        formControlName="email"
+        [error]="emailError()"
+      ></pt-input>
+
+      <pt-input
+        label="Password"
+        type="password"
+        autocomplete="new-password"
+        formControlName="password"
+        [error]="passwordError()"
+      ></pt-input>
+
+      @if (formError()) {
+        <p class="auth-form-error">{{ formError() }}</p>
+      }
+
+      <pt-button type="submit" [full]="true" [disabled]="submitting()">
+        {{ submitting() ? 'Creating account…' : 'Create account' }}
+      </pt-button>
+    </form>
+  </pt-card>
+
+  <p class="auth-switch">
+    Already have an account? <a routerLink="/login">Sign in</a>
+  </p>
+</div>

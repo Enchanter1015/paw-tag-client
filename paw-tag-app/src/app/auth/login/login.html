@@ -1,0 +1,67 @@
+<div class="login-screen">
+  <div class="login-cover">
+    <div class="login-avatar" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path
+          d="M8.5 8.5a1.75 1.75 0 1 0 0-3.5 1.75 1.75 0 0 0 0 3.5ZM15.5 8.5a1.75 1.75 0 1 0 0-3.5 1.75 1.75 0 0 0 0 3.5ZM5.5 12.75a1.75 1.75 0 1 0 0-3.5 1.75 1.75 0 0 0 0 3.5ZM18.5 12.75a1.75 1.75 0 1 0 0-3.5 1.75 1.75 0 0 0 0 3.5ZM12 21c-2.9 0-5.25-1.63-5.25-4.05 0-2.05 1.77-2.7 2.95-3.83C10.85 12.1 11.15 11 12 11s1.15 1.1 2.3 2.12c1.18 1.13 2.95 1.78 2.95 3.83C17.25 19.37 14.9 21 12 21Z"
+          fill="currentColor"
+        />
+      </svg>
+    </div>
+    <h1 class="login-title">Welcome back</h1>
+    <p class="login-subtitle">Sign in to PawTag</p>
+  </div>
+
+  <div class="login-body">
+    <form class="login-form" [formGroup]="form" (ngSubmit)="submit()">
+      <pt-input
+        label="Email or contact number"
+        type="email"
+        placeholder="you@example.com"
+        autocomplete="email"
+        formControlName="email"
+        [error]="emailError()"
+      ></pt-input>
+
+      <pt-input
+        label="Password"
+        type="password"
+        autocomplete="current-password"
+        formControlName="password"
+        [error]="passwordError()"
+      ></pt-input>
+
+      <div class="login-forgot">
+        <button type="button" class="login-link-btn">Forgot password?</button>
+      </div>
+
+      @if (formError()) {
+        <p class="login-form-error">{{ formError() }}</p>
+      }
+
+      <pt-button type="submit" [full]="true" [disabled]="submitting()">
+        {{ submitting() ? 'Signing in…' : 'Sign in' }}
+      </pt-button>
+    </form>
+
+    <div class="login-divider">
+      <span>or</span>
+    </div>
+
+    <pt-button variant="secondary" [full]="true">
+      <span class="login-scan-content">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <rect x="3" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.6" />
+          <rect x="14" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.6" />
+          <rect x="3" y="14" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.6" />
+          <rect x="14" y="14" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.6" />
+        </svg>
+        Scan a collar instead
+      </span>
+    </pt-button>
+
+    <p class="login-switch">
+      Don't have an account? <a routerLink="/register">Sign up</a>
+    </p>
+  </div>
+</div>

@@ -1,0 +1,130 @@
+:host {
+  display: block;
+  min-height: 100%;
+  background: var(--pt-surface-50);
+}
+
+.login-screen {
+  max-width: var(--pt-content-narrow);
+  margin: 0 auto;
+}
+
+.login-cover {
+  background: var(--pt-brand-tint);
+  padding: var(--pt-space-6) var(--pt-space-4) var(--pt-space-5);
+  border-radius: 0 0 var(--pt-radius-lg) var(--pt-radius-lg);
+}
+
+.login-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: var(--pt-radius-full);
+  background: var(--pt-brand);
+  color: var(--pt-on-brand);
+  margin-bottom: var(--pt-space-4);
+
+  svg {
+    width: 28px;
+    height: 28px;
+  }
+}
+
+.login-title {
+  margin: 0 0 var(--pt-space-1);
+  font-size: 26px;
+  line-height: 32px;
+  font-weight: 700;
+  color: var(--pt-ink);
+}
+
+.login-subtitle {
+  margin: 0;
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--pt-ink-muted);
+}
+
+.login-body {
+  padding: var(--pt-space-5) var(--pt-space-4) var(--pt-space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--pt-space-5);
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pt-space-4);
+}
+
+.login-forgot {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: calc(-1 * var(--pt-space-2));
+}
+
+.login-link-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--pt-accent);
+  cursor: pointer;
+
+  &:focus-visible {
+    outline: 3px solid var(--pt-focus-ring);
+    outline-offset: 2px;
+  }
+}
+
+.login-form-error {
+  margin: 0;
+  padding: var(--pt-space-3);
+  border-radius: var(--pt-radius-md);
+  background: var(--pt-danger-surface);
+  color: var(--pt-danger);
+  font-size: 14px;
+}
+
+.login-divider {
+  display: flex;
+  align-items: center;
+  gap: var(--pt-space-3);
+  color: var(--pt-ink-faint);
+  font-size: 13px;
+
+  &::before,
+  &::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--pt-border);
+  }
+}
+
+.login-scan-content {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--pt-space-2);
+
+  svg {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+.login-switch {
+  text-align: center;
+  margin: 0;
+  font-size: 14px;
+  color: var(--pt-ink-muted);
+
+  a {
+    color: var(--pt-accent);
+    font-weight: 600;
+  }
+}

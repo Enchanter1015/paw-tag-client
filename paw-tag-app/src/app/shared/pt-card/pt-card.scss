@@ -1,0 +1,10 @@
+:host {
+  display: block;
+}
+
+.pt-card {
+  background: var(--pt-surface-100);
+  border: 1px solid var(--pt-border);
+  border-radius: var(--pt-radius-lg);
+  padding: var(--pt-space-4);
+}
