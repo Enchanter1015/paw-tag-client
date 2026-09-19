@@ -56,11 +56,12 @@ describe('AnimalProfile', () => {
 
   afterEach(() => httpMock.verify());
 
-  it('shows a read-only view with no edit button for a guest', () => {
+  it('shows a read-only view with a QR code link but no edit button for a guest', () => {
     const fixture = createComponent();
 
-    const editButton = fixture.nativeElement.querySelector('pt-button');
-    expect(editButton).toBeNull();
+    const buttons: HTMLElement[] = Array.from(fixture.nativeElement.querySelectorAll('pt-button'));
+    expect(buttons.some((b) => b.textContent?.includes('Edit animal'))).toBe(false);
+    expect(buttons.some((b) => b.textContent?.includes('View QR code'))).toBe(true);
     expect(fixture.nativeElement.textContent).toContain('Rex');
     expect(fixture.nativeElement.textContent).not.toContain('Add medical record');
   });
