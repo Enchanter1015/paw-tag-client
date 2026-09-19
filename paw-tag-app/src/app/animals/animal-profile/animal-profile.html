@@ -1,0 +1,78 @@
+<div class="animal-profile-screen">
+  @if (loading()) {
+    <p class="animal-profile-status">Loading…</p>
+  } @else if (notFound()) {
+    <p class="animal-profile-status animal-profile-status--error">Animal not found.</p>
+  } @else if (animal(); as animal) {
+    @if (!editing()) {
+      <div class="animal-profile-header">
+        <pt-avatar size="lg" [name]="animal.name"></pt-avatar>
+        <div class="animal-profile-heading">
+          <h1 class="animal-profile-name">{{ animal.name }}</h1>
+          <span class="animal-profile-id">{{ animal.id }}</span>
+        </div>
+        <pt-tag [variant]="animal.isStreet ? 'info' : 'neutral'">
+          {{ animal.isStreet ? 'Street animal' : 'Registered pet' }}
+        </pt-tag>
+      </div>
+
+      <dl class="animal-profile-details">
+        <div class="detail-row">
+          <dt>Animal type</dt>
+          <dd>{{ animalTypeName(animal.animalTypeId) }}</dd>
+        </div>
+        <div class="detail-row">
+          <dt>Breed</dt>
+          <dd>{{ animal.breed || 'Not recorded' }}</dd>
+        </div>
+        <div class="detail-row">
+          <dt>Date of birth</dt>
+          <dd>{{ animal.dob || 'Not recorded' }}</dd>
+        </div>
+      </dl>
+
+      @if (!authState.isGuest()) {
+        <pt-button variant="secondary" (click)="startEditing()">Edit animal</pt-button>
+      }
+    } @else {
+      <form class="animal-profile-form" [formGroup]="form" (ngSubmit)="save()">
+        <h1 class="animal-profile-name">Edit animal</h1>
+
+        <pt-input label="Name" formControlName="name" [error]="nameError()"></pt-input>
+
+        <pt-input label="Date of birth (optional)" type="text" placeholder="YYYY-MM-DD" formControlName="dob"></pt-input>
+
+        <div class="field-group">
+          <label class="field-label" for="animalTypeId">Animal type</label>
+          <select id="animalTypeId" class="field-select" formControlName="animalTypeId">
+            <option value="" disabled>Select an animal type</option>
+            @for (type of animalTypes(); track type.id) {
+              <option [value]="type.id">{{ type.name }}</option>
+            }
+          </select>
+          @if (animalTypeError()) {
+            <p class="field-error">{{ animalTypeError() }}</p>
+          }
+        </div>
+
+        <pt-input label="Breed (optional)" formControlName="breed"></pt-input>
+
+        <label class="field-checkbox">
+          <input type="checkbox" formControlName="isStreet" />
+          Street animal (no known owner)
+        </label>
+
+        @if (formError()) {
+          <p class="animal-profile-error">{{ formError() }}</p>
+        }
+
+        <div class="animal-profile-actions">
+          <pt-button variant="secondary" type="button" (click)="cancelEditing()">Cancel</pt-button>
+          <pt-button type="submit" [disabled]="saving()">
+            {{ saving() ? 'Saving…' : 'Save changes' }}
+          </pt-button>
+        </div>
+      </form>
+    }
+  }
+</div>

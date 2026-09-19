@@ -1,0 +1,23 @@
+:host {
+  display: block;
+  width: fit-content;
+}
+
+.pt-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--pt-radius-full);
+  background: var(--pt-brand-tint);
+  color: var(--pt-brand);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.pt-avatar--lg {
+  width: 72px;
+  height: 72px;
+  font-size: 22px;
+}

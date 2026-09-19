@@ -1,0 +1,37 @@
+:host {
+  display: inline-block;
+}
+
+.pt-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--pt-space-1) var(--pt-space-2);
+  border-radius: var(--pt-radius-sm);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.pt-tag--success {
+  background: var(--pt-success-surface);
+  color: var(--pt-success);
+}
+
+.pt-tag--warning {
+  background: var(--pt-warning-surface);
+  color: var(--pt-warning);
+}
+
+.pt-tag--danger {
+  background: var(--pt-danger-surface);
+  color: var(--pt-danger);
+}
+
+.pt-tag--info {
+  background: var(--pt-info-surface);
+  color: var(--pt-info);
+}
+
+.pt-tag--neutral {
+  background: var(--pt-surface-200);
+  color: var(--pt-ink-muted);
+}
