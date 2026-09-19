@@ -19,6 +19,7 @@
   @if (authState.isAdministrator()) {
     <nav class="pt-admin-nav" aria-label="Administrator">
       <span class="pt-admin-nav-title">Admin</span>
+      <a routerLink="/admin/animals" routerLinkActive="is-active">Animal records</a>
       <a routerLink="/admin/users" routerLinkActive="is-active">User management</a>
       <a routerLink="/admin/verification" routerLinkActive="is-active">Record verification</a>
     </nav>
