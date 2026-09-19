@@ -150,6 +150,13 @@ Commits:
 
 > Note: current OpenAPI spec has no "list all users" endpoint — flag to backend before starting this PR; UI can be built against `GET /users?email=` in the interim with a manual lookup box.
 
+**Status: partially implemented (2026-09-19).** `UserManagementComponent` (`admin/user-management/`) ships at `/admin/users`, admin-gated, with email lookup and edit (name/email/phone/address via `UsersService.update`, including 400 field-error mapping). Commits 2 and 3 above were cut, not stubbed:
+
+- **Role change** — `User`/`UpdateUserInput` in `paw-tag-api` (`users.schema.ts`) expose no `role`/`roleId` field at all. Role only exists as a JWT claim (`AuthUser.role`) and on `VetHospitalMember` (hospital-scoped, not a global user role). There is nothing for `LookupsService.getRoles` + `UsersService.update` to write to.
+- **Deactivate** — there is no deactivate/delete endpoint on `/users` in the current API.
+
+Needs a backend change (expose `roleId` on `User`/`UpdateUserInput`, add a deactivate endpoint) before these two commits can be built for real; until then the UI intentionally omits them rather than wiring controls to non-existent endpoints or faking the behavior client-side.
+
 ---
 
 ## PR 13 — Reporting dashboard (KPIs + charts)
