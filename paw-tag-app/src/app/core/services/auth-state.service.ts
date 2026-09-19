@@ -31,6 +31,12 @@ export class AuthStateService {
     return this.currentUser?.role === role;
   }
 
+  // Case-insensitive match on "admin" since backend role names are inconsistently cased/duplicated
+  // (e.g. "Admin" and "admin" both exist) rather than the clean "Administrator" tier the design assumes.
+  isAdministrator(): boolean {
+    return /admin/i.test(this.currentUser?.role ?? '');
+  }
+
   refresh(): void {
     this.userSubject.next(this.readUser());
   }
