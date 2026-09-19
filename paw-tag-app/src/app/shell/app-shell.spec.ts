@@ -8,9 +8,9 @@ import { AuthStateService } from '../core/services/auth-state.service';
 import { TokenStorageService } from '../core/services/token-storage.service';
 import { API_BASE_URL } from '../core/services/api-config';
 
-function makeToken(): string {
+function makeToken(role = 'Administrator'): string {
   const encode = (obj: object) => btoa(JSON.stringify(obj)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-  const payload = { sub: 'user-1', role: 'Administrator', exp: Math.floor(Date.now() / 1000) + 3600 };
+  const payload = { sub: 'user-1', role, exp: Math.floor(Date.now() / 1000) + 3600 };
   return `${encode({ alg: 'none' })}.${encode(payload)}.signature`;
 }
 
@@ -66,5 +66,47 @@ describe('AppShell', () => {
 
     expect(tokenStorage.getAccessToken()).toBeNull();
     expect(navigateSpy).toHaveBeenCalledWith('/login');
+  });
+
+  it('hides login-only nav items and the admin section for a guest', () => {
+    const fixture = TestBed.createComponent(AppShell);
+    fixture.detectChanges();
+
+    const links = Array.from(fixture.nativeElement.querySelectorAll('.pt-nav a')).map(
+      (a) => (a as HTMLAnchorElement).textContent
+    );
+    expect(links).toEqual(['Home', 'Animals', 'Scan']);
+    expect(fixture.nativeElement.querySelector('.pt-admin-nav')).toBeNull();
+  });
+
+  it('shows Records and Profile but not the admin section for a registered user', () => {
+    const tokenStorage = TestBed.inject(TokenStorageService);
+    const authState = TestBed.inject(AuthStateService);
+    tokenStorage.setTokens(makeToken('User'), 'refresh-1');
+    authState.refresh();
+
+    const fixture = TestBed.createComponent(AppShell);
+    fixture.detectChanges();
+
+    const links = Array.from(fixture.nativeElement.querySelectorAll('.pt-nav a')).map(
+      (a) => (a as HTMLAnchorElement).textContent
+    );
+    expect(links).toEqual(['Home', 'Animals', 'Scan', 'Records', 'Profile']);
+    expect(fixture.nativeElement.querySelector('.pt-admin-nav')).toBeNull();
+  });
+
+  it('shows the admin section for an administrator regardless of exact role casing', () => {
+    const tokenStorage = TestBed.inject(TokenStorageService);
+    const authState = TestBed.inject(AuthStateService);
+    tokenStorage.setTokens(makeToken('admin'), 'refresh-1');
+    authState.refresh();
+
+    const fixture = TestBed.createComponent(AppShell);
+    fixture.detectChanges();
+
+    const adminNav = fixture.nativeElement.querySelector('.pt-admin-nav');
+    expect(adminNav).toBeTruthy();
+    const adminLinks = Array.from(adminNav.querySelectorAll('a')).map((a) => (a as HTMLAnchorElement).textContent);
+    expect(adminLinks).toEqual(['User management', 'Record verification']);
   });
 });

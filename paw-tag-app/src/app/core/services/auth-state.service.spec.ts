@@ -47,4 +47,22 @@ describe('AuthStateService', () => {
     expect(service.currentUser).toBeNull();
     expect(service.isAuthenticated()).toBe(false);
   });
+
+  it('treats any role containing "admin" (case-insensitive) as an administrator', () => {
+    tokenStorage.setTokens(makeToken({ sub: 'user-1', role: 'admin' }), 'refresh-1');
+    service.refresh();
+    expect(service.isAdministrator()).toBe(true);
+
+    tokenStorage.setTokens(makeToken({ sub: 'user-1', role: 'Admin' }), 'refresh-1');
+    service.refresh();
+    expect(service.isAdministrator()).toBe(true);
+
+    tokenStorage.setTokens(makeToken({ sub: 'user-1', role: 'doctor' }), 'refresh-1');
+    service.refresh();
+    expect(service.isAdministrator()).toBe(false);
+  });
+
+  it('is not an administrator when logged out', () => {
+    expect(service.isAdministrator()).toBe(false);
+  });
 });
