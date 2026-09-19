@@ -1,0 +1,55 @@
+<div class="animal-register-screen">
+  <h1 class="animal-register-title">Register an animal</h1>
+  <p class="animal-register-subtitle">Add a new pet or street animal to PawTag.</p>
+
+  <form class="animal-register-form" [formGroup]="form" (ngSubmit)="submit()">
+    <label class="field-checkbox">
+      <input type="checkbox" formControlName="isStreet" />
+      Street animal (no known owner)
+    </label>
+
+    <pt-input label="Name" formControlName="name" [error]="nameError()"></pt-input>
+    @if (generatingName()) {
+      <p class="field-hint">Generating a name…</p>
+    }
+
+    <pt-input label="Date of birth (optional)" type="text" placeholder="YYYY-MM-DD" formControlName="dob"></pt-input>
+
+    <div class="field-group">
+      <label class="field-label" for="animalTypeId">Animal type</label>
+      <select id="animalTypeId" class="field-select" formControlName="animalTypeId">
+        <option value="" disabled>Select an animal type</option>
+        @for (type of animalTypes(); track type.id) {
+          <option [value]="type.id">{{ type.name }}</option>
+        }
+      </select>
+      @if (animalTypeError()) {
+        <p class="field-error">{{ animalTypeError() }}</p>
+      }
+    </div>
+
+    <pt-input label="Breed (optional)" formControlName="breed"></pt-input>
+
+    <div class="field-group">
+      <label class="field-label" for="animalPhoto">Animal photo (optional)</label>
+      <input
+        id="animalPhoto"
+        class="field-file"
+        type="file"
+        accept="image/*"
+        (change)="onPhotoSelected($event)"
+      />
+      @if (photoPreview()) {
+        <img class="animal-photo-preview" [src]="photoPreview()" alt="Selected animal photo preview" />
+      }
+    </div>
+
+    @if (formError()) {
+      <p class="animal-register-error">{{ formError() }}</p>
+    }
+
+    <pt-button type="submit" [full]="true" [disabled]="submitting()">
+      {{ submitting() ? 'Registering…' : 'Register animal' }}
+    </pt-button>
+  </form>
+</div>
