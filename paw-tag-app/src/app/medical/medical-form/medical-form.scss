@@ -1,0 +1,63 @@
+:host {
+  display: block;
+}
+
+.medical-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pt-space-4);
+  padding: var(--pt-space-4);
+  background: var(--pt-surface-100);
+  border: 1px solid var(--pt-border);
+  border-radius: var(--pt-radius-lg);
+}
+
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pt-space-1);
+}
+
+.field-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--pt-ink);
+}
+
+.field-select {
+  height: 44px;
+  padding: 0 var(--pt-space-3);
+  border-radius: var(--pt-radius-md);
+  border: 1px solid transparent;
+  background: var(--pt-surface-200);
+  color: var(--pt-ink);
+  font-size: 15px;
+
+  &:focus {
+    outline: none;
+    background: var(--pt-surface-100);
+    border-color: var(--pt-border-strong);
+    box-shadow: 0 0 0 3px var(--pt-focus-ring);
+  }
+}
+
+.field-error {
+  margin: 0;
+  font-size: 12px;
+  color: var(--pt-danger);
+}
+
+.medical-form-error {
+  margin: 0;
+  padding: var(--pt-space-3);
+  border-radius: var(--pt-radius-md);
+  background: var(--pt-danger-surface);
+  color: var(--pt-danger);
+  font-size: 14px;
+}
+
+.medical-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--pt-space-3);
+}

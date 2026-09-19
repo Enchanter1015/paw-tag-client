@@ -154,7 +154,7 @@ export interface MedicalRecord {
   updatedAt: string;
 }
 
-export interface CreateVaccinationRecordInput {
+export interface CreateMedicalRecordInput {
   title: string;
   description?: string;
   medicalRecordTypeId: number;
@@ -163,7 +163,7 @@ export interface CreateVaccinationRecordInput {
   nextDueDate?: string;
 }
 
-export interface UpdateVaccinationRecordInput {
+export interface UpdateMedicalRecordInput {
   title?: string;
   description?: string;
   medicalRecordTypeId?: number;

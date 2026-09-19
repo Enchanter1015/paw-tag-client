@@ -53,6 +53,67 @@
   gap: var(--pt-space-3);
 }
 
+.medical-records-section {
+  margin-bottom: var(--pt-space-5);
+}
+
+.medical-records-footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--pt-space-4);
+}
+
+.medical-records-title {
+  margin: 0 0 var(--pt-space-3);
+  font-size: 17px;
+  line-height: 23px;
+  font-weight: 600;
+  color: var(--pt-ink);
+}
+
+.medical-records-empty {
+  margin: 0 0 var(--pt-space-3);
+  font-size: 14px;
+  color: var(--pt-ink-muted);
+}
+
+.medical-records-list {
+  list-style: none;
+  margin: 0 0 var(--pt-space-3);
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--pt-space-2);
+}
+
+.medical-record-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--pt-space-3);
+  padding: var(--pt-space-3);
+  background: var(--pt-surface-100);
+  border: 1px solid var(--pt-border);
+  border-radius: var(--pt-radius-md);
+}
+
+.medical-record-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.medical-record-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--pt-ink);
+}
+
+.medical-record-meta {
+  font-size: 12px;
+  color: var(--pt-ink-muted);
+}
+
 .detail-row {
   display: flex;
   justify-content: space-between;
@@ -141,5 +202,14 @@
 
 .animal-profile-actions {
   display: flex;
+  align-items: center;
+  justify-content: space-between;
   gap: var(--pt-space-3);
+}
+
+.animal-profile-link {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--pt-accent);
+  text-decoration: none;
 }

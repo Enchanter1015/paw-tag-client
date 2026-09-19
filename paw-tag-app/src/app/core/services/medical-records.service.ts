@@ -3,9 +3,9 @@ import { Inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { API_BASE_URL } from './api-config';
 import {
-  CreateVaccinationRecordInput,
+  CreateMedicalRecordInput,
   MedicalRecord,
-  UpdateVaccinationRecordInput,
+  UpdateMedicalRecordInput,
   VerifyMedicalRecordInput
 } from '../models/models';
 
@@ -16,7 +16,7 @@ export class MedicalRecordsService {
     @Inject(API_BASE_URL) private readonly baseUrl: string
   ) {}
 
-  addForAnimal(animalId: string, input: CreateVaccinationRecordInput): Observable<MedicalRecord> {
+  addForAnimal(animalId: string, input: CreateMedicalRecordInput): Observable<MedicalRecord> {
     return this.http.post<MedicalRecord>(`${this.baseUrl}/animals/${animalId}/medical-records`, input);
   }
 
@@ -28,7 +28,7 @@ export class MedicalRecordsService {
     return this.http.get<MedicalRecord>(`${this.baseUrl}/medical-records/${id}`);
   }
 
-  update(id: string, input: UpdateVaccinationRecordInput): Observable<MedicalRecord> {
+  update(id: string, input: UpdateMedicalRecordInput): Observable<MedicalRecord> {
     return this.http.patch<MedicalRecord>(`${this.baseUrl}/medical-records/${id}`, input);
   }
 

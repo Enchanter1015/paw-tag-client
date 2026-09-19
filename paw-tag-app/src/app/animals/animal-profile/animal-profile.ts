@@ -1,20 +1,24 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { AnimalsService } from '../../core/services/animals.service';
 import { LookupsService } from '../../core/services/lookups.service';
+import { MedicalRecordsService } from '../../core/services/medical-records.service';
 import { AuthStateService } from '../../core/services/auth-state.service';
-import { Animal, ApiError, Lookup } from '../../core/models/models';
+import { Animal, ApiError, Lookup, MedicalRecord } from '../../core/models/models';
+import { DueStatus, formatDate, getDueStatus, sortByAdministeredAtDesc } from '../../core/utils/medical-record-status.util';
 import { PtAvatar } from '../../shared/pt-avatar/pt-avatar';
 import { PtButton } from '../../shared/pt-button/pt-button';
 import { PtInput } from '../../shared/pt-input/pt-input';
 import { PtTag } from '../../shared/pt-tag/pt-tag';
 
+const RECENT_RECORDS_LIMIT = 5;
+
 @Component({
   selector: 'app-animal-profile',
   standalone: true,
-  imports: [ReactiveFormsModule, PtAvatar, PtButton, PtInput, PtTag],
+  imports: [ReactiveFormsModule, RouterLink, PtAvatar, PtButton, PtInput, PtTag],
   templateUrl: './animal-profile.html',
   styleUrl: './animal-profile.scss',
 })
@@ -22,16 +26,34 @@ export class AnimalProfile {
   private readonly fb = inject(FormBuilder);
   private readonly animalsService = inject(AnimalsService);
   private readonly lookupsService = inject(LookupsService);
+  private readonly medicalRecordsService = inject(MedicalRecordsService);
   protected readonly authState = inject(AuthStateService);
   private readonly route = inject(ActivatedRoute);
 
   readonly animal = signal<Animal | null>(null);
   readonly animalTypes = signal<Lookup[]>([]);
+  readonly medicalRecordTypes = signal<Lookup[]>([]);
+  readonly medicalRecords = signal<MedicalRecord[]>([]);
+  readonly medicalRecordsLoading = signal(true);
   readonly loading = signal(true);
   readonly notFound = signal(false);
   readonly editing = signal(false);
   readonly saving = signal(false);
   readonly formError = signal<string | null>(null);
+
+  readonly recentMedicalRecords = computed(() => this.medicalRecords().slice(0, RECENT_RECORDS_LIMIT));
+
+  readonly upcomingVaccinations = computed(() => {
+    const vaccineTypeIds = new Set(
+      this.medicalRecordTypes()
+        .filter((type) => /vaccin/i.test(type.name))
+        .map((type) => type.id)
+    );
+
+    return this.medicalRecords().filter(
+      (record) => vaccineTypeIds.has(record.medicalRecordTypeId) && getDueStatus(record)?.variant === 'warning'
+    );
+  });
 
   readonly form = this.fb.group({
     name: this.fb.control('', [Validators.required, Validators.maxLength(100)]),
@@ -43,6 +65,7 @@ export class AnimalProfile {
 
   constructor() {
     this.lookupsService.getAnimalTypes().subscribe((types) => this.animalTypes.set(types));
+    this.lookupsService.getMedicalRecordTypes().subscribe((types) => this.medicalRecordTypes.set(types));
 
     const id = this.route.snapshot.paramMap.get('id');
     if (!id) {
@@ -61,6 +84,16 @@ export class AnimalProfile {
         this.loading.set(false);
       },
     });
+
+    this.medicalRecordsService.listForAnimal(id).subscribe({
+      next: (records) => {
+        this.medicalRecords.set(sortByAdministeredAtDesc(records));
+        this.medicalRecordsLoading.set(false);
+      },
+      error: () => {
+        this.medicalRecordsLoading.set(false);
+      },
+    });
   }
 
   get name() {
@@ -73,6 +106,18 @@ export class AnimalProfile {
 
   animalTypeName(animalTypeId: number): string {
     return this.animalTypes().find((type) => type.id === animalTypeId)?.name ?? 'Animal';
+  }
+
+  medicalRecordTypeName(medicalRecordTypeId: number): string {
+    return this.medicalRecordTypes().find((type) => type.id === medicalRecordTypeId)?.name ?? 'Record';
+  }
+
+  medicalRecordDueStatus(record: MedicalRecord): DueStatus | null {
+    return getDueStatus(record);
+  }
+
+  formatAdministeredAt(record: MedicalRecord): string {
+    return formatDate(new Date(record.administeredAt));
   }
 
   nameError(): string | null {

@@ -3,7 +3,7 @@ import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { MedicalRecordsService } from './medical-records.service';
 import { API_BASE_URL } from './api-config';
-import { CreateVaccinationRecordInput, MedicalRecord, UpdateVaccinationRecordInput, VerifyMedicalRecordInput } from '../models/models';
+import { CreateMedicalRecordInput, MedicalRecord, UpdateMedicalRecordInput, VerifyMedicalRecordInput } from '../models/models';
 
 describe('MedicalRecordsService', () => {
   const baseUrl = 'http://localhost:3000/api/v1';
@@ -36,8 +36,8 @@ describe('MedicalRecordsService', () => {
 
   afterEach(() => httpMock.verify());
 
-  it('adds a vaccination record for an animal', () => {
-    const input: CreateVaccinationRecordInput = { title: 'Rabies vaccine', medicalRecordTypeId: 1, prescribedBy: 'uuid-vet' };
+  it('adds a medical record for an animal', () => {
+    const input: CreateMedicalRecordInput = { title: 'Rabies vaccine', medicalRecordTypeId: 1, prescribedBy: 'uuid-vet' };
 
     service.addForAnimal('a1b2c3d4', input).subscribe((result) => expect(result).toEqual(record));
 
@@ -47,7 +47,7 @@ describe('MedicalRecordsService', () => {
     req.flush(record);
   });
 
-  it('lists vaccination records for an animal', () => {
+  it('lists medical records for an animal', () => {
     service.listForAnimal('a1b2c3d4').subscribe((result) => expect(result).toEqual([record]));
 
     const req = httpMock.expectOne(`${baseUrl}/animals/a1b2c3d4/medical-records`);
@@ -64,7 +64,7 @@ describe('MedicalRecordsService', () => {
   });
 
   it('updates a medical record', () => {
-    const input: UpdateVaccinationRecordInput = { title: 'Rabies booster' };
+    const input: UpdateMedicalRecordInput = { title: 'Rabies booster' };
 
     service.update('uuid-record', input).subscribe();
 
