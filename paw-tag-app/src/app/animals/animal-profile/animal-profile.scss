@@ -1,0 +1,145 @@
+:host {
+  display: block;
+}
+
+.animal-profile-screen {
+  max-width: var(--pt-content-narrow);
+  margin: 0 auto;
+}
+
+.animal-profile-status {
+  padding: var(--pt-space-4);
+  text-align: center;
+  color: var(--pt-ink-muted);
+  font-size: 15px;
+}
+
+.animal-profile-status--error {
+  color: var(--pt-danger);
+}
+
+.animal-profile-header {
+  display: flex;
+  align-items: center;
+  gap: var(--pt-space-3);
+  margin-bottom: var(--pt-space-5);
+}
+
+.animal-profile-heading {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.animal-profile-name {
+  margin: 0;
+  font-size: 20px;
+  line-height: 26px;
+  font-weight: 700;
+  color: var(--pt-ink);
+}
+
+.animal-profile-id {
+  font-size: 14px;
+  font-family: ui-monospace, 'SFMono-Regular', Menlo, monospace;
+  color: var(--pt-ink-muted);
+}
+
+.animal-profile-details {
+  margin: 0 0 var(--pt-space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--pt-space-3);
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--pt-space-3);
+  padding-bottom: var(--pt-space-3);
+  border-bottom: 1px solid var(--pt-border);
+
+  dt {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--pt-ink-muted);
+  }
+
+  dd {
+    margin: 0;
+    font-size: 15px;
+    color: var(--pt-ink);
+    text-align: right;
+  }
+}
+
+.animal-profile-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pt-space-4);
+}
+
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pt-space-1);
+}
+
+.field-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--pt-ink);
+}
+
+.field-select {
+  height: 44px;
+  padding: 0 var(--pt-space-3);
+  border-radius: var(--pt-radius-md);
+  border: 1px solid transparent;
+  background: var(--pt-surface-200);
+  color: var(--pt-ink);
+  font-size: 15px;
+
+  &:focus {
+    outline: none;
+    background: var(--pt-surface-100);
+    border-color: var(--pt-border-strong);
+    box-shadow: 0 0 0 3px var(--pt-focus-ring);
+  }
+}
+
+.field-error {
+  margin: 0;
+  font-size: 12px;
+  color: var(--pt-danger);
+}
+
+.field-checkbox {
+  display: flex;
+  align-items: center;
+  gap: var(--pt-space-2);
+  min-height: 44px;
+  font-size: 15px;
+  color: var(--pt-ink);
+
+  input[type='checkbox'] {
+    width: 22px;
+    height: 22px;
+    accent-color: var(--pt-accent);
+  }
+}
+
+.animal-profile-error {
+  margin: 0;
+  padding: var(--pt-space-3);
+  border-radius: var(--pt-radius-md);
+  background: var(--pt-danger-surface);
+  color: var(--pt-danger);
+  font-size: 14px;
+}
+
+.animal-profile-actions {
+  display: flex;
+  gap: var(--pt-space-3);
+}

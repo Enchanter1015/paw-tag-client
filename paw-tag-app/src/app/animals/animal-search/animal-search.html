@@ -1,0 +1,49 @@
+<div class="animal-search-screen">
+  <h1 class="animal-search-title">Find an animal</h1>
+
+  <form class="animal-search-filters" [formGroup]="filterForm">
+    <pt-input label="Search by name or ID" placeholder="Search" formControlName="query"></pt-input>
+
+    <div class="filter-row">
+      <div class="field-group">
+        <label class="field-label" for="animalTypeId">Animal type</label>
+        <select id="animalTypeId" class="field-select" formControlName="animalTypeId">
+          <option value="">All types</option>
+          @for (type of animalTypes(); track type.id) {
+            <option [value]="type.id">{{ type.name }}</option>
+          }
+        </select>
+      </div>
+
+      <label class="field-checkbox">
+        <input type="checkbox" formControlName="isStreet" />
+        Street animals only
+      </label>
+    </div>
+  </form>
+
+  @if (loading()) {
+    <p class="animal-search-status">Loading…</p>
+  } @else if (loadError()) {
+    <p class="animal-search-status animal-search-status--error">{{ loadError() }}</p>
+  } @else if (results().length === 0) {
+    <p class="animal-search-status">No animals found. Try a different search.</p>
+  } @else {
+    <ul class="animal-search-results">
+      @for (animal of results(); track animal.id) {
+        <li>
+          <a class="animal-result-card" [routerLink]="['/animals', animal.id]">
+            <pt-avatar [name]="animal.name"></pt-avatar>
+            <div class="animal-result-info">
+              <span class="animal-result-name">{{ animal.name }}</span>
+              <span class="animal-result-meta">{{ animalTypeName(animal.animalTypeId) }} · {{ animal.id }}</span>
+            </div>
+            <pt-tag [variant]="animal.isStreet ? 'info' : 'neutral'">
+              {{ animal.isStreet ? 'Street animal' : 'Registered pet' }}
+            </pt-tag>
+          </a>
+        </li>
+      }
+    </ul>
+  }
+</div>

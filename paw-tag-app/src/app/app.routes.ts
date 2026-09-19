@@ -10,8 +10,7 @@ export const routes: Routes = [
   {
     path: '',
     component: AppShell,
-    canActivate: [authGuard],
-    children: [{ path: '', component: Dashboard }, ...animalsRoutes],
+    children: [{ path: '', component: Dashboard, canActivate: [authGuard] }, ...animalsRoutes],
   },
 ];
 
