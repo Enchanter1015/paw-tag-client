@@ -87,14 +87,31 @@
 }
 
 .medical-record-row {
+  background: var(--pt-surface-100);
+  border: 1px solid var(--pt-border);
+  border-radius: var(--pt-radius-md);
+}
+
+.medical-record-link {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--pt-space-3);
   padding: var(--pt-space-3);
-  background: var(--pt-surface-100);
-  border: 1px solid var(--pt-border);
-  border-radius: var(--pt-radius-md);
+  color: inherit;
+  text-decoration: none;
+
+  &:hover,
+  &:active {
+    background: var(--pt-surface-200);
+    border-radius: var(--pt-radius-md);
+  }
+
+  &:focus-visible {
+    outline: 3px solid var(--pt-focus-ring);
+    outline-offset: -3px;
+    border-radius: var(--pt-radius-md);
+  }
 }
 
 .medical-record-info {

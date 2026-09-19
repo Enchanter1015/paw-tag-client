@@ -23,15 +23,17 @@
     <ul class="medical-history-list">
       @for (record of records(); track record.id) {
         <li class="medical-record">
-          <div class="medical-record-main">
-            <span class="medical-record-title">{{ record.title }}</span>
-            <span class="medical-record-meta">
-              Administered {{ formatAdministeredAt(record) }}
-            </span>
-          </div>
-          @if (dueStatus(record); as status) {
-            <pt-tag [variant]="status.variant">{{ status.label }}</pt-tag>
-          }
+          <a class="medical-record-link" [routerLink]="['/animals', animalId, 'medical-records', record.id]">
+            <div class="medical-record-main">
+              <span class="medical-record-title">{{ record.title }}</span>
+              <span class="medical-record-meta">
+                Administered {{ formatAdministeredAt(record) }}
+              </span>
+            </div>
+            @if (dueStatus(record); as status) {
+              <pt-tag [variant]="status.variant">{{ status.label }}</pt-tag>
+            }
+          </a>
         </li>
       }
     </ul>

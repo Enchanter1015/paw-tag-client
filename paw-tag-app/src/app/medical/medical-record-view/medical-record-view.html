@@ -1,0 +1,39 @@
+<div class="record-view-screen">
+  @if (loading()) {
+    <p class="record-view-status">Loading…</p>
+  } @else if (notFound()) {
+    <p class="record-view-status record-view-status--error">Medical record not found.</p>
+  } @else if (record(); as record) {
+    <div class="record-view-tagrow">
+      <pt-tag variant="neutral">{{ medicalRecordTypeName() }}</pt-tag>
+      <span class="record-view-date">{{ formatAdministeredAt() }}</span>
+    </div>
+
+    <h1 class="record-view-title">{{ record.title }}</h1>
+
+    @if (record.description) {
+      <div class="record-view-description">{{ record.description }}</div>
+    }
+
+    <h2 class="record-view-section-title">Details</h2>
+    <dl class="record-view-details">
+      <div class="detail-row">
+        <dt>Animal</dt>
+        <dd>
+          @if (animal(); as animal) {
+            <a class="record-view-animal-link" [routerLink]="['/animals', animal.id]">{{ animal.name }}</a>
+            · <span class="record-view-id">{{ animal.id }}</span>
+          }
+        </dd>
+      </div>
+      <div class="detail-row">
+        <dt>Recorded by</dt>
+        <dd>{{ recordedByName() ?? 'Unknown' }}</dd>
+      </div>
+      <div class="detail-row">
+        <dt>Logged on</dt>
+        <dd>{{ formatLoggedOn() }}</dd>
+      </div>
+    </dl>
+  }
+</div>

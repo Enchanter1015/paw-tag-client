@@ -1,5 +1,5 @@
 import { Component, inject, signal } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { AnimalsService } from '../../core/services/animals.service';
 import { MedicalRecordsService } from '../../core/services/medical-records.service';
 import { AuthStateService } from '../../core/services/auth-state.service';
@@ -13,7 +13,7 @@ import { MedicalForm } from '../medical-form/medical-form';
 @Component({
   selector: 'app-medical-history',
   standalone: true,
-  imports: [PtButton, PtTag, MedicalForm],
+  imports: [RouterLink, PtButton, PtTag, MedicalForm],
   templateUrl: './medical-history.html',
   styleUrl: './medical-history.scss',
 })
