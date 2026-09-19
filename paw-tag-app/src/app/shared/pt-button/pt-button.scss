@@ -32,6 +32,12 @@
   width: 100%;
 }
 
+.pt-btn--sm {
+  height: 32px;
+  padding: 0 var(--pt-space-3);
+  font-size: 13px;
+}
+
 .pt-btn--primary {
   background: var(--pt-accent);
   color: var(--pt-on-accent);

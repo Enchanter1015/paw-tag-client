@@ -107,6 +107,6 @@ describe('AppShell', () => {
     const adminNav = fixture.nativeElement.querySelector('.pt-admin-nav');
     expect(adminNav).toBeTruthy();
     const adminLinks = Array.from(adminNav.querySelectorAll('a')).map((a) => (a as HTMLAnchorElement).textContent);
-    expect(adminLinks).toEqual(['User management', 'Record verification']);
+    expect(adminLinks).toEqual(['Animal records', 'User management', 'Record verification']);
   });
 });

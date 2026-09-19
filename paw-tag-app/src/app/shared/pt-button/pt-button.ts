@@ -13,4 +13,5 @@ export class PtButton {
   @Input() type: 'button' | 'submit' = 'button';
   @Input() disabled = false;
   @Input() full = false;
+  @Input() sm = false;
 }

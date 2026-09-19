@@ -1,0 +1,83 @@
+<div class="records-admin-screen">
+  <h1 class="records-admin-title">Animal records</h1>
+  <p class="records-admin-subtitle">Edit, merge or remove animal records.</p>
+
+  <form class="records-admin-filters" [formGroup]="filterForm">
+    <pt-input label="Search by name or ID" placeholder="Search" formControlName="query"></pt-input>
+
+    <div class="filter-row">
+      <div class="field-group">
+        <label class="field-label" for="animalTypeId">Animal type</label>
+        <select id="animalTypeId" class="field-select" formControlName="animalTypeId">
+          <option value="">All types</option>
+          @for (type of animalTypes(); track type.id) {
+            <option [value]="type.id">{{ type.name }}</option>
+          }
+        </select>
+      </div>
+
+      <label class="field-checkbox">
+        <input type="checkbox" formControlName="isStreet" />
+        Street animals only
+      </label>
+    </div>
+  </form>
+
+  @if (actionError()) {
+    <p class="records-admin-status records-admin-status--error">{{ actionError() }}</p>
+  }
+
+  @if (loading()) {
+    <p class="records-admin-status">Loading…</p>
+  } @else if (loadError()) {
+    <p class="records-admin-status records-admin-status--error">{{ loadError() }}</p>
+  } @else if (animals().length === 0) {
+    <p class="records-admin-status">No animals found.</p>
+  } @else {
+    <ul class="records-admin-list">
+      @for (animal of animals(); track animal.id) {
+        <li class="records-admin-row">
+          <div class="records-admin-row-main">
+            <div class="records-admin-info">
+              <span class="records-admin-name">{{ animal.name }}</span>
+              <span class="records-admin-meta">{{ animalTypeName(animal.animalTypeId) }} · {{ animal.id }}</span>
+            </div>
+            <pt-tag [variant]="animal.isStreet ? 'info' : 'neutral'">
+              {{ animal.isStreet ? 'Street animal' : 'Registered pet' }}
+            </pt-tag>
+          </div>
+
+          <div class="records-admin-actions">
+            <pt-button variant="secondary" [sm]="true" [routerLink]="['/animals', animal.id]">Edit</pt-button>
+            <pt-button variant="secondary" [sm]="true" type="button" (click)="toggleMerge(animal)">
+              {{ mergingId() === animal.id ? 'Cancel merge' : 'Merge' }}
+            </pt-button>
+            <pt-button variant="danger" [sm]="true" type="button" (click)="requestRemove(animal)">Remove</pt-button>
+          </div>
+
+          @if (mergingId() === animal.id) {
+            <div class="records-admin-merge-form">
+              <pt-input
+                label="Merge into animal ID"
+                placeholder="8-character animal ID"
+                [formControl]="mergeTargetId"
+                [error]="mergeTargetError()"
+              ></pt-input>
+              <pt-button [sm]="true" type="button" (click)="confirmMergeTarget(animal)">Continue</pt-button>
+            </div>
+          }
+        </li>
+      }
+    </ul>
+  }
+
+  <app-confirm-dialog
+    [open]="pendingAction() !== null"
+    [title]="dialogTitle()"
+    [message]="dialogMessage()"
+    [confirmLabel]="dialogConfirmLabel()"
+    [danger]="true"
+    (confirmed)="confirmPendingAction()"
+    (cancelled)="cancelPendingAction()"
+  ></app-confirm-dialog>
+</div>
