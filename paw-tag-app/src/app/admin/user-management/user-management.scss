@@ -1,0 +1,104 @@
+:host {
+  display: block;
+}
+
+.user-management-screen {
+  max-width: var(--pt-content-narrow);
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--pt-space-5);
+}
+
+.user-management-title {
+  margin: 0;
+  font-size: 20px;
+  line-height: 26px;
+  font-weight: 700;
+  color: var(--pt-ink);
+}
+
+.user-management-search {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pt-space-3);
+}
+
+.user-management-error {
+  margin: 0;
+  padding: var(--pt-space-3);
+  border-radius: var(--pt-radius-md);
+  background: var(--pt-danger-surface);
+  color: var(--pt-danger);
+  font-size: 14px;
+}
+
+.user-card-header {
+  display: flex;
+  align-items: center;
+  gap: var(--pt-space-3);
+  margin-bottom: var(--pt-space-4);
+}
+
+.user-card-heading {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.user-card-name {
+  margin: 0;
+  font-size: 18px;
+  line-height: 24px;
+  font-weight: 700;
+  color: var(--pt-ink);
+}
+
+.user-card-email {
+  font-size: 14px;
+  color: var(--pt-ink-muted);
+}
+
+.user-card-details {
+  margin: 0 0 var(--pt-space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--pt-space-3);
+}
+
+.user-card-id {
+  font-family: ui-monospace, 'SFMono-Regular', Menlo, monospace;
+  font-size: 13px;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--pt-space-3);
+  padding-bottom: var(--pt-space-3);
+  border-bottom: 1px solid var(--pt-border);
+
+  dt {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--pt-ink-muted);
+  }
+
+  dd {
+    margin: 0;
+    font-size: 15px;
+    color: var(--pt-ink);
+    text-align: right;
+  }
+}
+
+.user-management-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pt-space-4);
+}
+
+.user-management-actions {
+  display: flex;
+  gap: var(--pt-space-3);
+}

@@ -1,0 +1,70 @@
+<div class="user-management-screen">
+  <h1 class="user-management-title">User management</h1>
+
+  <form class="user-management-search" [formGroup]="searchForm" (ngSubmit)="search()">
+    <pt-input
+      label="Find user by email"
+      placeholder="user@example.com"
+      formControlName="email"
+      [error]="email.touched && email.invalid ? 'Enter a valid email address.' : null"
+    ></pt-input>
+    <pt-button type="submit" [disabled]="searching()">
+      {{ searching() ? 'Searching…' : 'Find user' }}
+    </pt-button>
+  </form>
+
+  @if (searchError()) {
+    <p class="user-management-error">{{ searchError() }}</p>
+  }
+
+  @if (user(); as user) {
+    <pt-card>
+      @if (!editing()) {
+        <div class="user-card-header">
+          <pt-avatar size="lg" [name]="user.name"></pt-avatar>
+          <div class="user-card-heading">
+            <h2 class="user-card-name">{{ user.name }}</h2>
+            <span class="user-card-email">{{ user.email }}</span>
+          </div>
+        </div>
+
+        <dl class="user-card-details">
+          <div class="detail-row">
+            <dt>Phone</dt>
+            <dd>{{ user.phoneNo || 'Not recorded' }}</dd>
+          </div>
+          <div class="detail-row">
+            <dt>Address</dt>
+            <dd>{{ user.address || 'Not recorded' }}</dd>
+          </div>
+          <div class="detail-row">
+            <dt>User ID</dt>
+            <dd class="user-card-id">{{ user.id }}</dd>
+          </div>
+        </dl>
+
+        <pt-button variant="secondary" (click)="startEditing()">Edit user</pt-button>
+      } @else {
+        <form class="user-management-form" [formGroup]="editForm" (ngSubmit)="save()">
+          <h2 class="user-card-name">Edit user</h2>
+
+          <pt-input label="Name" formControlName="name" [error]="editNameError()"></pt-input>
+          <pt-input label="Email" type="email" formControlName="email" [error]="editEmailError()"></pt-input>
+          <pt-input label="Phone (optional)" formControlName="phoneNo"></pt-input>
+          <pt-input label="Address (optional)" formControlName="address"></pt-input>
+
+          @if (formError()) {
+            <p class="user-management-error">{{ formError() }}</p>
+          }
+
+          <div class="user-management-actions">
+            <pt-button variant="secondary" type="button" (click)="cancelEditing()">Cancel</pt-button>
+            <pt-button type="submit" [disabled]="saving()">
+              {{ saving() ? 'Saving…' : 'Save changes' }}
+            </pt-button>
+          </div>
+        </form>
+      }
+    </pt-card>
+  }
+</div>
