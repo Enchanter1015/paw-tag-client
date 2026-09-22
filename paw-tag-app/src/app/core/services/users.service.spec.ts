@@ -14,6 +14,8 @@ describe('UsersService', () => {
     id: 'uuid-1',
     name: 'Jane Doe',
     email: 'jane@example.com',
+    roleId: 1,
+    isActive: true,
     updatedAt: '2026-01-01T00:00:00.000Z'
   };
 
@@ -67,6 +69,39 @@ describe('UsersService', () => {
     expect(req.request.method).toBe('PATCH');
     expect(req.request.body).toEqual(input);
     req.flush({ ...user, phoneNo: '5551234567' });
+  });
+
+  it('lists all users', () => {
+    service.list().subscribe((result) => expect(result).toEqual([user]));
+
+    const req = httpMock.expectOne(`${baseUrl}/users/list`);
+    expect(req.request.method).toBe('GET');
+    req.flush([user]);
+  });
+
+  it('changes a user role', () => {
+    service.changeRole('uuid-1', 2).subscribe();
+
+    const req = httpMock.expectOne(`${baseUrl}/users/uuid-1/role`);
+    expect(req.request.method).toBe('PATCH');
+    expect(req.request.body).toEqual({ roleId: 2 });
+    req.flush({ ...user, roleId: 2 });
+  });
+
+  it('deactivates a user', () => {
+    service.deactivate('uuid-1').subscribe();
+
+    const req = httpMock.expectOne(`${baseUrl}/users/uuid-1/deactivate`);
+    expect(req.request.method).toBe('POST');
+    req.flush({ ...user, isActive: false });
+  });
+
+  it('activates a user', () => {
+    service.activate('uuid-1').subscribe();
+
+    const req = httpMock.expectOne(`${baseUrl}/users/uuid-1/activate`);
+    expect(req.request.method).toBe('POST');
+    req.flush(user);
   });
 
   it('propagates a duplicate email error', () => {

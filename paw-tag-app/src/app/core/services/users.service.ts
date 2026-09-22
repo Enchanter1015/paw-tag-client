@@ -24,7 +24,23 @@ export class UsersService {
     return this.http.get<User>(`${this.baseUrl}/users/${id}`);
   }
 
+  list(): Observable<User[]> {
+    return this.http.get<User[]>(`${this.baseUrl}/users/list`);
+  }
+
   update(id: string, input: UpdateUserInput): Observable<User> {
     return this.http.patch<User>(`${this.baseUrl}/users/${id}`, input);
+  }
+
+  changeRole(id: string, roleId: number): Observable<User> {
+    return this.http.patch<User>(`${this.baseUrl}/users/${id}/role`, { roleId });
+  }
+
+  deactivate(id: string): Observable<User> {
+    return this.http.post<User>(`${this.baseUrl}/users/${id}/deactivate`, {});
+  }
+
+  activate(id: string): Observable<User> {
+    return this.http.post<User>(`${this.baseUrl}/users/${id}/activate`, {});
   }
 }

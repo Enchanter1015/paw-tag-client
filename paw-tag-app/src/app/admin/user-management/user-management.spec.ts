@@ -3,7 +3,7 @@ import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting, HttpTestingController } from '@angular/common/http/testing';
 import { UserManagement } from './user-management';
 import { API_BASE_URL } from '../../core/services/api-config';
-import { User } from '../../core/models/models';
+import { Lookup, User } from '../../core/models/models';
 
 describe('UserManagement', () => {
   const baseUrl = 'http://localhost:3000/api/v1';
@@ -13,8 +13,15 @@ describe('UserManagement', () => {
     email: 'jane@example.com',
     phoneNo: '0771234567',
     address: '12 Lotus Lane',
+    roleId: 1,
+    isActive: true,
     updatedAt: '2026-01-01T00:00:00Z',
   };
+  const roles: Lookup[] = [
+    { id: 1, name: 'Pet owner' },
+    { id: 2, name: 'Vet' },
+    { id: 3, name: 'Administrator' },
+  ];
 
   let httpMock: HttpTestingController;
 
@@ -26,6 +33,7 @@ describe('UserManagement', () => {
     httpMock = TestBed.inject(HttpTestingController);
     const fixture = TestBed.createComponent(UserManagement);
     fixture.detectChanges();
+    httpMock.expectOne(`${baseUrl}/roles`).flush(roles);
     return fixture;
   }
 
@@ -124,5 +132,86 @@ describe('UserManagement', () => {
 
     expect(component.editEmailError()).toBe('Email already in use');
     expect(component.formError()).toBe('Check the highlighted fields and try again.');
+  });
+
+  it('changes a user role after confirmation', () => {
+    const fixture = createComponent();
+    const component = fixture.componentInstance;
+
+    component.searchForm.setValue({ email: user.email });
+    component.search();
+    httpMock.expectOne((r) => r.url === `${baseUrl}/users`).flush(user);
+    fixture.detectChanges();
+
+    component.selectedRoleId.set(2);
+    component.requestRoleChange();
+    expect(component.pendingAction()).toEqual({ type: 'role', roleId: 2 });
+
+    component.confirmPendingAction();
+
+    const req = httpMock.expectOne(`${baseUrl}/users/${user.id}/role`);
+    expect(req.request.method).toBe('PATCH');
+    expect(req.request.body).toEqual({ roleId: 2 });
+    req.flush({ ...user, roleId: 2 });
+
+    expect(component.pendingAction()).toBeNull();
+    expect(component.user()?.roleId).toBe(2);
+  });
+
+  it('deactivates a user after confirmation', () => {
+    const fixture = createComponent();
+    const component = fixture.componentInstance;
+
+    component.searchForm.setValue({ email: user.email });
+    component.search();
+    httpMock.expectOne((r) => r.url === `${baseUrl}/users`).flush(user);
+    fixture.detectChanges();
+
+    component.requestDeactivate();
+    component.confirmPendingAction();
+
+    const req = httpMock.expectOne(`${baseUrl}/users/${user.id}/deactivate`);
+    expect(req.request.method).toBe('POST');
+    req.flush({ ...user, isActive: false });
+
+    expect(component.user()?.isActive).toBe(false);
+  });
+
+  it('reactivates a deactivated user after confirmation', () => {
+    const fixture = createComponent();
+    const component = fixture.componentInstance;
+
+    component.searchForm.setValue({ email: user.email });
+    component.search();
+    httpMock.expectOne((r) => r.url === `${baseUrl}/users`).flush({ ...user, isActive: false });
+    fixture.detectChanges();
+
+    component.requestActivate();
+    component.confirmPendingAction();
+
+    const req = httpMock.expectOne(`${baseUrl}/users/${user.id}/activate`);
+    expect(req.request.method).toBe('POST');
+    req.flush({ ...user, isActive: true });
+
+    expect(component.user()?.isActive).toBe(true);
+  });
+
+  it('surfaces an error when a role change or deactivation fails', () => {
+    const fixture = createComponent();
+    const component = fixture.componentInstance;
+
+    component.searchForm.setValue({ email: user.email });
+    component.search();
+    httpMock.expectOne((r) => r.url === `${baseUrl}/users`).flush(user);
+    fixture.detectChanges();
+
+    component.requestDeactivate();
+    component.confirmPendingAction();
+
+    const req = httpMock.expectOne(`${baseUrl}/users/${user.id}/deactivate`);
+    req.flush({ error: { code: 'FORBIDDEN', message: 'Missing permission' } }, { status: 403, statusText: 'Forbidden' });
+
+    expect(component.roleActionError()).toBe('Missing permission');
+    expect(component.pendingAction()).toBeNull();
   });
 });

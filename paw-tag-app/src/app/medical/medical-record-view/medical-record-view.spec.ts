@@ -40,6 +40,8 @@ describe('MedicalRecordView', () => {
     id: 'user-1',
     name: 'N. Silva',
     email: 'n.silva@example.com',
+    roleId: 1,
+    isActive: true,
     updatedAt: '2026-01-01T00:00:00Z',
   };
 

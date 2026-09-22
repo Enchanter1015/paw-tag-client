@@ -94,6 +94,32 @@ describe('ScanWeb', () => {
     expect(fixture.componentInstance.cameraOpen()).toBe(false);
   });
 
+  it('hides the manual-entry form until "Enter animal ID manually instead" is clicked', () => {
+    const fixture = TestBed.createComponent(ScanWeb);
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.querySelector('form.scan-form')).toBeNull();
+
+    const manualLink = fixture.nativeElement.querySelector('.scan-manual-link') as HTMLButtonElement;
+    expect(manualLink).toBeTruthy();
+    manualLink.click();
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.querySelector('form.scan-form')).toBeTruthy();
+  });
+
+  it('starts the camera scan when the target circle is clicked', () => {
+    const fixture = TestBed.createComponent(ScanWeb);
+    fixture.detectChanges();
+
+    const target = fixture.nativeElement.querySelector('.scan-target') as HTMLButtonElement;
+    target.click();
+    fixture.detectChanges();
+
+    expect(fixture.componentInstance.cameraOpen()).toBe(true);
+    expect(fixture.nativeElement.querySelector('app-qr-scanner')).toBeTruthy();
+  });
+
   it('surfaces a camera error and falls back to manual entry', () => {
     const fixture = TestBed.createComponent(ScanWeb);
     fixture.detectChanges();

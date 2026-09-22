@@ -21,7 +21,10 @@ describe('AnimalProfile', () => {
     updatedAt: '2026-01-01T00:00:00Z',
   };
 
-  const medicalRecordTypes: Lookup[] = [{ id: 1, name: 'Vaccination' }];
+  const medicalRecordTypes: Lookup[] = [
+    { id: 1, name: 'Vaccination' },
+    { id: 2, name: 'Wound treatment' },
+  ];
 
   let httpMock: HttpTestingController;
   let authState: { isGuest: () => boolean };
@@ -92,15 +95,12 @@ describe('AnimalProfile', () => {
     expect(component.animal()?.name).toBe('Rex Updated');
   });
 
-  it('shows an "Add medical record" link for an authenticated user that deep-links to the form', () => {
+  it('shows an "Add medical record" action for an authenticated user near the animal details', () => {
     authState.isGuest = () => false;
     const fixture = createComponent();
 
-    const links: HTMLAnchorElement[] = Array.from(fixture.nativeElement.querySelectorAll('a.animal-profile-link'));
-    const addLink = links.find((a) => a.textContent?.includes('Add medical record'));
-
-    expect(addLink).toBeTruthy();
-    expect(addLink!.getAttribute('href')).toBe(`/animals/${animal.id}/medical-records?add=true`);
+    const buttons: HTMLElement[] = Array.from(fixture.nativeElement.querySelectorAll('pt-button'));
+    expect(buttons.some((b) => b.textContent?.includes('Add medical record'))).toBe(true);
   });
 
   it('points the header at an edit action once an authenticated user\'s animal has loaded', () => {
@@ -140,6 +140,25 @@ describe('AnimalProfile', () => {
     expect(pageHeader.config().left).toEqual({ kind: 'back' });
     expect(pageHeader.config().title()).toBe('Rex Updated');
     expect(pageHeader.config().action?.kind).toBe('edit');
+  });
+
+  it('resolves and shows who registered the animal', () => {
+    const registeredAnimal: Animal = { ...animal, createdBy: 'user-1' };
+    const fixture = TestBed.createComponent(AnimalProfile);
+    fixture.detectChanges();
+    httpMock.expectOne(`${baseUrl}/animal-types`).flush(animalTypes);
+    httpMock.expectOne(`${baseUrl}/medical-record-types`).flush(medicalRecordTypes);
+    httpMock.expectOne(`${baseUrl}/animals/${animal.id}`).flush(registeredAnimal);
+    httpMock.expectOne(`${baseUrl}/animals/${animal.id}/medical-records`).flush([]);
+    httpMock.expectOne(`${baseUrl}/users/user-1`).flush({
+      id: 'user-1',
+      name: 'A. Fernando',
+      email: 'a.fernando@example.com',
+      updatedAt: '2026-01-01T00:00:00Z',
+    });
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.textContent).toContain('Registered by A. Fernando');
   });
 
   it('shows a not-found message when the animal does not exist', () => {
@@ -183,33 +202,41 @@ describe('AnimalProfile', () => {
     expect(component.recentMedicalRecords()[0].id).toBe('rec-6');
 
     const link = fixture.nativeElement.querySelector('a.animal-profile-link');
-    expect(link.textContent).toContain('View all medical records');
+    expect(link.textContent).toContain('View all');
     expect(link.getAttribute('href')).toBe(`/animals/${animal.id}/medical-records`);
 
     const recordLink = fixture.nativeElement.querySelector('a.medical-record-link') as HTMLAnchorElement;
     expect(recordLink.getAttribute('href')).toBe(`/animals/${animal.id}/medical-records/rec-6`);
   });
 
-  it('lists a vaccination-type record with a future next due date as an upcoming vaccination', () => {
-    const futureDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
-    const records = [
-      makeRecord({ id: 'rec-upcoming', medicalRecordTypeId: 1, nextDueDate: futureDate }),
-    ];
-    const fixture = createComponent(records);
-    const component = fixture.componentInstance;
+  it('shows only the most recent record per vaccine type in the vaccinations list', () => {
+    const olderRabies = makeRecord({
+      id: 'rec-rabies-old',
+      medicalRecordTypeId: 1,
+      administeredAt: '2025-01-01T00:00:00Z',
+    });
+    const newerRabies = makeRecord({
+      id: 'rec-rabies-new',
+      medicalRecordTypeId: 1,
+      administeredAt: '2026-01-01T00:00:00Z',
+    });
+    const nonVaccine = makeRecord({
+      id: 'rec-wound',
+      medicalRecordTypeId: 2,
+      administeredAt: '2026-06-01T00:00:00Z',
+    });
+    const fixture = createComponent([olderRabies, newerRabies, nonVaccine]);
 
-    expect(component.upcomingVaccinations().map((r) => r.id)).toEqual(['rec-upcoming']);
+    expect(fixture.componentInstance.vaccinations().map((r) => r.id)).toEqual(['rec-rabies-new']);
   });
 
-  it('excludes an overdue vaccination and a non-vaccination record from upcoming vaccinations', () => {
-    const futureDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
-    const pastDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
-    const records = [
-      makeRecord({ id: 'rec-overdue', medicalRecordTypeId: 1, nextDueDate: pastDate }),
-      makeRecord({ id: 'rec-other-type', medicalRecordTypeId: 2, nextDueDate: futureDate }),
-    ];
+  it('tags a vaccination due within 30 days as "Due soon" and one due later as "Up to date"', () => {
+    const dueSoonDate = new Date(Date.now() + 10 * 24 * 60 * 60 * 1000).toISOString();
+    const records = [makeRecord({ id: 'rec-rabies', medicalRecordTypeId: 1, nextDueDate: dueSoonDate })];
     const fixture = createComponent(records);
 
-    expect(fixture.componentInstance.upcomingVaccinations()).toEqual([]);
+    const status = fixture.componentInstance.medicalRecordDueStatus(records[0]);
+    expect(status?.variant).toBe('warning');
+    expect(status?.label).toBe('Due soon');
   });
 });

@@ -12,7 +12,9 @@
 .login-cover {
   background: var(--pt-brand-tint);
   padding: var(--pt-space-6) var(--pt-space-4) var(--pt-space-5);
-  border-radius: 0 0 var(--pt-radius-lg) var(--pt-radius-lg);
+  height: 25vh;
+  align-content: center;
+  // border-radius: 0 0 var(--pt-radius-lg) var(--pt-radius-lg);
 }
 
 .login-avatar {

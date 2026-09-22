@@ -32,7 +32,7 @@ describe('MedicalHistory', () => {
     prescribedBy: 'vet-1',
     animalId,
     administeredAt: '2026-01-01T00:00:00Z',
-    nextDueDate: '2099-01-01T00:00:00Z',
+    nextDueDate: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000).toISOString(),
     createdBy: 'vet-1',
     createdAt: '2026-01-01T00:00:00Z',
     updatedAt: '2026-01-01T00:00:00Z',
@@ -89,17 +89,30 @@ describe('MedicalHistory', () => {
 
   afterEach(() => httpMock.verify());
 
-  it('flags a record past its next due date as overdue, and an upcoming one as due', () => {
+  it('flags a record past its next due date as overdue, and one due within 30 days as due soon', () => {
     const fixture = createComponent([overdueRecord, upcomingRecord]);
     const component = fixture.componentInstance;
 
     const overdueStatus = component.dueStatus(overdueRecord);
     expect(overdueStatus?.variant).toBe('danger');
-    expect(overdueStatus?.label).toContain('Overdue since');
+    expect(overdueStatus?.label).toBe('Overdue');
 
     const upcomingStatus = component.dueStatus(upcomingRecord);
     expect(upcomingStatus?.variant).toBe('warning');
-    expect(upcomingStatus?.label).toContain('Due');
+    expect(upcomingStatus?.label).toBe('Due soon');
+  });
+
+  it('flags a record due more than 30 days out as up to date', () => {
+    const farOutRecord: MedicalRecord = {
+      ...overdueRecord,
+      id: 'rec-far-out',
+      nextDueDate: new Date(Date.now() + 200 * 24 * 60 * 60 * 1000).toISOString(),
+    };
+    const fixture = createComponent([farOutRecord]);
+
+    const status = fixture.componentInstance.dueStatus(farOutRecord);
+    expect(status?.variant).toBe('success');
+    expect(status?.label).toBe('Up to date');
   });
 
   it('shows no due status for a record with no next due date', () => {

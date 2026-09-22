@@ -66,6 +66,8 @@ export interface User {
   appleId?: string | null;
   phoneNo?: string | null;
   address?: string | null;
+  roleId: number;
+  isActive: boolean;
   updatedAt: string;
 }
 
