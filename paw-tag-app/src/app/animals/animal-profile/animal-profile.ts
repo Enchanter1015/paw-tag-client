@@ -3,15 +3,18 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { AnimalsService } from '../../core/services/animals.service';
+import { ImagesService } from '../../core/services/images.service';
 import { LookupsService } from '../../core/services/lookups.service';
 import { MedicalRecordsService } from '../../core/services/medical-records.service';
 import { AuthStateService } from '../../core/services/auth-state.service';
 import { PageHeaderService } from '../../core/services/page-header.service';
 import { UsersService } from '../../core/services/users.service';
 import { Animal, ApiError, Lookup, MedicalRecord } from '../../core/models/models';
+import { onImageError } from '../../core/utils/image-placeholder.util';
 import { DueStatus, formatDate, getDueStatus, sortByAdministeredAtDesc } from '../../core/utils/medical-record-status.util';
 import { PtAvatar } from '../../shared/pt-avatar/pt-avatar';
 import { PtButton } from '../../shared/pt-button/pt-button';
+import { PtImageViewer } from '../../shared/pt-image-viewer/pt-image-viewer';
 import { PtInput } from '../../shared/pt-input/pt-input';
 import { PtTag } from '../../shared/pt-tag/pt-tag';
 
@@ -20,13 +23,14 @@ const RECENT_RECORDS_LIMIT = 5;
 @Component({
   selector: 'app-animal-profile',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink, PtAvatar, PtButton, PtInput, PtTag],
+  imports: [ReactiveFormsModule, RouterLink, PtAvatar, PtButton, PtImageViewer, PtInput, PtTag],
   templateUrl: './animal-profile.html',
   styleUrl: './animal-profile.scss',
 })
 export class AnimalProfile {
   private readonly fb = inject(FormBuilder);
   private readonly animalsService = inject(AnimalsService);
+  private readonly imagesService = inject(ImagesService);
   private readonly lookupsService = inject(LookupsService);
   private readonly medicalRecordsService = inject(MedicalRecordsService);
   private readonly usersService = inject(UsersService);
@@ -45,6 +49,10 @@ export class AnimalProfile {
   readonly editing = signal(false);
   readonly saving = signal(false);
   readonly formError = signal<string | null>(null);
+  readonly uploadingPhotos = signal(false);
+  readonly photoError = signal<string | null>(null);
+  readonly viewingPhotoUrl = signal<string | null>(null);
+  protected readonly onImageError = onImageError;
 
   readonly recentMedicalRecords = computed(() => this.medicalRecords().slice(0, RECENT_RECORDS_LIMIT));
 
@@ -143,6 +151,35 @@ export class AnimalProfile {
 
   formatNextDueDate(record: MedicalRecord): string | null {
     return record.nextDueDate ? formatDate(new Date(record.nextDueDate)) : null;
+  }
+
+  uploadPhotos(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const files = input.files ? Array.from(input.files) : [];
+    input.value = '';
+    if (files.length === 0) {
+      return;
+    }
+
+    const animal = this.animal();
+    if (!animal) {
+      return;
+    }
+
+    this.photoError.set(null);
+    this.uploadingPhotos.set(true);
+
+    this.imagesService.uploadAnimalImages(animal.id, files).subscribe({
+      next: (images) => {
+        this.uploadingPhotos.set(false);
+        this.animal.set({ ...animal, images: [...(animal.images ?? []), ...images] });
+      },
+      error: (response: HttpErrorResponse) => {
+        this.uploadingPhotos.set(false);
+        const apiError = response.error as ApiError | undefined;
+        this.photoError.set(apiError?.error?.message ?? 'Could not upload photos. Please try again.');
+      },
+    });
   }
 
   nameError(): string | null {

@@ -62,6 +62,108 @@
   border-radius: var(--pt-radius-lg);
 }
 
+.animal-profile-photo-btn {
+  flex-shrink: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  border-radius: var(--pt-radius-lg);
+  cursor: pointer;
+
+  &:focus-visible {
+    outline: 3px solid var(--pt-focus-ring);
+    outline-offset: 2px;
+  }
+}
+
+.animal-profile-photo {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--pt-radius-lg);
+  object-fit: cover;
+  display: block;
+}
+
+.photos-section {
+  margin-bottom: var(--pt-space-5);
+}
+
+.photos-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: var(--pt-space-3);
+}
+
+.photos-header .medical-records-title {
+  margin: 0;
+}
+
+.photos-upload-label {
+  position: relative;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--pt-accent);
+  cursor: pointer;
+
+  input[type='file'] {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+  }
+}
+
+.photos-upload-label--disabled {
+  color: var(--pt-ink-muted);
+  cursor: default;
+
+  input[type='file'] {
+    cursor: default;
+  }
+}
+
+.photos-gallery {
+  list-style: none;
+  margin: 0 0 var(--pt-space-3);
+  padding: 0;
+  display: flex;
+  gap: var(--pt-space-2);
+  overflow-x: auto;
+}
+
+.photos-gallery-item {
+  flex-shrink: 0;
+  width: 88px;
+  height: 88px;
+  border-radius: var(--pt-radius-md);
+  overflow: hidden;
+  border: 1px solid var(--pt-border);
+
+  button {
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    border: none;
+    background: none;
+    cursor: pointer;
+
+    &:focus-visible {
+      outline: 3px solid var(--pt-focus-ring);
+      outline-offset: -3px;
+    }
+  }
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+}
+
 .medical-records-section {
   margin-bottom: var(--pt-space-5);
 }

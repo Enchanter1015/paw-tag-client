@@ -24,6 +24,16 @@ export interface Animal {
   createdBy?: string | null;
   createdAt: string;
   updatedAt: string;
+  images?: AnimalImage[];
+}
+
+export interface AnimalImage {
+  id: string;
+  animalId: string;
+  s3Key: string;
+  url: string;
+  createdBy: string;
+  createdAt: string;
 }
 
 export interface CreateAnimalInput {
@@ -154,6 +164,16 @@ export interface MedicalRecord {
   createdBy: string;
   createdAt: string;
   updatedAt: string;
+  images?: MedicalRecordImage[];
+}
+
+export interface MedicalRecordImage {
+  id: string;
+  medicalRecordId: string;
+  s3Key: string;
+  url: string;
+  createdBy: string;
+  createdAt: string;
 }
 
 export interface CreateMedicalRecordInput {
