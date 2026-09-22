@@ -1,0 +1,61 @@
+<div class="user-profile-screen">
+  @if (loading()) {
+    <p class="user-profile-status">Loading…</p>
+  } @else if (loadError()) {
+    <p class="user-profile-status user-profile-status--error">{{ loadError() }}</p>
+  } @else if (user(); as user) {
+    <div class="user-profile-header">
+      <pt-avatar size="lg" [name]="user.name"></pt-avatar>
+      <div class="user-profile-heading">
+        <h3 class="user-profile-name">{{ user.name }}</h3>
+        <span class="user-profile-email">{{ user.email }}</span>
+        @if (roleLabel) {
+          <pt-tag variant="info">{{ roleLabel }}</pt-tag>
+        }
+      </div>
+    </div>
+
+    <dl class="user-profile-details">
+      <div class="detail-row">
+        <dt>Contact number</dt>
+        <dd>{{ user.phoneNo || 'Not recorded' }}</dd>
+      </div>
+      <div class="detail-row">
+        <dt>Address</dt>
+        <dd>{{ user.address || 'Not recorded' }}</dd>
+      </div>
+    </dl>
+
+    <section class="user-profile-animals">
+      <div class="user-profile-animals-header">
+        <h2 class="user-profile-section-title">My animals</h2>
+        <a class="user-profile-link" routerLink="/animals/register">Add animal</a>
+      </div>
+
+      @if (!animalsLoading()) {
+        @if (myAnimals().length === 0) {
+          <p class="user-profile-empty">No animals registered yet.</p>
+        } @else {
+          <ul class="user-profile-animal-list">
+            @for (animal of myAnimals(); track animal.id) {
+              <li class="user-profile-animal-row">
+                <a class="user-profile-animal-link" [routerLink]="['/animals', animal.id]">
+                  <pt-avatar [name]="animal.name"></pt-avatar>
+                  <div class="user-profile-animal-info">
+                    <span class="user-profile-animal-name">{{ animal.name }}</span>
+                    <span class="user-profile-animal-id">{{ animal.id }}</span>
+                  </div>
+                  <pt-tag [variant]="animal.isStreet ? 'info' : 'neutral'">
+                    {{ animal.isStreet ? 'Street animal' : 'Registered pet' }}
+                  </pt-tag>
+                </a>
+              </li>
+            }
+          </ul>
+        }
+      }
+    </section>
+
+    <pt-button variant="secondary" [full]="true" (click)="signOut()">Sign out</pt-button>
+  }
+</div>

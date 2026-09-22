@@ -24,6 +24,9 @@
             <h2 class="user-card-name">{{ user.name }}</h2>
             <span class="user-card-email">{{ user.email }}</span>
           </div>
+          <pt-tag [variant]="user.isActive ? 'success' : 'neutral'">
+            {{ user.isActive ? 'Active' : 'Deactivated' }}
+          </pt-tag>
         </div>
 
         <dl class="user-card-details">
@@ -41,7 +44,41 @@
           </div>
         </dl>
 
-        <pt-button variant="secondary" (click)="startEditing()">Edit user</pt-button>
+        <div class="user-role-row">
+          <label class="field-label" for="roleId">Role</label>
+          <select
+            id="roleId"
+            class="field-select"
+            [value]="selectedRoleId()"
+            (change)="selectedRoleId.set(+$any($event.target).value)"
+          >
+            @for (role of roles(); track role.id) {
+              <option [value]="role.id">{{ role.name }}</option>
+            }
+          </select>
+          <pt-button
+            variant="secondary"
+            [sm]="true"
+            type="button"
+            [disabled]="selectedRoleId() === user.roleId"
+            (click)="requestRoleChange()"
+          >
+            Change role
+          </pt-button>
+        </div>
+
+        @if (roleActionError()) {
+          <p class="user-management-error">{{ roleActionError() }}</p>
+        }
+
+        <div class="user-management-actions">
+          <pt-button variant="secondary" (click)="startEditing()">Edit user</pt-button>
+          @if (user.isActive) {
+            <pt-button variant="danger" type="button" (click)="requestDeactivate()">Deactivate</pt-button>
+          } @else {
+            <pt-button variant="secondary" type="button" (click)="requestActivate()">Reactivate</pt-button>
+          }
+        </div>
       } @else {
         <form class="user-management-form" [formGroup]="editForm" (ngSubmit)="save()">
           <h2 class="user-card-name">Edit user</h2>
@@ -65,4 +102,14 @@
       }
     </pt-card>
   }
+
+  <app-confirm-dialog
+    [open]="pendingAction() !== null"
+    [title]="dialogTitle()"
+    [message]="dialogMessage()"
+    [confirmLabel]="dialogConfirmLabel()"
+    [danger]="pendingAction()?.type === 'deactivate'"
+    (confirmed)="confirmPendingAction()"
+    (cancelled)="cancelPendingAction()"
+  ></app-confirm-dialog>
 </div>

@@ -7,6 +7,7 @@ import { LookupsService } from '../../core/services/lookups.service';
 import { MedicalRecordsService } from '../../core/services/medical-records.service';
 import { AuthStateService } from '../../core/services/auth-state.service';
 import { PageHeaderService } from '../../core/services/page-header.service';
+import { UsersService } from '../../core/services/users.service';
 import { Animal, ApiError, Lookup, MedicalRecord } from '../../core/models/models';
 import { DueStatus, formatDate, getDueStatus, sortByAdministeredAtDesc } from '../../core/utils/medical-record-status.util';
 import { PtAvatar } from '../../shared/pt-avatar/pt-avatar';
@@ -28,11 +29,13 @@ export class AnimalProfile {
   private readonly animalsService = inject(AnimalsService);
   private readonly lookupsService = inject(LookupsService);
   private readonly medicalRecordsService = inject(MedicalRecordsService);
+  private readonly usersService = inject(UsersService);
   protected readonly authState = inject(AuthStateService);
   private readonly pageHeader = inject(PageHeaderService);
   private readonly route = inject(ActivatedRoute);
 
   readonly animal = signal<Animal | null>(null);
+  readonly registeredByName = signal<string | null>(null);
   readonly animalTypes = signal<Lookup[]>([]);
   readonly medicalRecordTypes = signal<Lookup[]>([]);
   readonly medicalRecords = signal<MedicalRecord[]>([]);
@@ -45,16 +48,22 @@ export class AnimalProfile {
 
   readonly recentMedicalRecords = computed(() => this.medicalRecords().slice(0, RECENT_RECORDS_LIMIT));
 
-  readonly upcomingVaccinations = computed(() => {
+  // One row per vaccine type, showing only its most recent record (medicalRecords is already
+  // sorted newest-first) so a repeat vaccination doesn't produce duplicate rows for the same type.
+  readonly vaccinations = computed(() => {
     const vaccineTypeIds = new Set(
       this.medicalRecordTypes()
         .filter((type) => /vaccin/i.test(type.name))
         .map((type) => type.id)
     );
 
-    return this.medicalRecords().filter(
-      (record) => vaccineTypeIds.has(record.medicalRecordTypeId) && getDueStatus(record)?.variant === 'warning'
-    );
+    const latestByType = new Map<number, MedicalRecord>();
+    for (const record of this.medicalRecords()) {
+      if (vaccineTypeIds.has(record.medicalRecordTypeId) && !latestByType.has(record.medicalRecordTypeId)) {
+        latestByType.set(record.medicalRecordTypeId, record);
+      }
+    }
+    return Array.from(latestByType.values());
   });
 
   readonly form = this.fb.group({
@@ -83,6 +92,13 @@ export class AnimalProfile {
         this.animal.set(animal);
         this.loading.set(false);
         this.updateHeader();
+
+        if (animal.createdBy) {
+          this.usersService.getById(animal.createdBy).subscribe({
+            next: (user) => this.registeredByName.set(user.name),
+            error: () => this.registeredByName.set(null),
+          });
+        }
       },
       error: () => {
         this.notFound.set(true);
@@ -123,6 +139,10 @@ export class AnimalProfile {
 
   formatAdministeredAt(record: MedicalRecord): string {
     return formatDate(new Date(record.administeredAt));
+  }
+
+  formatNextDueDate(record: MedicalRecord): string | null {
+    return record.nextDueDate ? formatDate(new Date(record.nextDueDate)) : null;
   }
 
   nameError(): string | null {

@@ -1,32 +1,61 @@
 <div class="scan-screen">
-  <p class="scan-subtitle">Tap the tag with an NFC-enabled phone, use the camera, or enter the animal ID manually.</p>
-
   @if (cameraOpen()) {
-    <app-qr-scanner (scanned)="onScanned($event)" (cameraError)="onCameraError($event)"></app-qr-scanner>
+    <div class="scan-target-wrap">
+      <app-qr-scanner
+        class="scan-video"
+        (scanned)="onScanned($event)"
+        (cameraError)="onCameraError($event)"
+      ></app-qr-scanner>
+    </div>
+
+    <h1 class="scan-heading">Scanning for a collar</h1>
+    <p class="scan-instructions">Point your camera at the PawTag QR code to open the animal's profile.</p>
+
     <pt-button variant="secondary" [full]="true" (click)="closeCamera()">Cancel scan</pt-button>
   } @else {
-    <pt-button [full]="true" (click)="toggleCamera()">Scan with camera</pt-button>
+    <div class="scan-target-wrap">
+      <button type="button" class="scan-target" (click)="toggleCamera()" aria-label="Scan with camera">
+        <span class="scan-target-ring"></span>
+        <span class="scan-target-circle">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <rect x="3" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8" />
+            <rect x="14" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8" />
+            <rect x="3" y="14" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8" />
+            <rect x="14" y="14" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8" />
+          </svg>
+        </span>
+      </button>
+    </div>
+
+    <h1 class="scan-heading">Scan with camera</h1>
+    <p class="scan-instructions">Point your camera at the PawTag QR code to open the animal's profile.</p>
+
+    @if (!manualEntryOpen()) {
+      <button type="button" class="scan-manual-link" (click)="manualEntryOpen.set(true)">
+        Enter animal ID manually instead
+      </button>
+    }
   }
 
-  <div class="scan-divider">or</div>
+  @if (manualEntryOpen()) {
+    <form class="scan-form" [formGroup]="form" (ngSubmit)="submit()">
+      <pt-input
+        label="Animal ID"
+        placeholder="Enter animal ID manually"
+        formControlName="animalId"
+        [error]="animalId.touched && animalId.hasError('required') ? 'Enter an animal ID.' : null"
+      ></pt-input>
 
-  <form class="scan-form" [formGroup]="form" (ngSubmit)="submit()">
-    <pt-input
-      label="Animal ID"
-      placeholder="Enter animal ID manually"
-      formControlName="animalId"
-      [error]="animalId.touched && animalId.hasError('required') ? 'Enter an animal ID.' : null"
-    ></pt-input>
+      @if (lookupError()) {
+        <p class="scan-error">
+          {{ lookupError() }}
+          <button type="button" class="scan-retry" (click)="retry()">Try again</button>
+        </p>
+      }
 
-    @if (lookupError()) {
-      <p class="scan-error">
-        {{ lookupError() }}
-        <button type="button" class="scan-retry" (click)="retry()">Try again</button>
-      </p>
-    }
-
-    <pt-button type="submit" [full]="true" [disabled]="resolving()">
-      {{ resolving() ? 'Looking up…' : 'Find animal' }}
-    </pt-button>
-  </form>
+      <pt-button type="submit" [full]="true" [disabled]="resolving()">
+        {{ resolving() ? 'Looking up…' : 'Find animal' }}
+      </pt-button>
+    </form>
+  }
 </div>

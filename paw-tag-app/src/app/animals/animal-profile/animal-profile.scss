@@ -34,33 +34,47 @@
 
 .animal-profile-name {
   margin: 0;
-  font-size: 15px;
-  line-height: 20px;
-  font-weight: 600;
+  font-size: 18px;
+  line-height: 24px;
+  font-weight: 700;
   color: var(--pt-ink);
 }
 
+.animal-profile-subtitle {
+  font-size: 13px;
+  color: var(--pt-ink-muted);
+}
+
 .animal-profile-id {
-  font-size: 14px;
+  font-size: 13px;
   font-family: ui-monospace, 'SFMono-Regular', Menlo, monospace;
   color: var(--pt-ink-muted);
 }
 
 .animal-profile-details {
-  margin: 0 0 var(--pt-space-5);
-  display: flex;
-  flex-direction: column;
-  gap: var(--pt-space-3);
+  margin: 0 0 var(--pt-space-4);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--pt-space-4) var(--pt-space-4);
+  padding: var(--pt-space-4);
+  background: var(--pt-surface-100);
+  border: 1px solid var(--pt-border);
+  border-radius: var(--pt-radius-lg);
 }
 
 .medical-records-section {
   margin-bottom: var(--pt-space-5);
 }
 
-.medical-records-footer {
+.medical-records-header {
   display: flex;
-  flex-wrap: wrap;
-  gap: var(--pt-space-4);
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: var(--pt-space-3);
+}
+
+.medical-records-header .medical-records-title {
+  margin: 0;
 }
 
 .medical-records-title {
@@ -133,22 +147,19 @@
 
 .detail-row {
   display: flex;
-  justify-content: space-between;
-  gap: var(--pt-space-3);
-  padding-bottom: var(--pt-space-3);
-  border-bottom: 1px solid var(--pt-border);
+  flex-direction: column;
+  gap: 2px;
 
   dt {
-    font-size: 13px;
-    font-weight: 600;
+    font-size: 12px;
     color: var(--pt-ink-muted);
   }
 
   dd {
     margin: 0;
     font-size: 15px;
+    font-weight: 600;
     color: var(--pt-ink);
-    text-align: right;
   }
 }
 
@@ -219,9 +230,10 @@
 
 .animal-profile-actions {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  justify-content: space-between;
   gap: var(--pt-space-3);
+  margin-bottom: var(--pt-space-5);
 }
 
 .animal-profile-link {

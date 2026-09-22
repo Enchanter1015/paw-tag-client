@@ -9,11 +9,14 @@
         <pt-avatar size="lg" [name]="animal.name"></pt-avatar>
         <div class="animal-profile-heading">
           <h3 class="animal-profile-name">{{ animal.name }}</h3>
+          <span class="animal-profile-subtitle">
+            {{ animal.isStreet ? 'Street dog' : 'Registered pet' }}
+            @if (registeredByName(); as registeredBy) {
+              · Registered by {{ registeredBy }}
+            }
+          </span>
           <span class="animal-profile-id">{{ animal.id }}</span>
         </div>
-        <pt-tag [variant]="animal.isStreet ? 'info' : 'neutral'">
-          {{ animal.isStreet ? 'Street animal' : 'Registered pet' }}
-        </pt-tag>
       </div>
 
       <dl class="animal-profile-details">
@@ -31,16 +34,34 @@
         </div>
       </dl>
 
-      @if (upcomingVaccinations().length > 0) {
+      <div class="animal-profile-actions">
+        <pt-button variant="secondary" [routerLink]="['/animals', animal.id, 'qr']">View QR code</pt-button>
+        @if (!authState.isGuest()) {
+          <pt-button
+            variant="secondary"
+            [routerLink]="['/animals', animal.id, 'medical-records']"
+            [queryParams]="{ add: 'true' }"
+          >
+            Add medical record
+          </pt-button>
+        }
+      </div>
+
+      @if (vaccinations().length > 0) {
         <section class="medical-records-section">
-          <h2 class="medical-records-title">Upcoming vaccinations</h2>
+          <h2 class="medical-records-title">Vaccinations</h2>
           <ul class="medical-records-list">
-            @for (record of upcomingVaccinations(); track record.id) {
+            @for (record of vaccinations(); track record.id) {
               <li class="medical-record-row">
                 <a class="medical-record-link" [routerLink]="['/animals', animal.id, 'medical-records', record.id]">
                   <div class="medical-record-info">
-                    <span class="medical-record-title">{{ record.title }}</span>
-                    <span class="medical-record-meta">{{ medicalRecordTypeName(record.medicalRecordTypeId) }}</span>
+                    <span class="medical-record-title">{{ medicalRecordTypeName(record.medicalRecordTypeId) }}</span>
+                    <span class="medical-record-meta">
+                      Given {{ formatAdministeredAt(record) }}
+                      @if (formatNextDueDate(record); as nextDue) {
+                        · Next due {{ nextDue }}
+                      }
+                    </span>
                   </div>
                   @if (medicalRecordDueStatus(record); as status) {
                     <pt-tag [variant]="status.variant">{{ status.label }}</pt-tag>
@@ -54,7 +75,10 @@
 
       @if (!medicalRecordsLoading()) {
         <section class="medical-records-section">
-          <h2 class="medical-records-title">Recent medical records</h2>
+          <div class="medical-records-header">
+            <h2 class="medical-records-title">Recent medical note</h2>
+            <a class="animal-profile-link" [routerLink]="['/animals', animal.id, 'medical-records']">View all</a>
+          </div>
           @if (recentMedicalRecords().length === 0) {
             <p class="medical-records-empty">No medical records yet.</p>
           } @else {
@@ -76,26 +100,8 @@
               }
             </ul>
           }
-          <div class="medical-records-footer">
-            <a class="animal-profile-link" [routerLink]="['/animals', animal.id, 'medical-records']">
-              View all medical records
-            </a>
-            @if (!authState.isGuest()) {
-              <a
-                class="animal-profile-link"
-                [routerLink]="['/animals', animal.id, 'medical-records']"
-                [queryParams]="{ add: 'true' }"
-              >
-                Add medical record
-              </a>
-            }
-          </div>
         </section>
       }
-
-      <div class="animal-profile-actions">
-        <pt-button variant="secondary" [routerLink]="['/animals', animal.id, 'qr']">View QR code</pt-button>
-      </div>
     } @else {
       <form class="animal-profile-form" [formGroup]="form" (ngSubmit)="save()">
         <pt-input label="Name" formControlName="name" [error]="nameError()"></pt-input>

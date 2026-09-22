@@ -3,24 +3,28 @@ import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { PageHeaderService } from '../../core/services/page-header.service';
 import { UsersService } from '../../core/services/users.service';
-import { ApiError, User } from '../../core/models/models';
+import { LookupsService } from '../../core/services/lookups.service';
+import { ApiError, Lookup, User } from '../../core/models/models';
+import { ConfirmDialog } from '../../shared/confirm-dialog/confirm-dialog';
 import { PtAvatar } from '../../shared/pt-avatar/pt-avatar';
 import { PtButton } from '../../shared/pt-button/pt-button';
 import { PtCard } from '../../shared/pt-card/pt-card';
 import { PtInput } from '../../shared/pt-input/pt-input';
+import { PtTag } from '../../shared/pt-tag/pt-tag';
 
-// The API currently exposes no "list all users" endpoint, so lookup is by exact email
-// (see docs/frontend-implementation-plan.md PR 12 note) — flagged to backend for a future list/search endpoint.
+type PendingAction = { type: 'role'; roleId: number } | { type: 'deactivate' } | { type: 'activate' };
+
 @Component({
   selector: 'app-user-management',
   standalone: true,
-  imports: [ReactiveFormsModule, PtAvatar, PtButton, PtCard, PtInput],
+  imports: [ReactiveFormsModule, ConfirmDialog, PtAvatar, PtButton, PtCard, PtInput, PtTag],
   templateUrl: './user-management.html',
   styleUrl: './user-management.scss',
 })
 export class UserManagement {
   private readonly fb = inject(FormBuilder);
   private readonly usersService = inject(UsersService);
+  private readonly lookupsService = inject(LookupsService);
 
   readonly searchForm = this.fb.group({
     email: this.fb.control('', [Validators.required, Validators.email]),
@@ -28,6 +32,7 @@ export class UserManagement {
 
   constructor() {
     inject(PageHeaderService).set({ title: () => 'User management', left: { kind: 'back' } });
+    this.lookupsService.getRoles().subscribe((roles) => this.roles.set(roles));
   }
 
   readonly user = signal<User | null>(null);
@@ -37,6 +42,16 @@ export class UserManagement {
   readonly editing = signal(false);
   readonly saving = signal(false);
   readonly formError = signal<string | null>(null);
+
+  readonly roles = signal<Lookup[]>([]);
+  readonly roleActionError = signal<string | null>(null);
+  readonly selectedRoleId = signal<number | null>(null);
+  readonly pendingAction = signal<PendingAction | null>(null);
+  readonly actionInFlight = signal(false);
+
+  roleName(roleId: number): string {
+    return this.roles().find((role) => role.id === roleId)?.name ?? 'Unknown role';
+  }
 
   readonly editForm = this.fb.group({
     name: this.fb.control('', [Validators.required, Validators.maxLength(150)]),
@@ -98,6 +113,7 @@ export class UserManagement {
     const email = this.searchForm.getRawValue().email!.trim();
     this.searching.set(true);
     this.searchError.set(null);
+    this.roleActionError.set(null);
     this.user.set(null);
     this.editing.set(false);
 
@@ -105,6 +121,7 @@ export class UserManagement {
       next: (user) => {
         this.searching.set(false);
         this.user.set(user);
+        this.selectedRoleId.set(user.roleId);
       },
       error: () => {
         this.searching.set(false);
@@ -166,6 +183,113 @@ export class UserManagement {
           this.applyServerError(response);
         },
       });
+  }
+
+  requestRoleChange(): void {
+    const user = this.user();
+    const roleId = this.selectedRoleId();
+    if (!user || roleId === null || roleId === user.roleId) {
+      return;
+    }
+    this.roleActionError.set(null);
+    this.pendingAction.set({ type: 'role', roleId });
+  }
+
+  requestDeactivate(): void {
+    this.roleActionError.set(null);
+    this.pendingAction.set({ type: 'deactivate' });
+  }
+
+  requestActivate(): void {
+    this.roleActionError.set(null);
+    this.pendingAction.set({ type: 'activate' });
+  }
+
+  cancelPendingAction(): void {
+    this.pendingAction.set(null);
+  }
+
+  dialogTitle(): string {
+    switch (this.pendingAction()?.type) {
+      case 'role':
+        return 'Change this user’s role?';
+      case 'deactivate':
+        return 'Deactivate this user?';
+      case 'activate':
+        return 'Reactivate this user?';
+      default:
+        return '';
+    }
+  }
+
+  dialogMessage(): string {
+    const user = this.user();
+    const action = this.pendingAction();
+    if (!user || !action) {
+      return '';
+    }
+    switch (action.type) {
+      case 'role':
+        return `${user.name}'s role will change to "${this.roleName(action.roleId)}".`;
+      case 'deactivate':
+        return `${user.name} will no longer be able to sign in until reactivated.`;
+      case 'activate':
+        return `${user.name} will be able to sign in again.`;
+    }
+  }
+
+  dialogConfirmLabel(): string {
+    if (this.actionInFlight()) {
+      return 'Working…';
+    }
+    switch (this.pendingAction()?.type) {
+      case 'role':
+        return 'Change role';
+      case 'deactivate':
+        return 'Deactivate';
+      case 'activate':
+        return 'Reactivate';
+      default:
+        return 'Confirm';
+    }
+  }
+
+  confirmPendingAction(): void {
+    const user = this.user();
+    const action = this.pendingAction();
+    if (!user || !action) {
+      return;
+    }
+
+    this.actionInFlight.set(true);
+
+    let request$;
+    switch (action.type) {
+      case 'role':
+        request$ = this.usersService.changeRole(user.id, action.roleId);
+        break;
+      case 'deactivate':
+        request$ = this.usersService.deactivate(user.id);
+        break;
+      case 'activate':
+        request$ = this.usersService.activate(user.id);
+        break;
+    }
+
+    request$.subscribe({
+      next: (updated) => {
+        this.actionInFlight.set(false);
+        this.pendingAction.set(null);
+        this.user.set(updated);
+        this.selectedRoleId.set(updated.roleId);
+      },
+      error: (response: HttpErrorResponse) => {
+        this.actionInFlight.set(false);
+        this.pendingAction.set(null);
+        const apiError = response.error as ApiError | undefined;
+        this.roleActionError.set(apiError?.error?.message ?? 'Something went wrong. Please try again.');
+      },
+    });
   }
 
   private applyServerError(response: HttpErrorResponse): void {

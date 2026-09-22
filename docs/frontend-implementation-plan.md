@@ -235,4 +235,3 @@ Commits:
 ## Open blockers to confirm with backend before starting
 - No "list all users" endpoint (needed by PR 12).
 - No coverage-aggregate endpoint for dashboard KPIs (PR 13) — otherwise requires expensive client-side aggregation over `/animals` + `/medical-records`.
-- No lat/lng fields on `Animal` (PR 15) or a "nearest" search parameter.

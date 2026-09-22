@@ -7,6 +7,7 @@ import { animalsRoutes } from './animals/animals.routes';
 import { adminRoutes } from './admin/admin.routes';
 import { medicalRoutes } from './medical/medical.routes';
 import { scanRoutes } from './scan/scan.routes';
+import { profileRoutes } from './profile/profile.routes';
 
 export const routes: Routes = [
   ...authRoutes,
@@ -19,6 +20,7 @@ export const routes: Routes = [
       ...adminRoutes,
       ...medicalRoutes,
       ...scanRoutes,
+      ...profileRoutes,
     ],
   },
 ];

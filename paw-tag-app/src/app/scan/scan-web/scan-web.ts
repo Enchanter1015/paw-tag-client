@@ -30,6 +30,7 @@ export class ScanWeb {
   }
 
   readonly cameraOpen = signal(false);
+  readonly manualEntryOpen = signal(false);
   readonly resolving = signal(false);
   readonly lookupError = signal<string | null>(null);
 
@@ -59,6 +60,7 @@ export class ScanWeb {
 
   onCameraError(message: string): void {
     this.cameraOpen.set(false);
+    this.manualEntryOpen.set(true);
     this.lookupError.set(message);
   }
 
@@ -88,6 +90,7 @@ export class ScanWeb {
       },
       error: () => {
         this.resolving.set(false);
+        this.manualEntryOpen.set(true);
         this.lookupError.set(`No animal found for ID "${id}".`);
       },
     });
