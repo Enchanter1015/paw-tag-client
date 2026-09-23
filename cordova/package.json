@@ -13,11 +13,19 @@
   "author": "Apache Cordova Team",
   "license": "Apache-2.0",
   "devDependencies": {
+    "cordova-android": "^15.1.0",
     "cordova-browser": "^7.0.0"
   },
   "cordova": {
     "platforms": [
-      "browser"
-    ]
+      "browser",
+      "android"
+    ],
+    "plugins": {
+      "cordova-plugin-android-permissions": {}
+    }
+  },
+  "dependencies": {
+    "cordova-plugin-android-permissions": "1.1.5"
   }
 }

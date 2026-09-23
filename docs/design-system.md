@@ -1,6 +1,6 @@
 # PawTag Design System (extracted from Claude artifact)
 
-Source: `https://claude.ai/artifact/Gizg3yqtdoD3XQxSxRqD6V` (PDF export). Tokens are implemented as CSS custom properties in [paw-tag-app/src/styles.scss](../paw-tag-app/src/styles.scss). Component/usage rules are enforced via [.github/instructions/pawtag-design-system.instructions.md](../.github/instructions/pawtag-design-system.instructions.md).
+Source: `https://claude.ai/artifact/Gizg3yqtdoD3XQxSxRqD6V` (PDF export). Tokens are implemented as CSS custom properties in [src/styles.scss](../src/styles.scss). Component/usage rules are enforced via [.github/instructions/pawtag-design-system.instructions.md](../.github/instructions/pawtag-design-system.instructions.md).
 
 ## Brand overview
 PawTag is the collar-tag platform behind Sri Lanka's street dog vaccination, sterilisation and treatment programme, extended to home dogs via a paid collar. One Angular + Cordova codebase serves: the field app (welfare workers/vets), the desk web platform (clinics/admins), and the public scan page (anyone). **Light theme only.** Every screen designed mobile-first (375–430px) then grown to desktop — never a desktop-only flow, never a different information architecture per breakpoint.

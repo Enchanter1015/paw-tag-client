@@ -1,6 +1,25 @@
 import { Component, ElementRef, EventEmitter, OnDestroy, Output, ViewChild, signal } from '@angular/core';
 import jsQR from 'jsqr';
 
+/** Subset of the cordova-plugin-android-permissions API used for the camera runtime permission check. */
+interface AndroidPermissions {
+  CAMERA: string;
+  checkPermission(
+    permission: string,
+    onSuccess: (status: { hasPermission: boolean }) => void,
+    onError: () => void,
+  ): void;
+  requestPermission(
+    permission: string,
+    onSuccess: (status: { hasPermission: boolean }) => void,
+    onError: () => void,
+  ): void;
+}
+
+interface CordovaGlobal {
+  plugins?: { permissions?: AndroidPermissions };
+}
+
 @Component({
   selector: 'app-qr-scanner',
   standalone: true,
@@ -23,6 +42,11 @@ export class QrScanner implements OnDestroy {
     const mediaDevices = navigator.mediaDevices;
     if (!mediaDevices?.getUserMedia) {
       this.cameraError.emit('Camera access is not available on this device.');
+      return;
+    }
+
+    if (!(await this.ensureAndroidCameraPermission())) {
+      this.cameraError.emit('Camera permission was denied. Enter the animal ID manually instead.');
       return;
     }
 
@@ -103,5 +127,35 @@ export class QrScanner implements OnDestroy {
   private stopStream(): void {
     this.stream?.getTracks().forEach((track) => track.stop());
     this.stream = null;
+  }
+
+  /**
+   * On Android, declaring the CAMERA permission in the manifest is not enough — Cordova's WebView
+   * won't surface a permission prompt for getUserMedia() until the app also holds the runtime
+   * permission, which cordova-plugin-android-permissions requests explicitly. No-op elsewhere.
+   */
+  private ensureAndroidCameraPermission(): Promise<boolean> {
+    const permissions = (window as unknown as { cordova?: CordovaGlobal }).cordova?.plugins?.permissions;
+    if (!permissions) {
+      return Promise.resolve(true);
+    }
+
+    return new Promise((resolve) => {
+      permissions.checkPermission(
+        permissions.CAMERA,
+        (status) => {
+          if (status.hasPermission) {
+            resolve(true);
+            return;
+          }
+          permissions.requestPermission(
+            permissions.CAMERA,
+            (requestStatus) => resolve(requestStatus.hasPermission),
+            () => resolve(false),
+          );
+        },
+        () => resolve(false),
+      );
+    });
   }
 }
