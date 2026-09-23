@@ -15,6 +15,38 @@
       <div class="record-view-description">{{ record.description }}</div>
     }
 
+    <div class="record-view-photos-header">
+      <h2 class="record-view-section-title">Photos</h2>
+      @if (!authState.isGuest()) {
+        <label class="record-view-upload-label" [class.record-view-upload-label--disabled]="uploadingPhotos()">
+          {{ uploadingPhotos() ? 'Uploading…' : 'Add photos' }}
+          <input
+            type="file"
+            accept="image/*"
+            multiple
+            [disabled]="uploadingPhotos()"
+            (change)="uploadPhotos($event)"
+          />
+        </label>
+      }
+    </div>
+    @if (photoError()) {
+      <p class="record-view-error">{{ photoError() }}</p>
+    }
+    @if (record.images && record.images.length > 0) {
+      <ul class="record-view-gallery">
+        @for (image of record.images; track image.id) {
+          <li class="record-view-gallery-item">
+            <button type="button" [attr.aria-label]="'View photo for ' + record.title" (click)="viewingPhotoUrl.set(image.url)">
+              <img [src]="image.url" [alt]="record.title" (error)="onImageError($event)" />
+            </button>
+          </li>
+        }
+      </ul>
+    } @else {
+      <p class="record-view-photos-empty">No photos yet.</p>
+    }
+
     <h2 class="record-view-section-title">Details</h2>
     <dl class="record-view-details">
       <div class="detail-row">
@@ -36,4 +68,6 @@
       </div>
     </dl>
   }
+
+  <pt-image-viewer [url]="viewingPhotoUrl()" [alt]="record()?.title ?? ''" (closed)="viewingPhotoUrl.set(null)"></pt-image-viewer>
 </div>

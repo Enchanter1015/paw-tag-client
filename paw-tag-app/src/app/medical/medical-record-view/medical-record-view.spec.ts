@@ -4,6 +4,7 @@ import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting, HttpTestingController } from '@angular/common/http/testing';
 import { MedicalRecordView } from './medical-record-view';
 import { API_BASE_URL } from '../../core/services/api-config';
+import { AuthStateService } from '../../core/services/auth-state.service';
 import { PageHeaderService } from '../../core/services/page-header.service';
 import { Animal, Lookup, MedicalRecord, User } from '../../core/models/models';
 
@@ -46,6 +47,7 @@ describe('MedicalRecordView', () => {
   };
 
   let httpMock: HttpTestingController;
+  let authState: { isGuest: () => boolean };
 
   function createComponent() {
     const fixture = TestBed.createComponent(MedicalRecordView);
@@ -59,12 +61,14 @@ describe('MedicalRecordView', () => {
   }
 
   beforeEach(() => {
+    authState = { isGuest: () => true };
     TestBed.configureTestingModule({
       imports: [MedicalRecordView],
       providers: [
         provideHttpClient(),
         provideHttpClientTesting(),
         { provide: API_BASE_URL, useValue: baseUrl },
+        { provide: AuthStateService, useValue: authState },
         {
           provide: ActivatedRoute,
           useValue: { snapshot: { paramMap: convertToParamMap({ id: animalId, recordId }) } },
@@ -121,5 +125,39 @@ describe('MedicalRecordView', () => {
     fixture.detectChanges();
 
     expect(fixture.nativeElement.textContent).toContain('Unknown');
+  });
+
+  it('uploads photos and appends them to the record for an authenticated user', () => {
+    authState.isGuest = () => false;
+    const fixture = createComponent();
+    const component = fixture.componentInstance;
+
+    const file = new File(['data'], 'photo.jpg', { type: 'image/jpeg' });
+    const input = { files: [file] as unknown as FileList, value: '' } as unknown as HTMLInputElement;
+    component.uploadPhotos({ target: input } as unknown as Event);
+
+    const req = httpMock.expectOne(`${baseUrl}/medical-records/${recordId}/images`);
+    expect(req.request.method).toBe('POST');
+    expect(req.request.body instanceof FormData).toBe(true);
+
+    const newImage = {
+      id: 'img-1',
+      medicalRecordId: recordId,
+      s3Key: 'k',
+      url: 'http://example.com/1.webp',
+      createdBy: 'user-1',
+      createdAt: '2026-01-01T00:00:00Z',
+    };
+    req.flush([newImage]);
+
+    expect(component.uploadingPhotos()).toBe(false);
+    expect(component.record()?.images).toEqual([newImage]);
+  });
+
+  it('hides the upload control for a guest', () => {
+    const fixture = createComponent();
+
+    const label = fixture.nativeElement.querySelector('.record-view-upload-label');
+    expect(label).toBeNull();
   });
 });

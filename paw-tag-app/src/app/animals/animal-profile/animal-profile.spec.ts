@@ -239,4 +239,42 @@ describe('AnimalProfile', () => {
     expect(status?.variant).toBe('warning');
     expect(status?.label).toBe('Due soon');
   });
+
+  it('uploads photos and appends them to the animal', () => {
+    authState.isGuest = () => false;
+    const fixture = createComponent();
+    const component = fixture.componentInstance;
+
+    const file = new File(['data'], 'photo.jpg', { type: 'image/jpeg' });
+    const input = { files: [file] as unknown as FileList, value: '' } as unknown as HTMLInputElement;
+    component.uploadPhotos({ target: input } as unknown as Event);
+
+    expect(component.uploadingPhotos()).toBe(true);
+
+    const req = httpMock.expectOne(`${baseUrl}/animals/${animal.id}/images`);
+    expect(req.request.method).toBe('POST');
+    expect(req.request.body instanceof FormData).toBe(true);
+
+    const newImage = { id: 'img-1', animalId: animal.id, s3Key: 'k', url: 'http://example.com/1.webp', createdBy: 'u1', createdAt: '2026-01-01T00:00:00Z' };
+    req.flush([newImage]);
+
+    expect(component.uploadingPhotos()).toBe(false);
+    expect(component.animal()?.images).toEqual([newImage]);
+  });
+
+  it('shows an error when photo upload fails', () => {
+    authState.isGuest = () => false;
+    const fixture = createComponent();
+    const component = fixture.componentInstance;
+
+    const file = new File(['data'], 'photo.jpg', { type: 'image/jpeg' });
+    const input = { files: [file] as unknown as FileList, value: '' } as unknown as HTMLInputElement;
+    component.uploadPhotos({ target: input } as unknown as Event);
+
+    const req = httpMock.expectOne(`${baseUrl}/animals/${animal.id}/images`);
+    req.flush({ error: { code: 'BAD_REQUEST', message: 'Invalid image' } }, { status: 400, statusText: 'Bad Request' });
+
+    expect(component.uploadingPhotos()).toBe(false);
+    expect(component.photoError()).toBe('Invalid image');
+  });
 });

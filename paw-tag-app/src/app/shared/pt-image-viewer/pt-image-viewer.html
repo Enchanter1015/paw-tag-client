@@ -1,0 +1,12 @@
+@if (url) {
+  <div class="image-viewer-backdrop" (click)="closed.emit()">
+    <button type="button" class="image-viewer-close" aria-label="Close" (click)="closed.emit()">✕</button>
+    <img
+      class="image-viewer-image"
+      [src]="url"
+      [alt]="alt"
+      (click)="$event.stopPropagation()"
+      (error)="onImageError($event)"
+    />
+  </div>
+}
