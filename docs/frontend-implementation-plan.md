@@ -1,8 +1,8 @@
 # Frontend Implementation Plan — SCRUM Frontend Backlog
 
 Source tickets: [scrum-frontend-tickets.xml](./scrum-frontend-tickets.xml)
-API contract: `http://localhost:3000/api/docs` (already modeled in `paw-tag-app/src/app/core`)
-UI design system: [docs/design-system.md](./design-system.md) (extracted from the Claude artifact) — tokens live in `paw-tag-app/src/styles.scss`, component/usage rules are enforced via `.github/instructions/pawtag-design-system.instructions.md`. All PRs below must build shared `pt-*` components (Button, Input, Card, Badge, Avatar, ListItem, TopBar, BottomNav) per that spec rather than one-off styling.
+API contract: `http://localhost:3000/api/docs` (already modeled in `src/app/core`)
+UI design system: [docs/design-system.md](./design-system.md) (extracted from the Claude artifact) — tokens live in `src/styles.scss`, component/usage rules are enforced via `.github/instructions/pawtag-design-system.instructions.md`. All PRs below must build shared `pt-*` components (Button, Input, Card, Badge, Avatar, ListItem, TopBar, BottomNav) per that spec rather than one-off styling.
 
 Service layer already in place and reused throughout (no re-implementation needed):
 `AuthService`, `UsersService`, `AnimalsService`, `VetHospitalsService`, `MedicalRecordsService`, `LookupsService`, `HealthService`, `TokenStorageService`, `authInterceptor`.

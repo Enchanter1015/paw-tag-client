@@ -1,4 +1,4 @@
-import { Component, ViewChild, inject, signal } from '@angular/core';
+import { Component, Injector, ViewChild, afterNextRender, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AnimalsService } from '../../core/services/animals.service';
@@ -18,6 +18,7 @@ export class ScanWeb {
   private readonly fb = inject(FormBuilder);
   private readonly animalsService = inject(AnimalsService);
   private readonly router = inject(Router);
+  private readonly injector = inject(Injector);
 
   @ViewChild(QrScanner) private readonly qrScanner?: QrScanner;
 
@@ -45,7 +46,8 @@ export class ScanWeb {
     }
     this.lookupError.set(null);
     this.cameraOpen.set(true);
-    queueMicrotask(() => this.qrScanner?.start());
+    // The scanner only exists once the @if block renders, so wait for that render before starting it.
+    afterNextRender(() => this.qrScanner?.start(), { injector: this.injector });
   }
 
   closeCamera(): void {

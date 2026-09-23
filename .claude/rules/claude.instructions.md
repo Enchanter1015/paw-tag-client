@@ -1,5 +1,5 @@
 ---
-description: "Use when creating or editing Angular TypeScript source in paw-tag-app — covers standalone HTTP service-layer conventions and the required unit tests."
+description: "Use when creating or editing Angular TypeScript source in this project — covers standalone HTTP service-layer conventions and the required unit tests."
 paths:
   - "src/**/*.ts"
 ---

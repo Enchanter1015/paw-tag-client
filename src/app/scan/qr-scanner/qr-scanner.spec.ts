@@ -48,6 +48,47 @@ describe('QrScanner', () => {
     expect(errorSpy).toHaveBeenCalledWith('Camera permission was denied. Enter the animal ID manually instead.');
   });
 
+  it('releases the camera if stop() runs while getUserMedia is still pending', async () => {
+    const trackStop = vi.fn();
+    let resolveStream!: (stream: MediaStream) => void;
+    Object.defineProperty(navigator, 'mediaDevices', {
+      value: { getUserMedia: vi.fn().mockReturnValue(new Promise((r) => (resolveStream = r))) },
+      configurable: true,
+    });
+    const fixture = createComponent();
+    const scanner = fixture.componentInstance;
+
+    const started = scanner.start();
+    await Promise.resolve();
+    scanner.stop();
+    resolveStream({ getTracks: () => [{ stop: trackStop }] } as unknown as MediaStream);
+    await started;
+
+    expect(trackStop).toHaveBeenCalled();
+    expect(scanner.active()).toBe(false);
+  });
+
+  it('emits a cameraError and releases the camera when the preview fails to play', async () => {
+    const trackStop = vi.fn();
+    Object.defineProperty(navigator, 'mediaDevices', {
+      value: {
+        getUserMedia: vi.fn().mockResolvedValue({ getTracks: () => [{ stop: trackStop }] }),
+      },
+      configurable: true,
+    });
+    const fixture = createComponent();
+    const video = fixture.nativeElement.querySelector('video') as HTMLVideoElement;
+    video.play = vi.fn().mockRejectedValue(new Error('NotAllowedError'));
+    const errorSpy = vi.fn();
+    fixture.componentInstance.cameraError.subscribe(errorSpy);
+
+    await fixture.componentInstance.start();
+
+    expect(errorSpy).toHaveBeenCalledWith('Camera preview is unavailable.');
+    expect(trackStop).toHaveBeenCalled();
+    expect(fixture.componentInstance.active()).toBe(false);
+  });
+
   it('stop() is safe to call when no stream was ever started', () => {
     const fixture = createComponent();
     expect(() => fixture.componentInstance.stop()).not.toThrow();
