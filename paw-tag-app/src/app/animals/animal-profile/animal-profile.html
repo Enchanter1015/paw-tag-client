@@ -22,8 +22,8 @@
           <h3 class="animal-profile-name">{{ animal.name }}</h3>
           <span class="animal-profile-subtitle">
             {{ animal.isStreet ? 'Street dog' : 'Registered pet' }}
-            @if (registeredByName(); as registeredBy) {
-              · Registered by {{ registeredBy }}
+            @if (owner(); as owner) {
+              · Registered by {{ owner.name }}
             }
           </span>
           <span class="animal-profile-id">{{ animal.id }}</span>
@@ -79,6 +79,22 @@
         </div>
       </dl>
 
+      @if (owner(); as owner) {
+        <section class="medical-records-section">
+          <h2 class="medical-records-title">Owner</h2>
+          <dl class="animal-profile-details">
+            <div class="detail-row">
+              <dt>Name</dt>
+              <dd>{{ owner.name }}</dd>
+            </div>
+            <div class="detail-row">
+              <dt>Contact number</dt>
+              <dd>{{ owner.phoneNo || 'Not recorded' }}</dd>
+            </div>
+          </dl>
+        </section>
+      }
+
       <div class="animal-profile-actions">
         <pt-button variant="secondary" [routerLink]="['/animals', animal.id, 'qr']">View QR code</pt-button>
         @if (!authState.isGuest()) {
@@ -99,6 +115,9 @@
             @for (record of vaccinations(); track record.id) {
               <li class="medical-record-row">
                 <a class="medical-record-link" [routerLink]="['/animals', animal.id, 'medical-records', record.id]">
+                  @if (record.images && record.images.length > 0) {
+                    <img class="medical-record-photo" [src]="record.images[0].url" alt="" (error)="onImageError($event)" />
+                  }
                   <div class="medical-record-info">
                     <span class="medical-record-title">{{ medicalRecordTypeName(record.medicalRecordTypeId) }}</span>
                     <span class="medical-record-meta">
@@ -131,6 +150,9 @@
               @for (record of recentMedicalRecords(); track record.id) {
                 <li class="medical-record-row">
                   <a class="medical-record-link" [routerLink]="['/animals', animal.id, 'medical-records', record.id]">
+                    @if (record.images && record.images.length > 0) {
+                      <img class="medical-record-photo" [src]="record.images[0].url" alt="" (error)="onImageError($event)" />
+                    }
                     <div class="medical-record-info">
                       <span class="medical-record-title">{{ record.title }}</span>
                       <span class="medical-record-meta">

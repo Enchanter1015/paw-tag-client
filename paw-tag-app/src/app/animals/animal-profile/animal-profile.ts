@@ -9,7 +9,7 @@ import { MedicalRecordsService } from '../../core/services/medical-records.servi
 import { AuthStateService } from '../../core/services/auth-state.service';
 import { PageHeaderService } from '../../core/services/page-header.service';
 import { UsersService } from '../../core/services/users.service';
-import { Animal, ApiError, Lookup, MedicalRecord } from '../../core/models/models';
+import { Animal, ApiError, Lookup, MedicalRecord, User } from '../../core/models/models';
 import { onImageError } from '../../core/utils/image-placeholder.util';
 import { DueStatus, formatDate, getDueStatus, sortByAdministeredAtDesc } from '../../core/utils/medical-record-status.util';
 import { PtAvatar } from '../../shared/pt-avatar/pt-avatar';
@@ -39,7 +39,7 @@ export class AnimalProfile {
   private readonly route = inject(ActivatedRoute);
 
   readonly animal = signal<Animal | null>(null);
-  readonly registeredByName = signal<string | null>(null);
+  readonly owner = signal<User | null>(null);
   readonly animalTypes = signal<Lookup[]>([]);
   readonly medicalRecordTypes = signal<Lookup[]>([]);
   readonly medicalRecords = signal<MedicalRecord[]>([]);
@@ -103,8 +103,8 @@ export class AnimalProfile {
 
         if (animal.createdBy) {
           this.usersService.getById(animal.createdBy).subscribe({
-            next: (user) => this.registeredByName.set(user.name),
-            error: () => this.registeredByName.set(null),
+            next: (user) => this.owner.set(user),
+            error: () => this.owner.set(null),
           });
         }
       },

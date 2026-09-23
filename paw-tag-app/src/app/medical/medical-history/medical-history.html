@@ -24,6 +24,9 @@
       @for (record of records(); track record.id) {
         <li class="medical-record">
           <a class="medical-record-link" [routerLink]="['/animals', animalId, 'medical-records', record.id]">
+            @if (record.images && record.images.length > 0) {
+              <img class="medical-record-photo" [src]="record.images[0].url" alt="" (error)="onImageError($event)" />
+            }
             <div class="medical-record-main">
               <span class="medical-record-title">{{ record.title }}</span>
               <span class="medical-record-meta">

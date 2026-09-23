@@ -58,10 +58,19 @@
   }
 }
 
+.medical-record-photo {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--pt-radius-md);
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
 .medical-record-main {
   display: flex;
   flex-direction: column;
   min-width: 0;
+  flex: 1;
 }
 
 .medical-record-title {

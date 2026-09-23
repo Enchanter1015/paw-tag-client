@@ -2,74 +2,59 @@
   <header class="pt-topbar">
     <div class="pt-topbar-start">
       @if (pageHeader.config().left; as left) {
-        @if (left.kind === 'back') {
-          <button type="button" class="pt-topbar-back" (click)="goBack()" aria-label="Back">
-            <svg class="pt-topbar-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-              <path d="M15 5 8 12l7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-            </svg>
-          </button>
-        } @else if (left.kind === 'close') {
-          <button type="button" class="pt-topbar-back" (click)="left.onClick()" aria-label="Close">
-            <svg class="pt-topbar-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-              <path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-            </svg>
-          </button>
-        }
+      @if (left.kind === 'back') {
+      <button type="button" class="pt-topbar-back" (click)="goBack()" aria-label="Back">
+        <svg class="pt-topbar-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"
+          aria-hidden="true">
+          <path d="M15 5 8 12l7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round" />
+        </svg>
+      </button>
+      } @else if (left.kind === 'close') {
+      <button type="button" class="pt-topbar-back" (click)="left.onClick()" aria-label="Close">
+        <svg class="pt-topbar-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"
+          aria-hidden="true">
+          <path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+        </svg>
+      </button>
+      }
       }
       <span class="pt-topbar-title">{{ pageHeader.config().title() }}</span>
     </div>
 
     @if (pageHeader.config().action; as action) {
-      @if (action.kind === 'edit') {
-        <button type="button" class="pt-topbar-action" (click)="action.onClick()" aria-label="Edit">
-          <svg class="pt-topbar-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <path
-              d="M4 20h4l10.5-10.5a2 2 0 0 0 0-2.83l-1.17-1.17a2 2 0 0 0-2.83 0L4 16v4Z"
-              stroke="currentColor"
-              stroke-width="1.6"
-              stroke-linejoin="round"
-            />
-          </svg>
-        </button>
-      } @else if (action.kind === 'save') {
-        <button type="button" class="pt-topbar-save" [disabled]="action.disabled()" (click)="action.onClick()">
-          {{ action.label() }}
-        </button>
-      } @else if (action.kind === 'tag') {
-        <span class="pt-topbar-tag">{{ action.label }}</span>
-      }
+    @if (action.kind === 'edit') {
+    <button type="button" class="pt-topbar-action" (click)="action.onClick()" aria-label="Edit">
+      <svg class="pt-topbar-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M4 20h4l10.5-10.5a2 2 0 0 0 0-2.83l-1.17-1.17a2 2 0 0 0-2.83 0L4 16v4Z" stroke="currentColor"
+          stroke-width="1.6" stroke-linejoin="round" />
+      </svg>
+    </button>
+    } @else if (action.kind === 'save') {
+    <button type="button" class="pt-topbar-save" [disabled]="action.disabled()" (click)="action.onClick()">
+      {{ action.label() }}
+    </button>
+    } @else if (action.kind === 'tag') {
+    <span class="pt-topbar-tag">{{ action.label }}</span>
+    }
     } @else if (authState.isAuthenticated()) {
-      <button type="button" class="pt-btn pt-btn-ghost" (click)="logout()">Sign out</button>
+    <button type="button" class="pt-btn pt-btn-ghost" (click)="logout()">Sign out</button>
     }
   </header>
 
   <aside class="pt-sidebar">
-    @if (authState.isAdministrator()) {
-      <nav class="pt-admin-nav" aria-label="Administrator">
-        <span class="pt-admin-nav-title">Admin</span>
-        <a routerLink="/admin/animals" routerLinkActive="is-active">Animal records</a>
-        <a routerLink="/admin/users" routerLinkActive="is-active">User management</a>
-        <a routerLink="/admin/verification" routerLinkActive="is-active">Record verification</a>
-      </nav>
-    }
+    <!-- @if (authState.isAdministrator()) {
+    <nav class="pt-admin-nav" aria-label="Administrator">
+      <span class="pt-admin-nav-title">Admin</span>
+      <a routerLink="/admin/animals" routerLinkActive="is-active">Animal records</a>
+      <a routerLink="/admin/users" routerLinkActive="is-active">User management</a>
+      <a routerLink="/admin/verification" routerLinkActive="is-active">Record verification</a>
+    </nav>
+    } -->
 
     <nav class="pt-nav" aria-label="Primary">
-      <a routerLink="/" routerLinkActive="is-active" [routerLinkActiveOptions]="{ exact: true }">
-        <svg class="pt-nav-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          <path d="M4 11.5 12 4l8 7.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
-          <path d="M6 10v8.5a1 1 0 0 0 1 1h3v-5h4v5h3a1 1 0 0 0 1-1V10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
-        </svg>
-        <span>Home</span>
-      </a>
-      <a routerLink="/animals" routerLinkActive="is-active">
-        <svg class="pt-nav-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          <path
-            d="M8.5 8.5a1.75 1.75 0 1 0 0-3.5 1.75 1.75 0 0 0 0 3.5ZM15.5 8.5a1.75 1.75 0 1 0 0-3.5 1.75 1.75 0 0 0 0 3.5ZM5.5 12.75a1.75 1.75 0 1 0 0-3.5 1.75 1.75 0 0 0 0 3.5ZM18.5 12.75a1.75 1.75 0 1 0 0-3.5 1.75 1.75 0 0 0 0 3.5ZM12 21c-2.9 0-5.25-1.63-5.25-4.05 0-2.05 1.77-2.7 2.95-3.83C10.85 12.1 11.15 11 12 11s1.15 1.1 2.3 2.12c1.18 1.13 2.95 1.78 2.95 3.83C17.25 19.37 14.9 21 12 21Z"
-            fill="currentColor"
-          />
-        </svg>
-        <span>Animals</span>
-      </a>
+      @if (authState.isGuest()) {
+
       <a routerLink="/scan" routerLinkActive="is-active">
         <svg class="pt-nav-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
           <rect x="3" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8" />
@@ -79,21 +64,61 @@
         </svg>
         <span>Scan</span>
       </a>
-      @if (!authState.isGuest()) {
-        <a routerLink="/records" routerLinkActive="is-active">
-          <svg class="pt-nav-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <path d="M5 6h14M5 12h14M5 18h9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
-          </svg>
-          <span>Records</span>
-        </a>
-        <a routerLink="/profile" routerLinkActive="is-active">
-          <svg class="pt-nav-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <circle cx="12" cy="8" r="3.25" stroke="currentColor" stroke-width="1.8" />
-            <path d="M4.75 19c1.1-3.1 4-4.75 7.25-4.75S18.15 15.9 19.25 19" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
-          </svg>
-          <span>Profile</span>
-        </a>
+      <!-- <a routerLink="/records" routerLinkActive="is-active">
+        <svg class="pt-nav-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M5 6h14M5 12h14M5 18h9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+        </svg>
+        <span>Records</span>
+      </a> -->
       }
+      @if (authState.isAuthenticated()) {
+
+      @if (authState.isAdministrator()) {
+      <a routerLink="/" routerLinkActive="is-active" [routerLinkActiveOptions]="{ exact: true }">
+        <svg class="pt-nav-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M4 11.5 12 4l8 7.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+            stroke-linejoin="round" />
+          <path d="M6 10v8.5a1 1 0 0 0 1 1h3v-5h4v5h3a1 1 0 0 0 1-1V10" stroke="currentColor" stroke-width="1.8"
+            stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+        <span>Home</span>
+      </a>
+     <a routerLink="/admin/animals" routerLinkActive="is-active">
+        <svg class="pt-nav-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path
+            d="M8.5 8.5a1.75 1.75 0 1 0 0-3.5 1.75 1.75 0 0 0 0 3.5ZM15.5 8.5a1.75 1.75 0 1 0 0-3.5 1.75 1.75 0 0 0 0 3.5ZM5.5 12.75a1.75 1.75 0 1 0 0-3.5 1.75 1.75 0 0 0 0 3.5ZM18.5 12.75a1.75 1.75 0 1 0 0-3.5 1.75 1.75 0 0 0 0 3.5ZM12 21c-2.9 0-5.25-1.63-5.25-4.05 0-2.05 1.77-2.7 2.95-3.83C10.85 12.1 11.15 11 12 11s1.15 1.1 2.3 2.12c1.18 1.13 2.95 1.78 2.95 3.83C17.25 19.37 14.9 21 12 21Z"
+            fill="currentColor" />
+        </svg>
+        <span>Animals</span>
+      </a>
+      }
+        <a routerLink="/admin/users" routerLinkActive="is-active">
+        <svg class="pt-nav-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path
+            d="M8.5 8.5a1.75 1.75 0 1 0 0-3.5 1.75 1.75 0 0 0 0 3.5ZM15.5 8.5a1.75 1.75 0 1 0 0-3.5 1.75 1.75 0 0 0 0 3.5ZM5.5 12.75a1.75 1.75 0 1 0 0-3.5 1.75 1.75 0 0 0 0 3.5ZM18.5 12.75a1.75 1.75 0 1 0 0-3.5 1.75 1.75 0 0 0 0 3.5ZM12 21c-2.9 0-5.25-1.63-5.25-4.05 0-2.05 1.77-2.7 2.95-3.83C10.85 12.1 11.15 11 12 11s1.15 1.1 2.3 2.12c1.18 1.13 2.95 1.78 2.95 3.83C17.25 19.37 14.9 21 12 21Z"
+            fill="currentColor" />
+        </svg>
+        <span>User management</span>
+      </a>
+      <a routerLink="/profile" routerLinkActive="is-active">
+        <svg class="pt-nav-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <circle cx="12" cy="8" r="3.25" stroke="currentColor" stroke-width="1.8" />
+          <path d="M4.75 19c1.1-3.1 4-4.75 7.25-4.75S18.15 15.9 19.25 19" stroke="currentColor" stroke-width="1.8"
+            stroke-linecap="round" />
+        </svg>
+        <span>Profile</span>
+      </a>
+      <!-- <a routerLink="/animals" routerLinkActive="is-active">
+        <svg class="pt-nav-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path
+            d="M8.5 8.5a1.75 1.75 0 1 0 0-3.5 1.75 1.75 0 0 0 0 3.5ZM15.5 8.5a1.75 1.75 0 1 0 0-3.5 1.75 1.75 0 0 0 0 3.5ZM5.5 12.75a1.75 1.75 0 1 0 0-3.5 1.75 1.75 0 0 0 0 3.5ZM18.5 12.75a1.75 1.75 0 1 0 0-3.5 1.75 1.75 0 0 0 0 3.5ZM12 21c-2.9 0-5.25-1.63-5.25-4.05 0-2.05 1.77-2.7 2.95-3.83C10.85 12.1 11.15 11 12 11s1.15 1.1 2.3 2.12c1.18 1.13 2.95 1.78 2.95 3.83C17.25 19.37 14.9 21 12 21Z"
+            fill="currentColor" />
+        </svg>
+        <span>Animals</span>
+      </a> -->
+    
+
+    }
     </nav>
   </aside>
 
