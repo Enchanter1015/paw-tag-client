@@ -37,8 +37,10 @@ export class QrScanner implements OnDestroy {
 
   private stream: MediaStream | null = null;
   private frameHandle: number | null = null;
+  private stopped = false;
 
   async start(): Promise<void> {
+    this.stopped = false;
     const mediaDevices = navigator.mediaDevices;
     if (!mediaDevices?.getUserMedia) {
       this.cameraError.emit('Camera access is not available on this device.');
@@ -50,12 +52,19 @@ export class QrScanner implements OnDestroy {
       return;
     }
 
+    let stream: MediaStream;
     try {
-      this.stream = await mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+      stream = await mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
     } catch {
       this.cameraError.emit('Camera permission was denied. Enter the animal ID manually instead.');
       return;
     }
+    // stop() may have run (e.g. "Cancel scan") while the permission prompt was open.
+    if (this.stopped) {
+      stream.getTracks().forEach((track) => track.stop());
+      return;
+    }
+    this.stream = stream;
 
     const video = this.videoRef?.nativeElement;
     if (!video) {
@@ -65,12 +74,22 @@ export class QrScanner implements OnDestroy {
     }
 
     video.srcObject = this.stream;
-    await video.play();
+    try {
+      await video.play();
+    } catch {
+      this.cameraError.emit('Camera preview is unavailable.');
+      this.stopStream();
+      return;
+    }
+    if (this.stopped) {
+      return;
+    }
     this.active.set(true);
     this.scanLoop();
   }
 
   stop(): void {
+    this.stopped = true;
     if (this.frameHandle !== null) {
       cancelAnimationFrame(this.frameHandle);
       this.frameHandle = null;

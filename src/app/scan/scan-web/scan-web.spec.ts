@@ -108,16 +108,26 @@ describe('ScanWeb', () => {
     expect(fixture.nativeElement.querySelector('form.scan-form')).toBeTruthy();
   });
 
-  it('starts the camera scan when the target circle is clicked', () => {
-    const fixture = TestBed.createComponent(ScanWeb);
-    fixture.detectChanges();
+  it('starts the camera scan when the target circle is clicked', async () => {
+    // Never resolves, so the scanner stays in its "waiting for camera" state for the assertions.
+    const getUserMedia = vi.fn().mockReturnValue(new Promise(() => {}));
+    Object.defineProperty(navigator, 'mediaDevices', { value: { getUserMedia }, configurable: true });
 
-    const target = fixture.nativeElement.querySelector('.scan-target') as HTMLButtonElement;
-    target.click();
-    fixture.detectChanges();
+    try {
+      const fixture = TestBed.createComponent(ScanWeb);
+      fixture.detectChanges();
 
-    expect(fixture.componentInstance.cameraOpen()).toBe(true);
-    expect(fixture.nativeElement.querySelector('app-qr-scanner')).toBeTruthy();
+      const target = fixture.nativeElement.querySelector('.scan-target') as HTMLButtonElement;
+      target.click();
+      fixture.detectChanges();
+      await fixture.whenStable();
+
+      expect(fixture.componentInstance.cameraOpen()).toBe(true);
+      expect(fixture.nativeElement.querySelector('app-qr-scanner')).toBeTruthy();
+      expect(getUserMedia).toHaveBeenCalledWith({ video: { facingMode: 'environment' } });
+    } finally {
+      delete (navigator as unknown as { mediaDevices?: unknown }).mediaDevices;
+    }
   });
 
   it('surfaces a camera error and falls back to manual entry', () => {
