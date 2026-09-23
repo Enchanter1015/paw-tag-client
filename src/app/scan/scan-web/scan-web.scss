@@ -40,6 +40,7 @@
   inset: 0;
   border-radius: var(--pt-radius-full);
   background: var(--pt-accent-tint);
+  animation: scan-target-pulse 2.4s ease-in-out infinite;
 }
 
 .scan-target-circle {
@@ -47,21 +48,58 @@
   width: 140px;
   height: 140px;
   border-radius: var(--pt-radius-full);
-  background: var(--pt-surface-100);
-  box-shadow: var(--pt-shadow-sm);
-  color: var(--pt-accent);
+  background: var(--pt-accent);
+  box-shadow: var(--pt-shadow-md);
+  color: var(--pt-on-accent);
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: var(--pt-space-2);
+  transition:
+    background-color 0.15s ease,
+    transform 0.15s ease;
 
   svg {
-    width: 40px;
-    height: 40px;
+    width: 48px;
+    height: 48px;
   }
 }
 
+.scan-target-label {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 18px;
+}
+
 .scan-target:hover .scan-target-circle {
-  background: var(--pt-surface-200);
+  background: var(--pt-accent-strong);
+}
+
+.scan-target:active .scan-target-circle {
+  transform: scale(0.96);
+}
+
+@keyframes scan-target-pulse {
+  0%,
+  100% {
+    transform: scale(0.92);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scan-target-ring {
+    animation: none;
+  }
+
+  .scan-target-circle {
+    transition: none;
+  }
 }
 
 .scan-video {
