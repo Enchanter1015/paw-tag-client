@@ -19,11 +19,43 @@
 
   
 
-  <pt-input
-    label="Prescribed by (vet user ID)"
-    formControlName="prescribedBy"
-    [error]="prescribedByError()"
-  ></pt-input>
+  <div class="field-group">
+    <span class="field-label" id="prescribingVetLabel">Prescribed by (vet hospital)</span>
+
+    @if (!selectedHospital()) {
+      <div class="vet-search">
+        <pt-input placeholder="Search for a vet hospital" [formControl]="hospitalSearch"></pt-input>
+
+        @if (hospitalSearching()) {
+          <p class="vet-search-status">Searching…</p>
+        } @else if (hospitalResults().length > 0) {
+          <ul class="vet-search-results" aria-labelledby="prescribingVetLabel">
+            @for (hospital of hospitalResults(); track hospital.id) {
+              <li>
+                <button type="button" (click)="selectHospital(hospital)">
+                  {{ hospital.name }}
+                  @if (hospital.address) {
+                    <span class="vet-search-address">{{ hospital.address }}</span>
+                  }
+                </button>
+              </li>
+            }
+          </ul>
+        } @else if (hospitalSearch.value) {
+          <p class="vet-search-status">No hospitals found.</p>
+        }
+      </div>
+    } @else {
+      <div class="vet-selected-hospital">
+        <span>{{ selectedHospital()!.name }}</span>
+        <button type="button" class="vet-change-hospital" (click)="changeHospital()">Change</button>
+      </div>
+    }
+
+    @if (prescribedByError()) {
+      <p class="field-error">{{ prescribedByError() }}</p>
+    }
+  </div>
 
   <pt-input
     label="Administered on"
@@ -39,6 +71,31 @@
     formControlName="nextDueDate"
   ></pt-input>
 
+  <div class="field-group">
+    <span class="field-label" id="medicalFormPhotosLabel">Photos (optional)</span>
+    <label class="medical-form-photo-upload" for="medicalFormPhotoInput">
+      Add photos
+      <input id="medicalFormPhotoInput" type="file" accept="image/*" multiple (change)="addPhotos($event)" />
+    </label>
+
+    @if (photoError()) {
+      <p class="field-error">{{ photoError() }}</p>
+    }
+
+    @if (stagedPhotos().length > 0) {
+      <ul class="medical-form-photo-list" aria-labelledby="medicalFormPhotosLabel">
+        @for (photo of stagedPhotos(); track photo.previewUrl; let i = $index) {
+          <li class="medical-form-photo-item">
+            <img [src]="photo.previewUrl" [alt]="photo.file.name" />
+            <button type="button" class="medical-form-photo-remove" aria-label="Remove photo" (click)="removePhoto(i)">
+              ✕
+            </button>
+          </li>
+        }
+      </ul>
+    }
+  </div>
+
   @if (formError()) {
     <p class="medical-form-error">{{ formError() }}</p>
   }
@@ -46,7 +103,7 @@
   <div class="medical-form-actions">
     <pt-button variant="secondary" type="button" (click)="cancelled.emit()">Cancel</pt-button>
     <pt-button type="submit" [disabled]="submitting()">
-      {{ submitting() ? 'Saving…' : 'Save record' }}
+      {{ uploadingPhotos() ? 'Uploading photos…' : submitting() ? 'Saving…' : 'Save record' }}
     </pt-button>
   </div>
 </form>

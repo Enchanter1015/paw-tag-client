@@ -71,7 +71,7 @@ export class Login {
       next: () => {
         this.submitting.set(false);
         const redirectTo = this.route.snapshot.queryParamMap.get('redirectTo');
-        this.router.navigateByUrl(redirectTo || '/');
+        this.router.navigateByUrl(redirectTo || '/profile');
       },
       error: (response: HttpErrorResponse) => {
         this.submitting.set(false);

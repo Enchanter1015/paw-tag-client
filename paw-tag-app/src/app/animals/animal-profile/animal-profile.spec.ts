@@ -154,11 +154,35 @@ describe('AnimalProfile', () => {
       id: 'user-1',
       name: 'A. Fernando',
       email: 'a.fernando@example.com',
+      phoneNo: '0771234567',
       updatedAt: '2026-01-01T00:00:00Z',
     });
     fixture.detectChanges();
 
     expect(fixture.nativeElement.textContent).toContain('Registered by A. Fernando');
+    expect(fixture.nativeElement.textContent).toContain('0771234567');
+  });
+
+  it('shows "Not recorded" for the owner contact number when none is on file', () => {
+    const registeredAnimal: Animal = { ...animal, createdBy: 'user-1' };
+    const fixture = TestBed.createComponent(AnimalProfile);
+    fixture.detectChanges();
+    httpMock.expectOne(`${baseUrl}/animal-types`).flush(animalTypes);
+    httpMock.expectOne(`${baseUrl}/medical-record-types`).flush(medicalRecordTypes);
+    httpMock.expectOne(`${baseUrl}/animals/${animal.id}`).flush(registeredAnimal);
+    httpMock.expectOne(`${baseUrl}/animals/${animal.id}/medical-records`).flush([]);
+    httpMock.expectOne(`${baseUrl}/users/user-1`).flush({
+      id: 'user-1',
+      name: 'A. Fernando',
+      email: 'a.fernando@example.com',
+      updatedAt: '2026-01-01T00:00:00Z',
+    });
+    fixture.detectChanges();
+
+    const contactRow = Array.from(fixture.nativeElement.querySelectorAll('dt')).find(
+      (dt) => (dt as HTMLElement).textContent === 'Contact number'
+    ) as HTMLElement;
+    expect(contactRow.nextElementSibling?.textContent).toBe('Not recorded');
   });
 
   it('shows a not-found message when the animal does not exist', () => {

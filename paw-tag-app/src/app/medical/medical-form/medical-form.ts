@@ -1,12 +1,19 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, EventEmitter, Input, Output, inject, signal } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
+import { debounceTime, switchMap, of } from 'rxjs';
 import { MedicalRecordsService } from '../../core/services/medical-records.service';
+import { ImagesService } from '../../core/services/images.service';
 import { LookupsService } from '../../core/services/lookups.service';
-import { AuthStateService } from '../../core/services/auth-state.service';
-import { ApiError, Lookup, MedicalRecord } from '../../core/models/models';
+import { VetHospitalsService } from '../../core/services/vet-hospitals.service';
+import { ApiError, Lookup, MedicalRecord, VetHospital } from '../../core/models/models';
 import { PtButton } from '../../shared/pt-button/pt-button';
 import { PtInput } from '../../shared/pt-input/pt-input';
+
+interface StagedPhoto {
+  file: File;
+  previewUrl: string;
+}
 
 @Component({
   selector: 'app-medical-form',
@@ -18,8 +25,9 @@ import { PtInput } from '../../shared/pt-input/pt-input';
 export class MedicalForm {
   private readonly fb = inject(FormBuilder);
   private readonly medicalRecordsService = inject(MedicalRecordsService);
+  private readonly imagesService = inject(ImagesService);
   private readonly lookupsService = inject(LookupsService);
-  private readonly authState = inject(AuthStateService);
+  private readonly vetHospitalsService = inject(VetHospitalsService);
 
   @Input({ required: true }) animalId!: string;
   @Output() readonly created = new EventEmitter<MedicalRecord>();
@@ -27,19 +35,44 @@ export class MedicalForm {
 
   readonly medicalRecordTypes = signal<Lookup[]>([]);
   readonly submitting = signal(false);
+  readonly uploadingPhotos = signal(false);
   readonly formError = signal<string | null>(null);
+  readonly photoError = signal<string | null>(null);
+  readonly stagedPhotos = signal<StagedPhoto[]>([]);
+
+  readonly hospitalSearch = new FormControl('');
+  readonly hospitalSearching = signal(false);
+  readonly hospitalResults = signal<VetHospital[]>([]);
+  readonly selectedHospital = signal<VetHospital | null>(null);
 
   readonly form = this.fb.group({
     title: this.fb.control('', [Validators.required, Validators.maxLength(200)]),
     description: this.fb.control(''),
     medicalRecordTypeId: this.fb.control('', [Validators.required]),
-    prescribedBy: this.fb.control(this.authState.currentUser?.sub ?? '', [Validators.required]),
+    prescribedBy: this.fb.control('', [Validators.required]),
     administeredAt: this.fb.control(this.todayIsoDate()),
     nextDueDate: this.fb.control(''),
   });
 
   constructor() {
     this.lookupsService.getMedicalRecordTypes().subscribe((types) => this.medicalRecordTypes.set(types));
+
+    this.hospitalSearch.valueChanges
+      .pipe(
+        debounceTime(300),
+        switchMap((query) => {
+          const trimmed = (query ?? '').trim();
+          if (!trimmed) {
+            return of([]);
+          }
+          this.hospitalSearching.set(true);
+          return this.vetHospitalsService.search(trimmed);
+        })
+      )
+      .subscribe((hospitals) => {
+        this.hospitalSearching.set(false);
+        this.hospitalResults.set(hospitals);
+      });
   }
 
   get title() {
@@ -88,7 +121,7 @@ export class MedicalForm {
       return null;
     }
     if (this.prescribedBy.hasError('required')) {
-      return "Enter the prescribing vet's user ID.";
+      return 'Select the prescribing vet hospital.';
     }
     if (this.prescribedBy.hasError('server')) {
       return this.prescribedBy.getError('server');
@@ -96,8 +129,42 @@ export class MedicalForm {
     return null;
   }
 
+  selectHospital(hospital: VetHospital): void {
+    this.selectedHospital.set(hospital);
+    this.hospitalResults.set([]);
+    this.hospitalSearch.setValue(hospital.name, { emitEvent: false });
+    this.prescribedBy.setValue(hospital.id);
+    this.prescribedBy.markAsTouched();
+  }
+
+  changeHospital(): void {
+    this.selectedHospital.set(null);
+    this.prescribedBy.setValue('');
+    this.hospitalSearch.setValue('');
+  }
+
+  addPhotos(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const files = input.files ? Array.from(input.files) : [];
+    input.value = '';
+    if (files.length === 0) {
+      return;
+    }
+
+    this.photoError.set(null);
+    const staged = files.map((file) => ({ file, previewUrl: URL.createObjectURL(file) }));
+    this.stagedPhotos.set([...this.stagedPhotos(), ...staged]);
+  }
+
+  removePhoto(index: number): void {
+    const photos = this.stagedPhotos();
+    URL.revokeObjectURL(photos[index].previewUrl);
+    this.stagedPhotos.set(photos.filter((_, i) => i !== index));
+  }
+
   submit(): void {
     this.formError.set(null);
+    this.photoError.set(null);
 
     if (this.form.invalid) {
       this.form.markAllAsTouched();
@@ -118,23 +185,55 @@ export class MedicalForm {
         nextDueDate: nextDueDate || undefined,
       })
       .subscribe({
-        next: (record) => {
-          this.submitting.set(false);
-          this.created.emit(record);
-          this.form.reset({
-            title: '',
-            description: '',
-            medicalRecordTypeId: '',
-            prescribedBy: this.authState.currentUser?.sub ?? '',
-            administeredAt: this.todayIsoDate(),
-            nextDueDate: '',
-          });
-        },
+        next: (record) => this.uploadStagedPhotos(record),
         error: (response: HttpErrorResponse) => {
           this.submitting.set(false);
           this.applyServerError(response);
         },
       });
+  }
+
+  private uploadStagedPhotos(record: MedicalRecord): void {
+    const photos = this.stagedPhotos();
+    if (photos.length === 0) {
+      this.finishSubmit(record);
+      return;
+    }
+
+    this.uploadingPhotos.set(true);
+    this.imagesService.uploadMedicalRecordImages(record.id, photos.map((p) => p.file)).subscribe({
+      next: (images) => {
+        this.uploadingPhotos.set(false);
+        this.finishSubmit({ ...record, images });
+      },
+      error: (response: HttpErrorResponse) => {
+        this.uploadingPhotos.set(false);
+        const apiError = response.error as ApiError | undefined;
+        this.photoError.set(
+          apiError?.error?.message ?? 'The record was saved, but the photos could not be uploaded.'
+        );
+        this.finishSubmit(record);
+      },
+    });
+  }
+
+  private finishSubmit(record: MedicalRecord): void {
+    this.submitting.set(false);
+    this.created.emit(record);
+    for (const photo of this.stagedPhotos()) {
+      URL.revokeObjectURL(photo.previewUrl);
+    }
+    this.stagedPhotos.set([]);
+    this.selectedHospital.set(null);
+    this.hospitalSearch.setValue('');
+    this.form.reset({
+      title: '',
+      description: '',
+      medicalRecordTypeId: '',
+      prescribedBy: '',
+      administeredAt: this.todayIsoDate(),
+      nextDueDate: '',
+    });
   }
 
   private applyServerError(response: HttpErrorResponse): void {

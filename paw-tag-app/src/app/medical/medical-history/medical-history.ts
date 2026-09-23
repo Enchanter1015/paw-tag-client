@@ -5,6 +5,7 @@ import { MedicalRecordsService } from '../../core/services/medical-records.servi
 import { AuthStateService } from '../../core/services/auth-state.service';
 import { PageHeaderService } from '../../core/services/page-header.service';
 import { MedicalRecord } from '../../core/models/models';
+import { onImageError } from '../../core/utils/image-placeholder.util';
 import { DueStatus, formatDate, getDueStatus, sortByAdministeredAtDesc } from '../../core/utils/medical-record-status.util';
 import { PtButton } from '../../shared/pt-button/pt-button';
 import { PtTag } from '../../shared/pt-tag/pt-tag';
@@ -29,6 +30,7 @@ export class MedicalHistory {
   readonly records = signal<MedicalRecord[]>([]);
   readonly loading = signal(true);
   readonly loadError = signal<string | null>(null);
+  protected readonly onImageError = onImageError;
 
   // Supports a deep link from AnimalProfile's "Add medical record" button (?add=true),
   // opening the form immediately instead of requiring an extra click.

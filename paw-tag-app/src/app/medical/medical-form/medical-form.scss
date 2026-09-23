@@ -47,6 +47,151 @@
   color: var(--pt-danger);
 }
 
+.vet-search {
+  position: relative;
+}
+
+.vet-search-status {
+  margin: var(--pt-space-1) 0 0;
+  font-size: 13px;
+  color: var(--pt-ink-muted);
+}
+
+.vet-search-results {
+  list-style: none;
+  margin: var(--pt-space-1) 0 0;
+  padding: 0;
+  border: 1px solid var(--pt-border);
+  border-radius: var(--pt-radius-md);
+  overflow: hidden;
+  background: var(--pt-surface-100);
+
+  li + li {
+    border-top: 1px solid var(--pt-border);
+  }
+
+  button {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    padding: var(--pt-space-3);
+    border: none;
+    background: none;
+    text-align: left;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--pt-ink);
+    cursor: pointer;
+
+    &:hover,
+    &:focus-visible {
+      background: var(--pt-surface-200);
+    }
+  }
+}
+
+.vet-search-address {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--pt-ink-muted);
+}
+
+.vet-selected-hospital {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--pt-space-3);
+  height: 44px;
+  padding: 0 var(--pt-space-3);
+  border-radius: var(--pt-radius-md);
+  background: var(--pt-surface-200);
+  color: var(--pt-ink);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.vet-change-hospital {
+  border: none;
+  background: none;
+  padding: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--pt-accent);
+  cursor: pointer;
+}
+
+.medical-form-photo-upload {
+  position: relative;
+  align-self: flex-start;
+  padding: 0 var(--pt-space-3);
+  height: 40px;
+  display: flex;
+  align-items: center;
+  border-radius: var(--pt-radius-md);
+  background: var(--pt-surface-200);
+  color: var(--pt-ink);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+
+  input[type='file'] {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+  }
+}
+
+.medical-form-photo-list {
+  list-style: none;
+  margin: var(--pt-space-2) 0 0;
+  padding: 0;
+  display: flex;
+  gap: var(--pt-space-2);
+  overflow-x: auto;
+}
+
+.medical-form-photo-item {
+  position: relative;
+  flex-shrink: 0;
+  width: 76px;
+  height: 76px;
+  border-radius: var(--pt-radius-md);
+  overflow: hidden;
+  border: 1px solid var(--pt-border);
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+}
+
+.medical-form-photo-remove {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 22px;
+  height: 22px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(19, 36, 32, 0.65);
+  color: #fff;
+  font-size: 12px;
+  line-height: 1;
+  cursor: pointer;
+
+  &:hover,
+  &:focus-visible {
+    background: rgba(19, 36, 32, 0.85);
+  }
+}
+
 .medical-form-error {
   margin: 0;
   padding: var(--pt-space-3);
