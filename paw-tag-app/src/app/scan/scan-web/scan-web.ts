@@ -26,7 +26,7 @@ export class ScanWeb {
   });
 
   constructor() {
-    inject(PageHeaderService).set({ title: () => 'Scan a collar', left: { kind: 'none' } });
+    inject(PageHeaderService).set({ title: () => 'Scan a collar', left: { kind: 'back' } });
   }
 
   readonly cameraOpen = signal(false);
