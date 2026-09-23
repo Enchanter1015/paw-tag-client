@@ -1,18 +1,23 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { AnimalsService } from '../../core/services/animals.service';
+import { AuthStateService } from '../../core/services/auth-state.service';
+import { ImagesService } from '../../core/services/images.service';
 import { LookupsService } from '../../core/services/lookups.service';
 import { MedicalRecordsService } from '../../core/services/medical-records.service';
 import { PageHeaderService } from '../../core/services/page-header.service';
 import { UsersService } from '../../core/services/users.service';
-import { Animal, Lookup, MedicalRecord } from '../../core/models/models';
+import { Animal, ApiError, Lookup, MedicalRecord } from '../../core/models/models';
+import { onImageError } from '../../core/utils/image-placeholder.util';
 import { formatDate } from '../../core/utils/medical-record-status.util';
+import { PtImageViewer } from '../../shared/pt-image-viewer/pt-image-viewer';
 import { PtTag } from '../../shared/pt-tag/pt-tag';
 
 @Component({
   selector: 'app-medical-record-view',
   standalone: true,
-  imports: [RouterLink, PtTag],
+  imports: [RouterLink, PtImageViewer, PtTag],
   templateUrl: './medical-record-view.html',
   styleUrl: './medical-record-view.scss',
 })
@@ -20,9 +25,11 @@ export class MedicalRecordView {
   private readonly route = inject(ActivatedRoute);
   private readonly medicalRecordsService = inject(MedicalRecordsService);
   private readonly animalsService = inject(AnimalsService);
+  private readonly imagesService = inject(ImagesService);
   private readonly lookupsService = inject(LookupsService);
   private readonly usersService = inject(UsersService);
   private readonly pageHeader = inject(PageHeaderService);
+  protected readonly authState = inject(AuthStateService);
 
   readonly animalId = this.route.snapshot.paramMap.get('id') ?? '';
 
@@ -32,6 +39,10 @@ export class MedicalRecordView {
   readonly recordedByName = signal<string | null>(null);
   readonly loading = signal(true);
   readonly notFound = signal(false);
+  readonly uploadingPhotos = signal(false);
+  readonly photoError = signal<string | null>(null);
+  readonly viewingPhotoUrl = signal<string | null>(null);
+  protected readonly onImageError = onImageError;
 
   constructor() {
     this.pageHeader.set({ title: () => 'Medical record', left: { kind: 'back' } });
@@ -58,6 +69,35 @@ export class MedicalRecordView {
       error: () => {
         this.notFound.set(true);
         this.loading.set(false);
+      },
+    });
+  }
+
+  uploadPhotos(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const files = input.files ? Array.from(input.files) : [];
+    input.value = '';
+    if (files.length === 0) {
+      return;
+    }
+
+    const record = this.record();
+    if (!record) {
+      return;
+    }
+
+    this.photoError.set(null);
+    this.uploadingPhotos.set(true);
+
+    this.imagesService.uploadMedicalRecordImages(record.id, files).subscribe({
+      next: (images) => {
+        this.uploadingPhotos.set(false);
+        this.record.set({ ...record, images: [...(record.images ?? []), ...images] });
+      },
+      error: (response: HttpErrorResponse) => {
+        this.uploadingPhotos.set(false);
+        const apiError = response.error as ApiError | undefined;
+        this.photoError.set(apiError?.error?.message ?? 'Could not upload photos. Please try again.');
       },
     });
   }

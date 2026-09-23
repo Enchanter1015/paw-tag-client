@@ -6,7 +6,18 @@
   } @else if (animal(); as animal) {
     @if (!editing()) {
       <div class="animal-profile-header">
-        <pt-avatar size="lg" [name]="animal.name"></pt-avatar>
+        @if (animal.images && animal.images.length > 0) {
+          <button
+            type="button"
+            class="animal-profile-photo-btn"
+            [attr.aria-label]="'View photo of ' + animal.name"
+            (click)="viewingPhotoUrl.set(animal.images[0].url)"
+          >
+            <img class="animal-profile-photo" [src]="animal.images[0].url" [alt]="animal.name" (error)="onImageError($event)" />
+          </button>
+        } @else {
+          <pt-avatar size="lg" [name]="animal.name"></pt-avatar>
+        }
         <div class="animal-profile-heading">
           <h3 class="animal-profile-name">{{ animal.name }}</h3>
           <span class="animal-profile-subtitle">
@@ -18,6 +29,40 @@
           <span class="animal-profile-id">{{ animal.id }}</span>
         </div>
       </div>
+
+      <section class="photos-section">
+        <div class="photos-header">
+          <h2 class="medical-records-title">Photos</h2>
+          @if (!authState.isGuest()) {
+            <label class="photos-upload-label" [class.photos-upload-label--disabled]="uploadingPhotos()">
+              {{ uploadingPhotos() ? 'Uploading…' : 'Add photos' }}
+              <input
+                type="file"
+                accept="image/*"
+                multiple
+                [disabled]="uploadingPhotos()"
+                (change)="uploadPhotos($event)"
+              />
+            </label>
+          }
+        </div>
+        @if (photoError()) {
+          <p class="animal-profile-error">{{ photoError() }}</p>
+        }
+        @if (animal.images && animal.images.length > 0) {
+          <ul class="photos-gallery">
+            @for (image of animal.images; track image.id) {
+              <li class="photos-gallery-item">
+                <button type="button" [attr.aria-label]="'View photo of ' + animal.name" (click)="viewingPhotoUrl.set(image.url)">
+                  <img [src]="image.url" [alt]="animal.name" (error)="onImageError($event)" />
+                </button>
+              </li>
+            }
+          </ul>
+        } @else {
+          <p class="medical-records-empty">No photos yet.</p>
+        }
+      </section>
 
       <dl class="animal-profile-details">
         <div class="detail-row">
@@ -158,4 +203,6 @@
       </form>
     }
   }
+
+  <pt-image-viewer [url]="viewingPhotoUrl()" [alt]="animal()?.name ?? ''" (closed)="viewingPhotoUrl.set(null)"></pt-image-viewer>
 </div>
