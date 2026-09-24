@@ -20,7 +20,10 @@ describe('AuthStateService', () => {
     tokenStorage = TestBed.inject(TokenStorageService);
   });
 
-  afterEach(() => localStorage.clear());
+  afterEach(() => {
+    window.dispatchEvent(new Event('online'));
+    localStorage.clear();
+  });
 
   it('reports no user when no token is stored', () => {
     expect(service.currentUser).toBeNull();
@@ -45,6 +48,27 @@ describe('AuthStateService', () => {
     service.refresh();
 
     expect(service.currentUser).toBeNull();
+    expect(service.isAuthenticated()).toBe(false);
+  });
+
+  it('keeps an expired session usable while offline so cached data stays reachable', () => {
+    tokenStorage.setTokens(makeToken({ sub: 'user-1', role: 'User' }, true), 'refresh-1');
+    window.dispatchEvent(new Event('offline'));
+
+    service.refresh();
+
+    expect(service.isAuthenticated()).toBe(true);
+    expect(service.currentUser?.sub).toBe('user-1');
+  });
+
+  it('drops the expired session again once back online', () => {
+    tokenStorage.setTokens(makeToken({ sub: 'user-1', role: 'User' }, true), 'refresh-1');
+    window.dispatchEvent(new Event('offline'));
+    service.refresh();
+
+    window.dispatchEvent(new Event('online'));
+    service.refresh();
+
     expect(service.isAuthenticated()).toBe(false);
   });
 

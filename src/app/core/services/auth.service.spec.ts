@@ -4,6 +4,7 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 import { AuthService } from './auth.service';
 import { TokenStorageService } from './token-storage.service';
 import { API_BASE_URL } from './api-config';
+import { OfflineCacheService } from './offline-cache.service';
 import { LoginInput, LogoutInput, RefreshInput, RegisterInput, TokenPair } from '../models/models';
 
 describe('AuthService', () => {
@@ -84,6 +85,27 @@ describe('AuthService', () => {
 
     expect(tokenStorage.getAccessToken()).toBeNull();
     expect(tokenStorage.getRefreshToken()).toBeNull();
+  });
+
+  it('clears cached offline profiles on logout', () => {
+    const offlineCache = TestBed.inject(OfflineCacheService);
+    offlineCache.set('animal:1', { name: 'Rex' });
+
+    service.logout({ refreshToken: 'refresh-1' }).subscribe();
+    httpMock.expectOne(`${baseUrl}/auth/logout`).flush(null);
+
+    expect(offlineCache.get('animal:1')).toBeNull();
+  });
+
+  it('keeps cached offline profiles when logout fails', () => {
+    const offlineCache = TestBed.inject(OfflineCacheService);
+    offlineCache.set('animal:1', { name: 'Rex' });
+
+    service.logout({ refreshToken: 'refresh-1' }).subscribe({ error: () => undefined });
+    httpMock.expectOne(`${baseUrl}/auth/logout`).flush(null, { status: 500, statusText: 'Server Error' });
+
+    expect(offlineCache.get('animal:1')).not.toBeNull();
+    offlineCache.clear();
   });
 
   it('propagates an error response without storing tokens', () => {

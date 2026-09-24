@@ -1,0 +1,41 @@
+{
+  "$schema": "./node_modules/@angular/service-worker/config/schema.json",
+  "index": "/index.html",
+  "assetGroups": [
+    {
+      "name": "app",
+      "installMode": "prefetch",
+      "resources": {
+        "files": ["/favicon.ico", "/index.csr.html", "/index.html", "/manifest.webmanifest", "/*.css", "/*.js"]
+      }
+    },
+    {
+      "name": "assets",
+      "installMode": "lazy",
+      "updateMode": "prefetch",
+      "resources": {
+        "files": ["/**/*.(svg|cur|jpg|jpeg|png|apng|webp|avif|gif|otf|ttf|woff|woff2)"]
+      }
+    }
+  ],
+  "dataGroups": [
+    {
+      "name": "animal-profiles",
+      "urls": [
+        "https://apps.technest.lk/paw-tag-api/api/v1/animals",
+        "https://apps.technest.lk/paw-tag-api/api/v1/animals/*",
+        "https://apps.technest.lk/paw-tag-api/api/v1/animals/*/medical-records",
+        "https://apps.technest.lk/paw-tag-api/api/v1/medical-records/*",
+        "https://apps.technest.lk/paw-tag-api/api/v1/users/*",
+        "https://apps.technest.lk/paw-tag-api/api/v1/animal-types",
+        "https://apps.technest.lk/paw-tag-api/api/v1/medical-record-types"
+      ],
+      "cacheConfig": {
+        "strategy": "freshness",
+        "maxSize": 1000,
+        "maxAge": "7d",
+        "timeout": "5s"
+      }
+    }
+  ]
+}

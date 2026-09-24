@@ -205,6 +205,19 @@
   padding-bottom: calc(var(--pt-space-4) + 64px + env(safe-area-inset-bottom, 0px));
 }
 
+// Bleeds to the edges of the content area and sticks under the top bar (56px) while scrolling.
+.pt-shell-offline-banner {
+  position: sticky;
+  top: 56px;
+  z-index: 1;
+  display: block;
+  margin: calc(var(--pt-space-4) * -1) calc(var(--pt-space-4) * -1) var(--pt-space-4);
+
+  &:empty {
+    display: none;
+  }
+}
+
 @media (min-width: 768px) {
   .pt-shell {
     flex-direction: row;

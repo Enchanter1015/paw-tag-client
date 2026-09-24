@@ -1,10 +1,22 @@
 <div class="animal-profile-screen">
   @if (loading()) {
     <p class="animal-profile-status">Loading…</p>
+  } @else if (notFound() && offlineIndicator.offline()) {
+    <p class="animal-profile-status animal-profile-status--error" role="status">
+      You're offline and this profile hasn't been saved on this device yet. Connect to the internet to view it.
+    </p>
   } @else if (notFound()) {
     <p class="animal-profile-status animal-profile-status--error">Animal not found.</p>
   } @else if (animal(); as animal) {
     @if (!editing()) {
+      <pt-offline-notice
+        [cachedAt]="cachedAt()"
+        note="Editing, photos and new records need an internet connection."
+      ></pt-offline-notice>
+      @if (offlineNotice()) {
+        <p class="animal-profile-error animal-profile-offline-notice" role="alert">{{ offlineNotice() }}</p>
+      }
+
       <div class="animal-profile-header">
         @if (animal.images && animal.images.length > 0) {
           <button
@@ -34,13 +46,16 @@
         <div class="photos-header">
           <h2 class="medical-records-title">Photos</h2>
           @if (!authState.isGuest()) {
-            <label class="photos-upload-label" [class.photos-upload-label--disabled]="uploadingPhotos()">
+            <label
+              class="photos-upload-label"
+              [class.photos-upload-label--disabled]="uploadingPhotos() || offlineIndicator.offline()"
+            >
               {{ uploadingPhotos() ? 'Uploading…' : 'Add photos' }}
               <input
                 type="file"
                 accept="image/*"
                 multiple
-                [disabled]="uploadingPhotos()"
+                [disabled]="uploadingPhotos() || offlineIndicator.offline()"
                 (change)="uploadPhotos($event)"
               />
             </label>
@@ -98,13 +113,17 @@
       <div class="animal-profile-actions">
         <pt-button variant="secondary" [routerLink]="['/animals', animal.id, 'qr']">View QR code</pt-button>
         @if (!authState.isGuest()) {
-          <pt-button
-            variant="secondary"
-            [routerLink]="['/animals', animal.id, 'medical-records']"
-            [queryParams]="{ add: 'true' }"
-          >
-            Add medical record
-          </pt-button>
+          @if (offlineIndicator.offline()) {
+            <pt-button variant="secondary" [disabled]="true">Add medical record</pt-button>
+          } @else {
+            <pt-button
+              variant="secondary"
+              [routerLink]="['/animals', animal.id, 'medical-records']"
+              [queryParams]="{ add: 'true' }"
+            >
+              Add medical record
+            </pt-button>
+          }
         }
       </div>
 

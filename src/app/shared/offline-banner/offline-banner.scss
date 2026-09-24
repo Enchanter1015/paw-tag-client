@@ -1,0 +1,18 @@
+.pt-offline-banner {
+  display: flex;
+  align-items: center;
+  gap: var(--pt-space-2);
+  padding: var(--pt-space-2) var(--pt-space-4);
+  background: var(--pt-warning-surface);
+  color: var(--pt-ink);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 18px;
+}
+
+.pt-offline-banner-icon {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  color: var(--pt-warning);
+}

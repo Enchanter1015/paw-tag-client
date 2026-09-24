@@ -1,0 +1,19 @@
+:host {
+  display: block;
+}
+
+.pt-offline-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--pt-space-2);
+  margin-bottom: var(--pt-space-3);
+  padding: var(--pt-space-3);
+  border-radius: var(--pt-radius-md);
+  background: var(--pt-info-surface);
+}
+
+.pt-offline-notice-text {
+  margin: 0;
+  color: var(--pt-ink);
+  font-size: 14px;
+}
