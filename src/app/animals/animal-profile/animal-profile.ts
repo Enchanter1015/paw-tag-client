@@ -6,6 +6,9 @@ import { AnimalsService } from '../../core/services/animals.service';
 import { ImagesService } from '../../core/services/images.service';
 import { LookupsService } from '../../core/services/lookups.service';
 import { MedicalRecordsService } from '../../core/services/medical-records.service';
+import { OfflineCacheKeys, OfflineCacheService } from '../../core/services/offline-cache.service';
+import { OfflineIndicatorService } from '../../core/services/offline-indicator.service';
+import { OfflinePrefetchService } from '../../core/services/offline-prefetch.service';
 import { AuthStateService } from '../../core/services/auth-state.service';
 import { PageHeaderService } from '../../core/services/page-header.service';
 import { UsersService } from '../../core/services/users.service';
@@ -14,16 +17,19 @@ import { onImageError } from '../../core/utils/image-placeholder.util';
 import { DueStatus, formatDate, getDueStatus, sortByAdministeredAtDesc } from '../../core/utils/medical-record-status.util';
 import { PtAvatar } from '../../shared/pt-avatar/pt-avatar';
 import { PtButton } from '../../shared/pt-button/pt-button';
+import { OfflineNotice } from '../../shared/offline-notice/offline-notice';
 import { PtImageViewer } from '../../shared/pt-image-viewer/pt-image-viewer';
 import { PtInput } from '../../shared/pt-input/pt-input';
 import { PtTag } from '../../shared/pt-tag/pt-tag';
 
 const RECENT_RECORDS_LIMIT = 5;
+const OFFLINE_EDIT_MESSAGE = "You're offline. Editing needs an internet connection.";
+const OFFLINE_PHOTO_MESSAGE = "You're offline. Adding photos needs an internet connection.";
 
 @Component({
   selector: 'app-animal-profile',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink, PtAvatar, PtButton, PtImageViewer, PtInput, PtTag],
+  imports: [ReactiveFormsModule, RouterLink, OfflineNotice, PtAvatar, PtButton, PtImageViewer, PtInput, PtTag],
   templateUrl: './animal-profile.html',
   styleUrl: './animal-profile.scss',
 })
@@ -34,6 +40,9 @@ export class AnimalProfile {
   private readonly lookupsService = inject(LookupsService);
   private readonly medicalRecordsService = inject(MedicalRecordsService);
   private readonly usersService = inject(UsersService);
+  private readonly offlineCache = inject(OfflineCacheService);
+  private readonly offlinePrefetch = inject(OfflinePrefetchService);
+  protected readonly offlineIndicator = inject(OfflineIndicatorService);
   protected readonly authState = inject(AuthStateService);
   private readonly pageHeader = inject(PageHeaderService);
   private readonly route = inject(ActivatedRoute);
@@ -52,6 +61,9 @@ export class AnimalProfile {
   readonly uploadingPhotos = signal(false);
   readonly photoError = signal<string | null>(null);
   readonly viewingPhotoUrl = signal<string | null>(null);
+  // Set when the profile was served from the on-device cache because the network was unreachable.
+  readonly cachedAt = signal<string | null>(null);
+  readonly offlineNotice = signal<string | null>(null);
   protected readonly onImageError = onImageError;
 
   readonly recentMedicalRecords = computed(() => this.medicalRecords().slice(0, RECENT_RECORDS_LIMIT));
@@ -85,8 +97,12 @@ export class AnimalProfile {
   constructor() {
     this.updateHeader();
 
-    this.lookupsService.getAnimalTypes().subscribe((types) => this.animalTypes.set(types));
-    this.lookupsService.getMedicalRecordTypes().subscribe((types) => this.medicalRecordTypes.set(types));
+    this.offlineCache
+      .fetch(OfflineCacheKeys.animalTypes, this.lookupsService.getAnimalTypes())
+      .subscribe({ next: ({ data }) => this.animalTypes.set(data), error: () => undefined });
+    this.offlineCache
+      .fetch(OfflineCacheKeys.medicalRecordTypes, this.lookupsService.getMedicalRecordTypes())
+      .subscribe({ next: ({ data }) => this.medicalRecordTypes.set(data), error: () => undefined });
 
     const id = this.route.snapshot.paramMap.get('id');
     if (!id) {
@@ -95,15 +111,16 @@ export class AnimalProfile {
       return;
     }
 
-    this.animalsService.getById(id).subscribe({
-      next: (animal) => {
+    this.offlineCache.fetch(OfflineCacheKeys.animal(id), this.animalsService.getById(id)).subscribe({
+      next: ({ data: animal, fromCache, cachedAt }) => {
         this.animal.set(animal);
+        this.cachedAt.set(fromCache ? cachedAt : null);
         this.loading.set(false);
         this.updateHeader();
 
         if (animal.createdBy) {
-          this.usersService.getById(animal.createdBy).subscribe({
-            next: (user) => this.owner.set(user),
+          this.offlineCache.fetch(OfflineCacheKeys.user(animal.createdBy), this.usersService.getById(animal.createdBy)).subscribe({
+            next: ({ data: user }) => this.owner.set(user),
             error: () => this.owner.set(null),
           });
         }
@@ -114,8 +131,12 @@ export class AnimalProfile {
       },
     });
 
-    this.medicalRecordsService.listForAnimal(id).subscribe({
-      next: (records) => {
+    const records$ = this.medicalRecordsService.listForAnimal(id);
+    this.offlineCache.fetch(OfflineCacheKeys.animalMedicalRecords(id), records$).subscribe({
+      next: ({ data: records, fromCache }) => {
+        if (!fromCache) {
+          this.offlinePrefetch.rememberMedicalRecords(records);
+        }
         this.medicalRecords.set(sortByAdministeredAtDesc(records));
         this.medicalRecordsLoading.set(false);
       },
@@ -163,6 +184,11 @@ export class AnimalProfile {
 
     const animal = this.animal();
     if (!animal) {
+      return;
+    }
+
+    if (this.offlineIndicator.offline()) {
+      this.photoError.set(OFFLINE_PHOTO_MESSAGE);
       return;
     }
 
@@ -216,6 +242,11 @@ export class AnimalProfile {
     if (!animal) {
       return;
     }
+    if (this.offlineIndicator.offline()) {
+      this.offlineNotice.set(OFFLINE_EDIT_MESSAGE);
+      return;
+    }
+    this.offlineNotice.set(null);
     this.form.setValue({
       name: animal.name,
       dob: animal.dob ?? '',

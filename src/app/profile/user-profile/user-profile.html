@@ -4,6 +4,8 @@
   } @else if (loadError()) {
     <p class="user-profile-status user-profile-status--error">{{ loadError() }}</p>
   } @else if (user(); as user) {
+    <pt-offline-notice [cachedAt]="cachedAt()"></pt-offline-notice>
+
     <div class="user-profile-header">
       <pt-avatar size="lg" [name]="user.name"></pt-avatar>
       <div class="user-profile-heading">
@@ -56,6 +58,9 @@
       }
     </section>
 
+    @if (signOutError()) {
+      <p class="user-profile-status user-profile-status--error" role="alert">{{ signOutError() }}</p>
+    }
     <pt-button variant="secondary" [full]="true" (click)="signOut()">Sign out</pt-button>
   }
 </div>

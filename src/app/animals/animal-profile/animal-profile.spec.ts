@@ -1,4 +1,5 @@
 import { TestBed } from '@angular/core/testing';
+import { vi } from 'vitest';
 import { ActivatedRoute, convertToParamMap } from '@angular/router';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting, HttpTestingController } from '@angular/common/http/testing';
@@ -41,6 +42,7 @@ describe('AnimalProfile', () => {
   }
 
   beforeEach(() => {
+    localStorage.clear();
     authState = { isGuest: () => true };
     TestBed.configureTestingModule({
       imports: [AnimalProfile],
@@ -58,7 +60,12 @@ describe('AnimalProfile', () => {
     httpMock = TestBed.inject(HttpTestingController);
   });
 
-  afterEach(() => httpMock.verify());
+  afterEach(() => {
+    httpMock.verify();
+    vi.restoreAllMocks();
+    window.dispatchEvent(new Event('online'));
+    localStorage.clear();
+  });
 
   it('shows a read-only view with a QR code link but no edit button for a guest', () => {
     const fixture = createComponent();
@@ -300,5 +307,149 @@ describe('AnimalProfile', () => {
 
     expect(component.uploadingPhotos()).toBe(false);
     expect(component.photoError()).toBe('Invalid image');
+  });
+  describe('offline', () => {
+    const networkDown = () => new ProgressEvent('error');
+
+    // Simulates reopening the profile with no connectivity: every request fails at the network level.
+    function createOfflineComponent() {
+      vi.spyOn(navigator, 'onLine', 'get').mockReturnValue(false);
+      window.dispatchEvent(new Event('offline'));
+      const fixture = TestBed.createComponent(AnimalProfile);
+      fixture.detectChanges();
+      httpMock.expectOne(`${baseUrl}/animal-types`).error(networkDown());
+      httpMock.expectOne(`${baseUrl}/medical-record-types`).error(networkDown());
+      httpMock.expectOne(`${baseUrl}/animals/${animal.id}`).error(networkDown());
+      httpMock.expectOne(`${baseUrl}/animals/${animal.id}/medical-records`).error(networkDown());
+      fixture.detectChanges();
+      return fixture;
+    }
+
+    it('serves a previously viewed profile from the device cache when offline', () => {
+      const records = [makeRecord({ id: 'rec-rabies', title: 'Rabies booster' })];
+      createComponent(records).destroy();
+
+      const fixture = createOfflineComponent();
+      const component = fixture.componentInstance;
+
+      expect(component.notFound()).toBe(false);
+      expect(component.animal()).toEqual(animal);
+      expect(component.animalTypes()).toEqual(animalTypes);
+      expect(component.medicalRecords().map((r) => r.id)).toEqual(['rec-rabies']);
+      expect(component.cachedAt()).not.toBeNull();
+
+      const notice = fixture.nativeElement.querySelector('.pt-offline-notice') as HTMLElement;
+      expect(notice.textContent).toContain('Showing details saved on this device on');
+      expect(notice.textContent).toContain('need an internet connection');
+      expect(fixture.nativeElement.textContent).toContain('Rabies booster');
+    });
+
+    it('serves the cached owner when offline', () => {
+      const registeredAnimal: Animal = { ...animal, createdBy: 'user-1' };
+      const first = TestBed.createComponent(AnimalProfile);
+      first.detectChanges();
+      httpMock.expectOne(`${baseUrl}/animal-types`).flush(animalTypes);
+      httpMock.expectOne(`${baseUrl}/medical-record-types`).flush(medicalRecordTypes);
+      httpMock.expectOne(`${baseUrl}/animals/${animal.id}`).flush(registeredAnimal);
+      httpMock.expectOne(`${baseUrl}/animals/${animal.id}/medical-records`).flush([]);
+      httpMock
+        .expectOne(`${baseUrl}/users/user-1`)
+        .flush({ id: 'user-1', name: 'A. Fernando', email: 'a@example.com', updatedAt: '2026-01-01T00:00:00Z' });
+      first.destroy();
+
+      const fixture = createOfflineComponent();
+      httpMock.expectOne(`${baseUrl}/users/user-1`).error(networkDown());
+      fixture.detectChanges();
+
+      expect(fixture.componentInstance.owner()?.name).toBe('A. Fernando');
+    });
+
+    it('explains that the profile is not saved on the device when offline with no cached copy', () => {
+      const fixture = createOfflineComponent();
+
+      expect(fixture.componentInstance.notFound()).toBe(true);
+      expect(fixture.nativeElement.textContent).toContain("hasn't been saved on this device yet");
+      expect(fixture.nativeElement.textContent).not.toContain('Animal not found');
+    });
+
+    it('does not show the offline notice for a live profile while online', () => {
+      const fixture = createComponent();
+
+      expect(fixture.componentInstance.cachedAt()).toBeNull();
+      expect(fixture.nativeElement.querySelector('.pt-offline-notice')).toBeNull();
+    });
+
+    it('still reports not found for a 404 while online, even if a cached copy exists', () => {
+      createComponent().destroy();
+
+      const fixture = TestBed.createComponent(AnimalProfile);
+      fixture.detectChanges();
+      httpMock.expectOne(`${baseUrl}/animal-types`).flush(animalTypes);
+      httpMock.expectOne(`${baseUrl}/medical-record-types`).flush(medicalRecordTypes);
+      httpMock.expectOne(`${baseUrl}/animals/${animal.id}/medical-records`).flush([]);
+      httpMock
+        .expectOne(`${baseUrl}/animals/${animal.id}`)
+        .flush({ error: { code: 'NOT_FOUND', message: 'Animal not found' } }, { status: 404, statusText: 'Not Found' });
+
+      expect(fixture.componentInstance.notFound()).toBe(true);
+    });
+
+    it('blocks editing with an explicit offline message', () => {
+      authState.isGuest = () => false;
+      createComponent().destroy();
+      const fixture = createOfflineComponent();
+      const component = fixture.componentInstance;
+
+      component.startEditing();
+      fixture.detectChanges();
+
+      expect(component.editing()).toBe(false);
+      expect(component.offlineNotice()).toBe("You're offline. Editing needs an internet connection.");
+      expect(fixture.nativeElement.querySelector('[role="alert"]').textContent).toContain(
+        'Editing needs an internet connection'
+      );
+    });
+
+    it('clears the offline edit message once editing starts after reconnecting', () => {
+      authState.isGuest = () => false;
+      createComponent().destroy();
+      const fixture = createOfflineComponent();
+      const component = fixture.componentInstance;
+      component.startEditing();
+
+      window.dispatchEvent(new Event('online'));
+      component.startEditing();
+
+      expect(component.editing()).toBe(true);
+      expect(component.offlineNotice()).toBeNull();
+    });
+
+    it('blocks photo uploads without sending a request', () => {
+      authState.isGuest = () => false;
+      createComponent().destroy();
+      const fixture = createOfflineComponent();
+      const component = fixture.componentInstance;
+
+      const file = new File(['data'], 'photo.jpg', { type: 'image/jpeg' });
+      const input = { files: [file] as unknown as FileList, value: '' } as unknown as HTMLInputElement;
+      component.uploadPhotos({ target: input } as unknown as Event);
+
+      httpMock.expectNone(`${baseUrl}/animals/${animal.id}/images`);
+      expect(component.uploadingPhotos()).toBe(false);
+      expect(component.photoError()).toBe("You're offline. Adding photos needs an internet connection.");
+      const fileInput = fixture.nativeElement.querySelector('input[type="file"]') as HTMLInputElement;
+      expect(fileInput.disabled).toBe(true);
+    });
+
+    it('disables the "Add medical record" action', () => {
+      authState.isGuest = () => false;
+      createComponent().destroy();
+      const fixture = createOfflineComponent();
+
+      const addButton = Array.from(fixture.nativeElement.querySelectorAll('pt-button')).find((b) =>
+        (b as HTMLElement).textContent?.includes('Add medical record')
+      ) as HTMLElement;
+      expect(addButton.querySelector('button')?.disabled).toBe(true);
+    });
   });
 });

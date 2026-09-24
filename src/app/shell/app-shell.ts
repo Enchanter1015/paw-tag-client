@@ -5,11 +5,12 @@ import { AuthService } from '../core/services/auth.service';
 import { AuthStateService } from '../core/services/auth-state.service';
 import { PageHeaderService } from '../core/services/page-header.service';
 import { TokenStorageService } from '../core/services/token-storage.service';
+import { OfflineBanner } from '../shared/offline-banner/offline-banner';
 
 @Component({
   selector: 'app-shell',
   standalone: true,
-  imports: [RouterOutlet, RouterLink, RouterLinkActive],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, OfflineBanner],
   templateUrl: './app-shell.html',
   styleUrl: './app-shell.scss',
 })

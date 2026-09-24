@@ -1,6 +1,11 @@
 <div class="medical-history-screen">
+  <pt-offline-notice
+    [cachedAt]="cachedAt()"
+    note="Adding medical records needs an internet connection."
+  ></pt-offline-notice>
+
   @if (!authState.isGuest() && !showForm()) {
-    <pt-button variant="secondary" type="button" (click)="showForm.set(true)">
+    <pt-button variant="secondary" type="button" [disabled]="offlineIndicator.offline()" (click)="showForm.set(true)">
       Add medical record
     </pt-button>
   }

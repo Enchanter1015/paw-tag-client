@@ -6,18 +6,21 @@ import { AuthStateService } from '../../core/services/auth-state.service';
 import { ImagesService } from '../../core/services/images.service';
 import { LookupsService } from '../../core/services/lookups.service';
 import { MedicalRecordsService } from '../../core/services/medical-records.service';
+import { OfflineCacheKeys, OfflineCacheService } from '../../core/services/offline-cache.service';
+import { OfflineIndicatorService } from '../../core/services/offline-indicator.service';
 import { PageHeaderService } from '../../core/services/page-header.service';
 import { UsersService } from '../../core/services/users.service';
 import { Animal, ApiError, Lookup, MedicalRecord } from '../../core/models/models';
 import { onImageError } from '../../core/utils/image-placeholder.util';
 import { formatDate } from '../../core/utils/medical-record-status.util';
+import { OfflineNotice } from '../../shared/offline-notice/offline-notice';
 import { PtImageViewer } from '../../shared/pt-image-viewer/pt-image-viewer';
 import { PtTag } from '../../shared/pt-tag/pt-tag';
 
 @Component({
   selector: 'app-medical-record-view',
   standalone: true,
-  imports: [RouterLink, PtImageViewer, PtTag],
+  imports: [RouterLink, OfflineNotice, PtImageViewer, PtTag],
   templateUrl: './medical-record-view.html',
   styleUrl: './medical-record-view.scss',
 })
@@ -29,6 +32,8 @@ export class MedicalRecordView {
   private readonly lookupsService = inject(LookupsService);
   private readonly usersService = inject(UsersService);
   private readonly pageHeader = inject(PageHeaderService);
+  private readonly offlineCache = inject(OfflineCacheService);
+  protected readonly offlineIndicator = inject(OfflineIndicatorService);
   protected readonly authState = inject(AuthStateService);
 
   readonly animalId = this.route.snapshot.paramMap.get('id') ?? '';
@@ -42,13 +47,19 @@ export class MedicalRecordView {
   readonly uploadingPhotos = signal(false);
   readonly photoError = signal<string | null>(null);
   readonly viewingPhotoUrl = signal<string | null>(null);
+  // Set when the record was served from the on-device cache because the network was unreachable.
+  readonly cachedAt = signal<string | null>(null);
   protected readonly onImageError = onImageError;
 
   constructor() {
     this.pageHeader.set({ title: () => 'Medical record', left: { kind: 'back' } });
 
-    this.lookupsService.getMedicalRecordTypes().subscribe((types) => this.medicalRecordTypes.set(types));
-    this.animalsService.getById(this.animalId).subscribe((animal) => this.animal.set(animal));
+    this.offlineCache
+      .fetch(OfflineCacheKeys.medicalRecordTypes, this.lookupsService.getMedicalRecordTypes())
+      .subscribe({ next: ({ data }) => this.medicalRecordTypes.set(data), error: () => undefined });
+    this.offlineCache
+      .fetch(OfflineCacheKeys.animal(this.animalId), this.animalsService.getById(this.animalId))
+      .subscribe({ next: ({ data }) => this.animal.set(data), error: () => undefined });
 
     const recordId = this.route.snapshot.paramMap.get('recordId');
     if (!recordId) {
@@ -57,12 +68,13 @@ export class MedicalRecordView {
       return;
     }
 
-    this.medicalRecordsService.getById(recordId).subscribe({
-      next: (record) => {
+    this.offlineCache.fetch(OfflineCacheKeys.medicalRecord(recordId), this.medicalRecordsService.getById(recordId)).subscribe({
+      next: ({ data: record, fromCache, cachedAt }) => {
         this.record.set(record);
+        this.cachedAt.set(fromCache ? cachedAt : null);
         this.loading.set(false);
-        this.usersService.getById(record.createdBy).subscribe({
-          next: (user) => this.recordedByName.set(user.name),
+        this.offlineCache.fetch(OfflineCacheKeys.user(record.createdBy), this.usersService.getById(record.createdBy)).subscribe({
+          next: ({ data: user }) => this.recordedByName.set(user.name),
           error: () => this.recordedByName.set(null),
         });
       },
@@ -83,6 +95,11 @@ export class MedicalRecordView {
 
     const record = this.record();
     if (!record) {
+      return;
+    }
+
+    if (this.offlineIndicator.offline()) {
+      this.photoError.set("You're offline. Adding photos needs an internet connection.");
       return;
     }
 

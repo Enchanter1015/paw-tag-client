@@ -1,12 +1,14 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { TokenStorageService } from './token-storage.service';
+import { OfflineIndicatorService } from './offline-indicator.service';
 import { decodeJwtPayload } from './jwt.util';
 import { AuthUser } from '../models/models';
 
 // Derives the current user/role from the stored access token; call refresh() after login/logout
 @Injectable({ providedIn: 'root' })
 export class AuthStateService {
+  private readonly offlineIndicator = inject(OfflineIndicatorService);
   private readonly userSubject: BehaviorSubject<AuthUser | null>;
   readonly currentUser$;
 
@@ -52,7 +54,9 @@ export class AuthStateService {
       return null;
     }
 
-    if (payload.exp && payload.exp * 1000 < Date.now()) {
+    // An expired token can't be renewed without a connection, so offline the stored session stays
+    // usable for reading cached data; once back online the API's 401 sends the user to /login.
+    if (payload.exp && payload.exp * 1000 < Date.now() && !this.offlineIndicator.offline()) {
       return null;
     }
 

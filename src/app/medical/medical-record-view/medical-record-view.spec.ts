@@ -1,4 +1,5 @@
 import { TestBed } from '@angular/core/testing';
+import { vi } from 'vitest';
 import { ActivatedRoute, convertToParamMap } from '@angular/router';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting, HttpTestingController } from '@angular/common/http/testing';
@@ -7,6 +8,7 @@ import { API_BASE_URL } from '../../core/services/api-config';
 import { AuthStateService } from '../../core/services/auth-state.service';
 import { PageHeaderService } from '../../core/services/page-header.service';
 import { Animal, Lookup, MedicalRecord, User } from '../../core/models/models';
+import { OfflineCacheKeys, OfflineCacheService } from '../../core/services/offline-cache.service';
 
 describe('MedicalRecordView', () => {
   const baseUrl = 'http://localhost:3000/api/v1';
@@ -60,7 +62,33 @@ describe('MedicalRecordView', () => {
     return fixture;
   }
 
+  const networkDown = () => new ProgressEvent('error');
+
+  // The connectivity service may be created after the event fires, so stub navigator.onLine too —
+  // mirroring a real device that is already offline when the page opens.
+  function goOffline() {
+    vi.spyOn(navigator, 'onLine', 'get').mockReturnValue(false);
+    window.dispatchEvent(new Event('offline'));
+  }
+
+  // Opens the record with no connectivity; `withAuthor` expects the recorder lookup that only
+  // happens once a (cached) record is available.
+  function createOfflineComponent(withAuthor = true) {
+    goOffline();
+    const fixture = TestBed.createComponent(MedicalRecordView);
+    fixture.detectChanges();
+    httpMock.expectOne(`${baseUrl}/medical-record-types`).error(networkDown());
+    httpMock.expectOne(`${baseUrl}/animals/${animalId}`).error(networkDown());
+    httpMock.expectOne(`${baseUrl}/medical-records/${recordId}`).error(networkDown());
+    if (withAuthor) {
+      httpMock.expectOne(`${baseUrl}/users/${record.createdBy}`).error(networkDown());
+    }
+    fixture.detectChanges();
+    return fixture;
+  }
+
   beforeEach(() => {
+    localStorage.clear();
     authState = { isGuest: () => true };
     TestBed.configureTestingModule({
       imports: [MedicalRecordView],
@@ -78,7 +106,12 @@ describe('MedicalRecordView', () => {
     httpMock = TestBed.inject(HttpTestingController);
   });
 
-  afterEach(() => httpMock.verify());
+  afterEach(() => {
+    httpMock.verify();
+    vi.restoreAllMocks();
+    window.dispatchEvent(new Event('online'));
+    localStorage.clear();
+  });
 
   it('shows the record type, title, description and who logged it', () => {
     const fixture = createComponent();
@@ -159,5 +192,55 @@ describe('MedicalRecordView', () => {
 
     const label = fixture.nativeElement.querySelector('.record-view-upload-label');
     expect(label).toBeNull();
+  });
+  describe('offline', () => {
+    it('serves a previously viewed record with its type, animal and recorder from the cache', () => {
+      createComponent().destroy();
+
+      const fixture = createOfflineComponent();
+      const component = fixture.componentInstance;
+
+      expect(component.notFound()).toBe(false);
+      expect(component.record()).toEqual(record);
+      expect(component.medicalRecordTypeName()).toBe('Wound treatment');
+      expect(component.animal()?.name).toBe('Kalu');
+      expect(component.recordedByName()).toBe('N. Silva');
+      expect(fixture.nativeElement.querySelector('.pt-offline-notice').textContent).toContain(
+        'Showing details saved on this device on'
+      );
+    });
+
+    it('opens a record that was only ever seen in a list, falling back to "Unknown" for the recorder', () => {
+      TestBed.inject(OfflineCacheService).set(OfflineCacheKeys.medicalRecord(recordId), record);
+
+      const fixture = createOfflineComponent();
+
+      expect(fixture.componentInstance.record()?.title).toBe(record.title);
+      expect(fixture.nativeElement.textContent).toContain('Unknown');
+    });
+
+    it('explains that the record is not saved on the device when offline with no cached copy', () => {
+      const fixture = createOfflineComponent(false);
+
+      expect(fixture.componentInstance.notFound()).toBe(true);
+      expect(fixture.nativeElement.textContent).toContain("hasn't been saved on this device yet");
+      expect(fixture.nativeElement.textContent).not.toContain('Medical record not found.');
+    });
+
+    it('blocks photo uploads without sending a request', () => {
+      authState.isGuest = () => false;
+      createComponent().destroy();
+      const fixture = createOfflineComponent();
+      const component = fixture.componentInstance;
+
+      const file = new File(['data'], 'photo.jpg', { type: 'image/jpeg' });
+      const input = { files: [file] as unknown as FileList, value: '' } as unknown as HTMLInputElement;
+      component.uploadPhotos({ target: input } as unknown as Event);
+
+      httpMock.expectNone(`${baseUrl}/medical-records/${recordId}/images`);
+      expect(component.photoError()).toBe("You're offline. Adding photos needs an internet connection.");
+      const fileInput = fixture.nativeElement.querySelector('input[type="file"]') as HTMLInputElement;
+      expect(fileInput.disabled).toBe(true);
+    });
   });
 });

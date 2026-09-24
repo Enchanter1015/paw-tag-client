@@ -1,9 +1,15 @@
 <div class="record-view-screen">
   @if (loading()) {
     <p class="record-view-status">Loading…</p>
+  } @else if (notFound() && offlineIndicator.offline()) {
+    <p class="record-view-status record-view-status--error" role="status">
+      You're offline and this medical record hasn't been saved on this device yet. Connect to the internet to view it.
+    </p>
   } @else if (notFound()) {
     <p class="record-view-status record-view-status--error">Medical record not found.</p>
   } @else if (record(); as record) {
+    <pt-offline-notice [cachedAt]="cachedAt()" note="Adding photos needs an internet connection."></pt-offline-notice>
+
     <div class="record-view-tagrow">
       <pt-tag variant="neutral">{{ medicalRecordTypeName() }}</pt-tag>
       <span class="record-view-date">{{ formatAdministeredAt() }}</span>
@@ -18,13 +24,16 @@
     <div class="record-view-photos-header">
       <h2 class="record-view-section-title">Photos</h2>
       @if (!authState.isGuest()) {
-        <label class="record-view-upload-label" [class.record-view-upload-label--disabled]="uploadingPhotos()">
+        <label
+          class="record-view-upload-label"
+          [class.record-view-upload-label--disabled]="uploadingPhotos() || offlineIndicator.offline()"
+        >
           {{ uploadingPhotos() ? 'Uploading…' : 'Add photos' }}
           <input
             type="file"
             accept="image/*"
             multiple
-            [disabled]="uploadingPhotos()"
+            [disabled]="uploadingPhotos() || offlineIndicator.offline()"
             (change)="uploadPhotos($event)"
           />
         </label>

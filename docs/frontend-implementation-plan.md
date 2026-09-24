@@ -176,10 +176,19 @@ Commits:
 **Ticket:** SCRUM-55
 
 Commits:
-1. `feat(pwa): add Angular Service Worker (ng add @angular/pwa), cache animal profile GET responses`
+1. `feat(pwa): add Angular Service Worker (ng add @angular/pwa), cache animal profile and my animal medical records GET responses`
 2. `feat(core): add OfflineIndicatorService (online/offline via window events) + banner component`
 3. `feat(animals): serve cached AnimalProfileComponent data when offline, block write actions with explicit offline messaging`
 4. `test: OfflineIndicatorService state transitions, AnimalProfileComponent offline fallback`
+
+**Status: implemented (2026-09-24).** Deviations from the commits above:
+
+- **Service worker is web-only.** `ngsw-config.json` caches the app shell and the profile GETs (`animals/*`, `animals/*/medical-records`, `users/*`, lookups; freshness, 7d). It registers only in production over http(s). Cordova serves from `file://`, where service workers can't run, so the real offline store is `OfflineCacheService`: localStorage, capped at 200 entries, cleared on logout because it holds owner contact details. It falls back to the cached copy only on connectivity errors (status 0, or while offline). A 404/403 still surfaces normally.
+- **Added `offlineInterceptor`.** While offline it fails POST/PATCH/PUT/DELETE immediately with an `ApiError`-shaped "You're offline…" message, so every existing form shows a clear offline error instead of a generic one. PR 17 can swap this for queueing.
+- Banner is `shared/offline-banner` (`pt-offline-banner`), rendered at the top of the shell content.
+- **Offline profile, "My animals" and medical records.** When `UserProfile` loads online, `OfflinePrefetchService` caches every one of the user's animals: profile, owner, medical record list, each record and its author, plus the lookup lists. They then open offline even if never viewed. `MedicalHistory` and `MedicalRecordView` fall back to the cache and show a `pt-offline-notice`. "Add medical record" and photo upload are blocked offline.
+- **Expired sessions stay usable offline.** `AuthStateService` doesn't treat an expired access token as logged out while offline (it can't be refreshed without a connection), so `authGuard` doesn't bounce a field worker to /login. Once online, the API's 401 handles it as before.
+- Photos are not cached for offline use (image URLs are on a separate host); they fall back to the placeholder.
 
 ---
 

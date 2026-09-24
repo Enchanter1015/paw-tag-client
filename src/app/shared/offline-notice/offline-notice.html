@@ -1,0 +1,11 @@
+@if (cachedAt || offlineIndicator.offline()) {
+  <div class="pt-offline-notice" role="status">
+    <pt-tag variant="info">Offline</pt-tag>
+    <p class="pt-offline-notice-text">
+      @if (cachedAt) {
+        Showing details saved on this device on {{ formattedCachedAt() }}.
+      }
+      {{ note }}
+    </p>
+  </div>
+}

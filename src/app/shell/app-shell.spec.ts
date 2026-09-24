@@ -38,6 +38,20 @@ describe('AppShell', () => {
     localStorage.clear();
   });
 
+  it('shows the offline banner only while the device is offline', () => {
+    const fixture = TestBed.createComponent(AppShell);
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('.pt-offline-banner')).toBeNull();
+
+    window.dispatchEvent(new Event('offline'));
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('.pt-content .pt-offline-banner')).toBeTruthy();
+
+    window.dispatchEvent(new Event('online'));
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('.pt-offline-banner')).toBeNull();
+  });
+
   it('hides the sign-out button when logged out', () => {
     const fixture = TestBed.createComponent(AppShell);
     fixture.detectChanges();

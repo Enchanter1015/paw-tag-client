@@ -1,4 +1,5 @@
 import { TestBed } from '@angular/core/testing';
+import { vi } from 'vitest';
 import { ActivatedRoute, convertToParamMap, provideRouter } from '@angular/router';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting, HttpTestingController } from '@angular/common/http/testing';
@@ -7,6 +8,7 @@ import { API_BASE_URL } from '../../core/services/api-config';
 import { AuthStateService } from '../../core/services/auth-state.service';
 import { PageHeaderService } from '../../core/services/page-header.service';
 import { Animal, MedicalRecord } from '../../core/models/models';
+import { OfflineCacheKeys, OfflineCacheService } from '../../core/services/offline-cache.service';
 
 describe('MedicalHistory', () => {
   const baseUrl = 'http://localhost:3000/api/v1';
@@ -60,7 +62,27 @@ describe('MedicalHistory', () => {
     return fixture;
   }
 
+  const networkDown = () => new ProgressEvent('error');
+
+  // The connectivity service may be created after the event fires, so stub navigator.onLine too —
+  // mirroring a real device that is already offline when the page opens.
+  function goOffline() {
+    vi.spyOn(navigator, 'onLine', 'get').mockReturnValue(false);
+    window.dispatchEvent(new Event('offline'));
+  }
+
+  function createOfflineComponent() {
+    goOffline();
+    const fixture = TestBed.createComponent(MedicalHistory);
+    fixture.detectChanges();
+    httpMock.expectOne(`${baseUrl}/animals/${animalId}`).error(networkDown());
+    httpMock.expectOne(`${baseUrl}/animals/${animalId}/medical-records`).error(networkDown());
+    fixture.detectChanges();
+    return fixture;
+  }
+
   beforeEach(() => {
+    localStorage.clear();
     authState = { isGuest: () => true };
     queryParams = {};
     TestBed.configureTestingModule({
@@ -87,7 +109,12 @@ describe('MedicalHistory', () => {
     httpMock = TestBed.inject(HttpTestingController);
   });
 
-  afterEach(() => httpMock.verify());
+  afterEach(() => {
+    httpMock.verify();
+    vi.restoreAllMocks();
+    window.dispatchEvent(new Event('online'));
+    localStorage.clear();
+  });
 
   it('flags a record past its next due date as overdue, and one due within 30 days as due soon', () => {
     const fixture = createComponent([overdueRecord, upcomingRecord]);
@@ -183,5 +210,58 @@ describe('MedicalHistory', () => {
 
     expect(fixture.componentInstance.showForm()).toBe(false);
     expect(fixture.nativeElement.querySelector('app-medical-form')).toBeNull();
+  });
+  describe('offline', () => {
+    it('remembers each listed record so its detail view opens offline', () => {
+      createComponent([overdueRecord, upcomingRecord]);
+      const cache = TestBed.inject(OfflineCacheService);
+
+      expect(cache.get(OfflineCacheKeys.medicalRecord('rec-overdue'))?.data).toEqual(overdueRecord);
+      expect(cache.get(OfflineCacheKeys.medicalRecord('rec-upcoming'))?.data).toEqual(upcomingRecord);
+    });
+
+    it('serves the cached history, animal name and a saved-on notice when offline', () => {
+      createComponent([overdueRecord, upcomingRecord]).destroy();
+
+      const fixture = createOfflineComponent();
+      const component = fixture.componentInstance;
+
+      expect(component.loadError()).toBeNull();
+      expect(component.records().map((r) => r.id)).toEqual(['rec-upcoming', 'rec-overdue']);
+      expect(component.animalName()).toBe('Kalu');
+      expect(component.cachedAt()).not.toBeNull();
+      const notice = fixture.nativeElement.querySelector('.pt-offline-notice') as HTMLElement;
+      expect(notice.textContent).toContain('Showing details saved on this device on');
+      expect(notice.textContent).toContain('Adding medical records needs an internet connection.');
+    });
+
+    it('disables "Add medical record" for an authenticated user while offline', () => {
+      authState.isGuest = () => false;
+      createComponent([overdueRecord]).destroy();
+
+      const fixture = createOfflineComponent();
+
+      const addButton = fixture.nativeElement.querySelector('pt-button button') as HTMLButtonElement;
+      expect(addButton.textContent).toContain('Add medical record');
+      expect(addButton.disabled).toBe(true);
+    });
+
+    it('explains that the history is not saved on the device when offline with no cached copy', () => {
+      const fixture = createOfflineComponent();
+
+      expect(fixture.componentInstance.loadError()).toContain("hasn't been saved on this device yet");
+      expect(fixture.nativeElement.textContent).not.toContain('Could not load medical history');
+    });
+
+    it('keeps the generic error for a server failure while online', () => {
+      const fixture = TestBed.createComponent(MedicalHistory);
+      fixture.detectChanges();
+      httpMock.expectOne(`${baseUrl}/animals/${animalId}`).flush(animal);
+      httpMock
+        .expectOne(`${baseUrl}/animals/${animalId}/medical-records`)
+        .flush(null, { status: 503, statusText: 'Service Unavailable' });
+
+      expect(fixture.componentInstance.loadError()).toBe('Could not load medical history. Please try again.');
+    });
   });
 });
