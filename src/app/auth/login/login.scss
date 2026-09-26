@@ -1,32 +1,83 @@
 :host {
   display: block;
-  min-height: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
   background: var(--pt-surface-50);
 }
 
+.login-wrapper {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--pt-space-6) var(--pt-space-4);
+  position: relative;
+  overflow: hidden;
+
+  // Subtle organic texture / background warmth without generic neon glow
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 600px;
+    height: 240px;
+    background: radial-gradient(
+      ellipse at 50% -20%,
+      rgba(217, 80, 60, 0.12) 0%,
+      rgba(242, 163, 61, 0.06) 45%,
+      transparent 70%
+    );
+    pointer-events: none;
+    z-index: 0;
+  }
+}
+
 .login-screen {
-  max-width: var(--pt-content-narrow);
-  margin: 0 auto;
+  width: 100%;
+  max-width: 440px;
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--pt-space-4);
 }
 
-.login-cover {
-  background: var(--pt-brand-tint);
-  padding: var(--pt-space-6) var(--pt-space-4) var(--pt-space-5);
-  height: 25vh;
-  align-content: center;
-  // border-radius: 0 0 var(--pt-radius-lg) var(--pt-radius-lg);
+// ----------------------------------------
+// Brand Hero
+// ----------------------------------------
+.login-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: var(--pt-space-2) 0;
 }
 
-.login-avatar {
+.login-hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--pt-space-2);
+  padding: 4px var(--pt-space-3) 4px 6px;
+  background: var(--pt-surface-100);
+  border: 1px solid var(--pt-border);
+  border-radius: var(--pt-radius-full);
+  box-shadow: var(--pt-shadow-sm);
+  margin-bottom: var(--pt-space-4);
+}
+
+.login-logo-mark {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 56px;
-  height: 56px;
-  border-radius: var(--pt-radius-full);
-  background: var(--pt-brand);
-  color: var(--pt-on-brand);
-  margin-bottom: var(--pt-space-4);
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  flex-shrink: 0;
 
   svg {
     width: 28px;
@@ -34,26 +85,62 @@
   }
 }
 
+.login-hero-meta {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.login-brand-name {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--pt-ink);
+}
+
+.login-brand-tag {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--pt-brand);
+}
+
 .login-title {
   margin: 0 0 var(--pt-space-1);
-  font-size: 26px;
-  line-height: 32px;
+  font-size: 24px;
+  line-height: 30px;
   font-weight: 700;
+  letter-spacing: -0.02em;
   color: var(--pt-ink);
 }
 
 .login-subtitle {
   margin: 0;
-  font-size: 15px;
-  line-height: 22px;
+  font-size: 14px;
+  line-height: 20px;
   color: var(--pt-ink-muted);
+  max-width: 340px;
 }
 
-.login-body {
-  padding: var(--pt-space-5) var(--pt-space-4) var(--pt-space-6);
+// ----------------------------------------
+// Main Authentication Card
+// ----------------------------------------
+.login-card {
+  background: var(--pt-surface-100);
+  border: 1px solid var(--pt-border);
+  border-radius: var(--pt-radius-lg);
+  padding: var(--pt-space-5);
+  box-shadow:
+    0 1px 3px rgba(19, 36, 32, 0.04),
+    0 8px 24px -4px rgba(19, 36, 32, 0.06);
   display: flex;
   flex-direction: column;
-  gap: var(--pt-space-5);
+  gap: var(--pt-space-4);
+
+  @media (min-width: 480px) {
+    padding: var(--pt-space-6);
+  }
 }
 
 .login-form {
@@ -62,20 +149,32 @@
   gap: var(--pt-space-4);
 }
 
+.login-password-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pt-space-2);
+}
+
 .login-forgot {
   display: flex;
   justify-content: flex-end;
-  margin-top: calc(-1 * var(--pt-space-2));
 }
 
 .login-link-btn {
   background: none;
   border: none;
-  padding: 0;
-  font-size: 14px;
+  padding: 2px 4px;
+  font-size: 13px;
   font-weight: 600;
   color: var(--pt-accent);
   cursor: pointer;
+  border-radius: var(--pt-radius-sm);
+  transition: color 0.15s ease, background-color 0.15s ease;
+
+  &:hover {
+    color: var(--pt-accent-strong);
+    background-color: var(--pt-accent-tint);
+  }
 
   &:focus-visible {
     outline: 3px solid var(--pt-focus-ring);
@@ -83,21 +182,70 @@
   }
 }
 
+// ----------------------------------------
+// Error Alert
+// ----------------------------------------
 .login-form-error {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--pt-space-2);
   margin: 0;
   padding: var(--pt-space-3);
   border-radius: var(--pt-radius-md);
   background: var(--pt-danger-surface);
+  border: 1px solid rgba(196, 52, 42, 0.2);
   color: var(--pt-danger);
-  font-size: 14px;
+  font-size: 13px;
+  line-height: 18px;
+  font-weight: 500;
 }
 
+.login-error-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.login-actions {
+  margin-top: var(--pt-space-1);
+}
+
+.login-btn-loading {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--pt-space-2);
+}
+
+.login-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: login-spin 0.7s linear infinite;
+}
+
+@keyframes login-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// ----------------------------------------
+// Divider
+// ----------------------------------------
 .login-divider {
   display: flex;
   align-items: center;
   gap: var(--pt-space-3);
   color: var(--pt-ink-faint);
-  font-size: 13px;
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: var(--pt-space-1) 0;
 
   &::before,
   &::after {
@@ -108,15 +256,83 @@
   }
 }
 
-.login-scan-content {
+// ----------------------------------------
+// Collar Quick Scan Card
+// ----------------------------------------
+.login-scan-box {
+  background: var(--pt-surface-50);
+  border: 1px solid var(--pt-border);
+  border-radius: var(--pt-radius-md);
+  padding: var(--pt-space-3) var(--pt-space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--pt-space-3);
+  transition: border-color 0.15s ease;
+
+  &:hover {
+    border-color: var(--pt-border-strong);
+  }
+}
+
+.login-scan-info {
+  display: flex;
+  align-items: center;
+  gap: var(--pt-space-3);
+}
+
+.login-scan-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: var(--pt-radius-md);
+  background: var(--pt-accent-tint);
+  color: var(--pt-accent);
+  flex-shrink: 0;
+
+  svg {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+.login-scan-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.login-scan-heading {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--pt-ink);
+}
+
+.login-scan-desc {
+  font-size: 12px;
+  color: var(--pt-ink-muted);
+}
+
+.login-scan-btn-label {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: var(--pt-space-2);
 
   svg {
-    width: 20px;
-    height: 20px;
+    width: 17px;
+    height: 17px;
+    color: var(--pt-accent);
   }
+}
+
+// ----------------------------------------
+// Card Footer & Links
+// ----------------------------------------
+.login-card-footer {
+  border-top: 1px solid var(--pt-border);
+  padding-top: var(--pt-space-4);
+  margin-top: var(--pt-space-1);
 }
 
 .login-switch {
@@ -128,5 +344,26 @@
   a {
     color: var(--pt-accent);
     font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    transition: color 0.15s ease;
+
+    &:hover {
+      color: var(--pt-accent-strong);
+    }
+
+    &:focus-visible {
+      outline: 3px solid var(--pt-focus-ring);
+      outline-offset: 2px;
+      border-radius: var(--pt-radius-sm);
+    }
   }
+}
+
+.login-legal-note {
+  text-align: center;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--pt-ink-faint);
+  padding: 0 var(--pt-space-2);
 }
