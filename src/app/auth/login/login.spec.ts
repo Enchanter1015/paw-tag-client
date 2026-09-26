@@ -112,4 +112,19 @@ describe('Login', () => {
 
     expect(router.url).toBe('/scan');
   });
+
+  it('navigates to the home page when clicking the back button', async () => {
+    const fixture = TestBed.createComponent(Login);
+    fixture.detectChanges();
+
+    const backLink = fixture.nativeElement.querySelector('.auth-back-link') as HTMLAnchorElement;
+    expect(backLink).toBeTruthy();
+    expect(backLink.getAttribute('routerLink') ?? backLink.getAttribute('href')).toBe('/');
+
+    backLink.click();
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    expect(router.url).toBe('/');
+  });
 });
