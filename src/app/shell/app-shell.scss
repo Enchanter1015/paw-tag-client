@@ -119,6 +119,44 @@
   }
 }
 
+.pt-topbar-end {
+  display: flex;
+  align-items: center;
+  gap: var(--pt-space-2);
+}
+
+.pt-topbar-theme-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 1px solid var(--pt-border);
+  background: var(--pt-surface-50);
+  color: var(--pt-ink);
+  cursor: pointer;
+  border-radius: var(--pt-radius-md);
+  flex-shrink: 0;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+
+  .pt-topbar-icon {
+    width: 18px;
+    height: 18px;
+  }
+
+  &:hover {
+    background: var(--pt-surface-200);
+    border-color: var(--pt-border-strong);
+    color: var(--pt-accent);
+  }
+
+  &:focus-visible {
+    outline: 3px solid var(--pt-focus-ring);
+    outline-offset: 2px;
+  }
+}
+
 .pt-topbar-tag {
   flex-shrink: 0;
   padding: 4px var(--pt-space-2);
