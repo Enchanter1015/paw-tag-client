@@ -1,71 +1,158 @@
-<div class="scan-screen">
-  @if (cameraOpen()) {
-    <div class="scan-target-wrap">
-      <app-qr-scanner
-        class="scan-video"
-        (scanned)="onScanned($event)"
-        (cameraError)="onCameraError($event)"
-      ></app-qr-scanner>
-    </div>
+<div class="scan-wrapper">
+  <div class="scan-screen">
+    <!-- Field Header -->
+    <header class="scan-hero">
+      <div class="scan-hero-badge">
+        <span class="scan-badge-dot"></span>
+        <span class="scan-badge-label">Collar Tag & Medical Registry</span>
+      </div>
 
-    <h1 class="scan-heading">Scanning for a collar</h1>
-    <p class="scan-instructions">Point your camera at the PawTag QR code to open the animal's profile.</p>
+      <h1 class="scan-heading">
+        @if (cameraOpen()) {
+          Scanning for collar tag
+        } @else {
+          Scan a collar
+        }
+      </h1>
+      <p class="scan-instructions">
+        Point your camera at a PawTag QR code or enter the animal ID to view vaccination, sterilisation, and caregiver records.
+      </p>
+    </header>
 
-    <pt-button variant="secondary" [full]="true" (click)="closeCamera()">Cancel scan</pt-button>
-  } @else {
-    <div class="scan-target-wrap">
-      <button type="button" class="scan-target" (click)="toggleCamera()" aria-label="Scan with camera">
-        <span class="scan-target-ring"></span>
-        <span class="scan-target-circle">
-          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <path
-              d="M3 8V5a2 2 0 0 1 2-2h3M16 3h3a2 2 0 0 1 2 2v3M21 16v3a2 2 0 0 1-2 2h-3M8 21H5a2 2 0 0 1-2-2v-3"
-              stroke="currentColor"
-              stroke-width="1.8"
-              stroke-linecap="round"
-            />
-            <path
-              d="M8 10.5a1 1 0 0 1 1-1h1l.8-1.2a.7.7 0 0 1 .6-.3h1.2a.7.7 0 0 1 .6.3l.8 1.2h1a1 1 0 0 1 1 1V15a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1z"
-              stroke="currentColor"
-              stroke-width="1.6"
-              stroke-linejoin="round"
-            />
-            <circle cx="12" cy="12.7" r="1.6" stroke="currentColor" stroke-width="1.6" />
-          </svg>
-          <span class="scan-target-label">Tap to scan</span>
-        </span>
-      </button>
-    </div>
+    <!-- Main Interactive Scanner Area -->
+    <div class="scan-card">
+      @if (cameraOpen()) {
+        <!-- Active Camera Viewport -->
+        <div class="scan-camera-section">
+          <div class="scan-target-wrap">
+            <app-qr-scanner
+              class="scan-video"
+              (scanned)="onScanned($event)"
+              (cameraError)="onCameraError($event)"
+            ></app-qr-scanner>
+          </div>
 
-    <h1 class="scan-heading">Scan with camera</h1>
-    <p class="scan-instructions">Point your camera at the PawTag QR code to open the animal's profile.</p>
+          <div class="scan-camera-actions">
+            <pt-button variant="secondary" [full]="true" (click)="closeCamera()">
+              <span class="scan-cancel-btn-content">
+                <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                  <path
+                    fill-rule="evenodd"
+                    d="M4.293 4.293a1 1 0 0 1 1.414 0L10 8.586l4.293-4.293a1 1 0 1 1 1.414 1.414L11.414 10l4.293 4.293a1 1 0 0 1-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 0 1-1.414-1.414L8.586 10 4.293 5.707a1 1 0 0 1 0-1.414Z"
+                    clip-rule="evenodd"
+                  />
+                </svg>
+                Cancel scan
+              </span>
+            </pt-button>
+          </div>
+        </div>
+      } @else {
+        <!-- Tap-to-Scan Radar Button -->
+        <div class="scan-radar-section">
+          <div class="scan-target-wrap">
+            <button type="button" class="scan-target" (click)="toggleCamera()" aria-label="Scan with camera">
+              <span class="scan-target-ambient" aria-hidden="true"></span>
+              <span class="scan-target-ring" aria-hidden="true"></span>
+              <span class="scan-target-circle">
+                <svg class="scan-icon-main" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                  <!-- Viewfinder frame -->
+                  <path
+                    d="M3 8V5a2 2 0 0 1 2-2h3M16 3h3a2 2 0 0 1 2 2v3M21 16v3a2 2 0 0 1-2 2h-3M8 21H5a2 2 0 0 1-2-2v-3"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                  />
+                  <!-- Camera body and lens -->
+                  <path
+                    d="M8 10.5a1 1 0 0 1 1-1h1l.8-1.2a.7.7 0 0 1 .6-.3h1.2a.7.7 0 0 1 .6.3l.8 1.2h1a1 1 0 0 1 1 1V15a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1z"
+                    stroke="currentColor"
+                    stroke-width="1.6"
+                    stroke-linejoin="round"
+                  />
+                  <circle cx="12" cy="12.7" r="1.6" stroke="currentColor" stroke-width="1.6" />
+                </svg>
+                <span class="scan-target-label">Tap to scan</span>
+                <span class="scan-target-hint">Camera QR & Tag</span>
+              </span>
+            </button>
+          </div>
 
-    @if (!manualEntryOpen()) {
-      <button type="button" class="scan-manual-link" (click)="manualEntryOpen.set(true)">
-        Enter animal ID manually instead
-      </button>
-    }
-  }
+          <p class="scan-camera-prompt">Tap the button above to launch camera scanner</p>
 
-  @if (manualEntryOpen()) {
-    <form class="scan-form" [formGroup]="form" (ngSubmit)="submit()">
-      <pt-input
-        label="Animal ID"
-        placeholder="Enter animal ID manually"
-        formControlName="animalId"
-        [error]="animalId.touched && animalId.hasError('required') ? 'Enter an animal ID.' : null"
-      ></pt-input>
-
-      @if (lookupError()) {
-        <p class="scan-error">
-          {{ lookupError() }}
-          <button type="button" class="scan-retry" (click)="retry()">Try again</button>
-        </p>
+          @if (!manualEntryOpen()) {
+            <div class="scan-toggle-wrap">
+              <button type="button" class="scan-manual-link" (click)="manualEntryOpen.set(true)">
+                <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+                  <rect x="3" y="4" width="14" height="12" rx="2" />
+                  <path d="M7 8h6M7 12h3" stroke-linecap="round" />
+                </svg>
+                Enter animal ID manually instead
+              </button>
+            </div>
+          }
+        </div>
       }
 
-      <pt-button type="submit" [full]="true" [disabled]="resolving()">
-        {{ resolving() ? 'Looking up…' : 'Find animal' }}
-      </pt-button>
-    </form>
-  }
+      <!-- Manual Entry Section -->
+      @if (manualEntryOpen()) {
+        <div class="scan-manual-section">
+          <div class="scan-divider">
+            <span>Manual ID Lookup</span>
+          </div>
+
+          <form class="scan-form" [formGroup]="form" (ngSubmit)="submit()">
+            <pt-input
+              label="Animal ID or Collar Code"
+              placeholder="e.g. D-8492 or abcd1234"
+              formControlName="animalId"
+              [error]="animalId.touched && animalId.hasError('required') ? 'Enter an animal ID.' : null"
+            ></pt-input>
+
+            @if (lookupError()) {
+              <div class="scan-error" role="alert">
+                <div class="scan-error-content">
+                  <svg class="scan-error-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    <path
+                      fill-rule="evenodd"
+                      d="M18 10a8 8 0 1 1-16 0 8 8 0 0 1 16 0Zm-7 4a1 1 0 1 1-2 0 1 1 0 0 1 2 0Zm-1-9a1 1 0 0 0-1 1v4a1 1 0 1 0 2 0V6a1 1 0 0 0-1-1Z"
+                      clip-rule="evenodd"
+                    />
+                  </svg>
+                  <span>{{ lookupError() }}</span>
+                </div>
+                <button type="button" class="scan-retry" (click)="retry()">Try again</button>
+              </div>
+            }
+
+            <pt-button type="submit" [full]="true" [disabled]="resolving()">
+              @if (resolving()) {
+                <span class="scan-btn-loading">
+                  <span class="scan-spinner" aria-hidden="true"></span>
+                  <span>Looking up…</span>
+                </span>
+              } @else {
+                <span>Find animal</span>
+              }
+            </pt-button>
+          </form>
+        </div>
+      }
+    </div>
+
+    <!-- Field Information Footnotes -->
+    <div class="scan-info-cards">
+      <div class="scan-info-card">
+        <div class="scan-info-icon" aria-hidden="true">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M10 2a8 8 0 1 0 0 16 8 8 0 0 0 0-16ZM10 6v4m0 4h.01" />
+          </svg>
+        </div>
+        <div class="scan-info-text">
+          <span class="scan-info-title">Found a lost or stray animal?</span>
+          <span class="scan-info-desc">Scanning reveals emergency contact details and recent rabies vaccinations.</span>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

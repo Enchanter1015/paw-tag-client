@@ -3,21 +3,233 @@
 }
 
 .qr-scanner {
+  position: relative;
   display: flex;
+  align-items: center;
   justify-content: center;
-  background: #000;
-  border-radius: var(--pt-radius-md);
+  background: #091310;
+  border: 1px solid var(--pt-border-strong);
+  border-radius: var(--pt-radius-lg);
   overflow: hidden;
-  min-height: 220px;
+  min-height: 280px;
+  box-shadow: 0 8px 32px rgba(19, 36, 32, 0.2);
 }
 
 .qr-scanner-video {
   width: 100%;
-  max-height: 320px;
+  height: 100%;
+  min-height: 280px;
+  max-height: 360px;
   object-fit: cover;
   display: none;
 }
 
 .qr-scanner-video--active {
   display: block;
+}
+
+// ----------------------------------------
+// Viewfinder HUD
+// ----------------------------------------
+.qr-scanner-hud {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--pt-space-4);
+  pointer-events: none;
+  background: radial-gradient(
+    circle at center,
+    transparent 40%,
+    rgba(9, 19, 16, 0.65) 100%
+  );
+}
+
+.qr-scanner-mask {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.qr-scanner-reticle {
+  position: relative;
+  width: 190px;
+  height: 190px;
+  border-radius: var(--pt-radius-md);
+  box-shadow: 0 0 0 4000px rgba(9, 19, 16, 0.35);
+}
+
+// Reticle Corners
+.reticle-corner {
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  border-color: #34d399;
+  border-style: solid;
+  border-width: 0;
+}
+
+.reticle-tl {
+  top: -2px;
+  left: -2px;
+  border-top-width: 3.5px;
+  border-left-width: 3.5px;
+  border-top-left-radius: 8px;
+}
+
+.reticle-tr {
+  top: -2px;
+  right: -2px;
+  border-top-width: 3.5px;
+  border-right-width: 3.5px;
+  border-top-right-radius: 8px;
+}
+
+.reticle-bl {
+  bottom: -2px;
+  left: -2px;
+  border-bottom-width: 3.5px;
+  border-left-width: 3.5px;
+  border-bottom-left-radius: 8px;
+}
+
+.reticle-br {
+  bottom: -2px;
+  right: -2px;
+  border-bottom-width: 3.5px;
+  border-right-width: 3.5px;
+  border-bottom-right-radius: 8px;
+}
+
+// Scanning Laser Animation
+.reticle-laser {
+  position: absolute;
+  left: 4px;
+  right: 4px;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    #34d399 20%,
+    #a7f3d0 50%,
+    #34d399 80%,
+    transparent
+  );
+  box-shadow: 0 0 8px #34d399;
+  animation: scan-laser-sweep 2s ease-in-out infinite alternate;
+}
+
+@keyframes scan-laser-sweep {
+  0% {
+    top: 6px;
+    opacity: 0.8;
+  }
+  100% {
+    top: calc(100% - 8px);
+    opacity: 0.8;
+  }
+}
+
+// Status Pill at Bottom of Scanner
+.qr-scanner-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: var(--pt-radius-full);
+  background: rgba(9, 19, 16, 0.85);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #f5f9f7;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  margin-top: auto;
+}
+
+.status-pulse-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #34d399;
+  box-shadow: 0 0 8px #34d399;
+  animation: status-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes status-pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.4;
+    transform: scale(0.85);
+  }
+}
+
+// ----------------------------------------
+// Camera Initializing Placeholder
+// ----------------------------------------
+.qr-scanner-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--pt-space-3);
+  padding: var(--pt-space-6);
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.qr-scanner-loader {
+  position: relative;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--pt-accent);
+}
+
+.qr-loader-ring {
+  position: absolute;
+  inset: 0;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-top-color: var(--pt-accent);
+  border-radius: 50%;
+  animation: qr-spin 0.9s linear infinite;
+}
+
+.qr-loader-icon {
+  width: 24px;
+  height: 24px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.qr-placeholder-text {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+@keyframes qr-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reticle-laser {
+    animation: none;
+    top: 50%;
+  }
+
+  .status-pulse-dot,
+  .qr-loader-ring {
+    animation: none;
+  }
 }
