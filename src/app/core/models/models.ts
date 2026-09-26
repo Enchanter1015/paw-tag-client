@@ -233,3 +233,10 @@ export interface AuthUser {
   exp?: number;
 }
 
+export interface DashboardStats {
+  totalAnimals: number;
+  vaccinatedAnimals: number;
+  vaccinationDueAnimals: number;
+  recentAnimals: Animal[];
+}
+

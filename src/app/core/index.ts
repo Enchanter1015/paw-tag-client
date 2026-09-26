@@ -9,3 +9,4 @@ export * from './services/vet-hospitals.service';
 export * from './services/medical-records.service';
 export * from './services/lookups.service';
 export * from './services/health.service';
+export * from './services/dashboard.service';

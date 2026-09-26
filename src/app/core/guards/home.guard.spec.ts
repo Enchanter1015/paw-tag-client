@@ -23,7 +23,7 @@ describe('homeGuard', () => {
     platform.isWeb = () => true;
     authState.isAuthenticated = () => false;
 
-    const result = TestBed.runInInjectionContext(() => homeGuard({} as any, []));
+    const result = TestBed.runInInjectionContext(() => homeGuard({} as any, [], {} as any));
     expect(result).toBe(true);
   });
 
@@ -31,7 +31,7 @@ describe('homeGuard', () => {
     platform.isWeb = () => true;
     authState.isAuthenticated = () => true;
 
-    const result = TestBed.runInInjectionContext(() => homeGuard({} as any, []));
+    const result = TestBed.runInInjectionContext(() => homeGuard({} as any, [], {} as any));
     expect(result).toBe(false);
   });
 
@@ -39,7 +39,7 @@ describe('homeGuard', () => {
     platform.isWeb = () => false;
     authState.isAuthenticated = () => false;
 
-    const result = TestBed.runInInjectionContext(() => homeGuard({} as any, []));
+    const result = TestBed.runInInjectionContext(() => homeGuard({} as any, [], {} as any));
     expect(result).toBe(false);
   });
 
@@ -47,7 +47,7 @@ describe('homeGuard', () => {
     platform.isWeb = () => false;
     authState.isAuthenticated = () => true;
 
-    const result = TestBed.runInInjectionContext(() => homeGuard({} as any, []));
+    const result = TestBed.runInInjectionContext(() => homeGuard({} as any, [], {} as any));
     expect(result).toBe(false);
   });
 });

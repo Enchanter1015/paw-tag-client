@@ -16,6 +16,7 @@
   background: var(--pt-surface-100);
   border-bottom: 1px solid var(--pt-border);
   box-shadow: var(--pt-shadow-sm);
+  z-index: 100;
 }
 
 .pt-topbar-start {
@@ -227,7 +228,7 @@
   .pt-topbar {
     position: fixed;
     inset: 0 0 auto 0;
-    z-index: 1;
+    z-index: 100;
   }
 
   .pt-sidebar {
