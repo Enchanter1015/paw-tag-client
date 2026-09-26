@@ -1,4 +1,37 @@
 <div class="qr-scanner">
   <video #video class="qr-scanner-video" [class.qr-scanner-video--active]="active()" muted playsinline></video>
   <canvas #canvas class="qr-scanner-canvas" hidden></canvas>
+
+  @if (active()) {
+    <div class="qr-scanner-hud" aria-hidden="true">
+      <!-- Darkened vignette overlay framing the scanning box -->
+      <div class="qr-scanner-mask">
+        <div class="qr-scanner-reticle">
+          <span class="reticle-corner reticle-tl"></span>
+          <span class="reticle-corner reticle-tr"></span>
+          <span class="reticle-corner reticle-bl"></span>
+          <span class="reticle-corner reticle-br"></span>
+          <div class="reticle-laser"></div>
+        </div>
+      </div>
+
+      <!-- Live alignment pill -->
+      <div class="qr-scanner-status">
+        <span class="status-pulse-dot"></span>
+        <span class="status-text">Align collar QR within frame</span>
+      </div>
+    </div>
+  } @else {
+    <!-- Camera warm-up / initializing state -->
+    <div class="qr-scanner-placeholder">
+      <div class="qr-scanner-loader">
+        <span class="qr-loader-ring"></span>
+        <svg class="qr-loader-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3 8V5a2 2 0 0 1 2-2h3M16 3h3a2 2 0 0 1 2 2v3M21 16v3a2 2 0 0 1-2 2h-3M8 21H5a2 2 0 0 1-2-2v-3" />
+          <circle cx="12" cy="12" r="3" />
+        </svg>
+      </div>
+      <p class="qr-placeholder-text">Starting camera sensor…</p>
+    </div>
+  }
 </div>
