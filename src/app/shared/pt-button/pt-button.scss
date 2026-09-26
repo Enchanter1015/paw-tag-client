@@ -62,7 +62,8 @@
   color: var(--pt-on-accent);
 
   &:hover:not(:disabled) {
-    background: #a72c23;
+    background: var(--pt-danger);
+    filter: brightness(0.9);
   }
 }
 
