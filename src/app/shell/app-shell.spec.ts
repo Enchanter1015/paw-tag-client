@@ -56,8 +56,10 @@ describe('AppShell', () => {
     const fixture = TestBed.createComponent(AppShell);
     fixture.detectChanges();
 
-    const button = fixture.nativeElement.querySelector('button');
-    expect(button).toBeNull();
+    const signOutBtn = Array.from(fixture.nativeElement.querySelectorAll('button')).find((b: any) =>
+      b.textContent?.includes('Sign out')
+    );
+    expect(signOutBtn).toBeFalsy();
   });
 
   it('shows the sign-out button, logs out and navigates to /login when logged in', () => {
@@ -71,16 +73,33 @@ describe('AppShell', () => {
     const fixture = TestBed.createComponent(AppShell);
     fixture.detectChanges();
 
-    const button = fixture.nativeElement.querySelector('button') as HTMLButtonElement;
-    expect(button).toBeTruthy();
+    const signOutButton = Array.from(fixture.nativeElement.querySelectorAll('button')).find((b: any) =>
+      b.textContent?.includes('Sign out')
+    ) as HTMLButtonElement;
+    expect(signOutButton).toBeTruthy();
 
-    button.click();
+    signOutButton.click();
 
     const req = httpMock.expectOne(`${baseUrl}/auth/logout`);
     req.flush(null);
 
     expect(tokenStorage.getAccessToken()).toBeNull();
     expect(navigateSpy).toHaveBeenCalledWith('/login');
+  });
+
+  it('renders a theme toggle button and toggles theme on click', () => {
+    const fixture = TestBed.createComponent(AppShell);
+    fixture.detectChanges();
+
+    const themeToggle = fixture.nativeElement.querySelector('.pt-topbar-theme-toggle') as HTMLButtonElement;
+    expect(themeToggle).toBeTruthy();
+
+    expect(themeToggle.getAttribute('aria-label')).toBe('Switch to dark theme');
+    themeToggle.click();
+    fixture.detectChanges();
+
+    expect(themeToggle.getAttribute('aria-label')).toBe('Switch to light theme');
+    expect(document.documentElement.getAttribute('data-theme')).toBe('dark');
   });
 
   it('hides login-only nav items and the admin section for a guest', () => {

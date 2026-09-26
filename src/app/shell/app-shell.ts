@@ -4,6 +4,7 @@ import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/rou
 import { AuthService } from '../core/services/auth.service';
 import { AuthStateService } from '../core/services/auth-state.service';
 import { PageHeaderService } from '../core/services/page-header.service';
+import { ThemeService } from '../core/services/theme.service';
 import { TokenStorageService } from '../core/services/token-storage.service';
 import { OfflineBanner } from '../shared/offline-banner/offline-banner';
 
@@ -17,6 +18,7 @@ import { OfflineBanner } from '../shared/offline-banner/offline-banner';
 export class AppShell {
   protected readonly authState = inject(AuthStateService);
   protected readonly pageHeader = inject(PageHeaderService);
+  protected readonly themeService = inject(ThemeService);
   private readonly authService = inject(AuthService);
   private readonly tokenStorage = inject(TokenStorageService);
   private readonly router = inject(Router);
