@@ -1,0 +1,210 @@
+<div class="pt-home">
+  <!-- Public Navigation Header -->
+  <header class="pt-home-header">
+    <div class="pt-home-container pt-home-nav-inner">
+      <a routerLink="/" class="pt-home-brand" aria-label="PawTag LK Home">
+        <div class="pt-home-brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="32" height="32" rx="10" fill="var(--pt-brand)" />
+            <circle cx="16" cy="6.5" r="2" fill="var(--pt-surface-100)" />
+            <path
+              d="M12.5 13a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3ZM19.5 13a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3ZM9.5 17a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3ZM22.5 17a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3ZM16 25c-2.8 0-4.8-1.5-4.8-3.6 0-1.8 1.6-2.4 2.7-3.4 1-0.9 1.3-1.8 2.1-1.8s1.1 0.9 2.1 1.8c1.1 1 2.7 1.6 2.7 3.4 0 2.1-2 3.6-4.8 3.6Z"
+              fill="var(--pt-surface-100)"
+            />
+          </svg>
+        </div>
+        <div class="pt-home-brand-text">
+          <span class="pt-home-brand-name">PawTag</span>
+          <span class="pt-home-brand-tag">Sri Lanka</span>
+        </div>
+      </a>
+
+      <div class="pt-home-nav-actions">
+        <a routerLink="/login" class="pt-home-nav-link">Sign in</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="pt-home-hero">
+    <div class="pt-home-container pt-home-hero-content">
+      <div class="pt-home-hero-badge">
+        <span class="pt-home-pill-dot" aria-hidden="true"></span>
+        <span>Animal Welfare & Rabies Tracking</span>
+      </div>
+
+      <h1 class="pt-home-hero-title">
+        QR collar tracking for street dogs across Sri Lanka.
+      </h1>
+
+      <p class="pt-home-hero-desc">
+        PawTag is a platform for tracking street dog vaccination, sterilisation, and medical treatment via a QR-coded collar.
+        When an animal is tagged in the field, anyone can scan the collar to check rabies vaccination dates, medical history,
+        or reach the clinic caring for the dog.
+      </p>
+
+      <p class="pt-home-hero-subdesc">
+        Used by veterinarians, animal-welfare field workers, community members, and pet owners to keep records clear and accessible.
+      </p>
+
+      <!-- Hero CTAs: Exactly 2 CTAs -->
+      <div class="pt-home-hero-actions">
+        <pt-button variant="primary" [routerLink]="['/login']">
+          <span class="pt-home-cta-label">Log in</span>
+        </pt-button>
+
+        <pt-button variant="secondary" [routerLink]="['/scan']">
+          <span class="pt-home-cta-label">
+            <svg class="pt-home-cta-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2" />
+              <rect x="7" y="7" width="10" height="10" rx="2" stroke-dasharray="2 2" />
+            </svg>
+            Scan a collar
+          </span>
+        </pt-button>
+      </div>
+
+      <p class="pt-home-hero-note">Scanning a collar is public and does not require an account or app download.</p>
+    </div>
+  </section>
+
+  <!-- Section 1: How it works -->
+  <section class="pt-home-section pt-home-section--alt">
+    <div class="pt-home-container">
+      <div class="pt-home-section-header">
+        <h2 class="pt-home-section-title">How it works</h2>
+        <p class="pt-home-section-intro">
+          A physical QR collar connects dogs on the road directly to their veterinary history.
+        </p>
+      </div>
+
+      <div class="pt-home-grid pt-home-grid--3">
+        <div class="pt-home-step-card">
+          <div class="pt-home-step-num">1</div>
+          <h3 class="pt-home-card-title">Tag and register in the field</h3>
+          <p class="pt-home-card-text">
+            During sterilisation or vaccination drives, field workers fit a numbered QR collar on the dog and log photos,
+            distinguishing marks, location, and rabies batch numbers into PawTag.
+          </p>
+        </div>
+
+        <div class="pt-home-step-card">
+          <div class="pt-home-step-num">2</div>
+          <h3 class="pt-home-card-title">Scan the collar anytime</h3>
+          <p class="pt-home-card-text">
+            If someone finds an injured or lost dog, or a team checks an area during a booster round, scanning the collar
+            immediately shows whether the dog is vaccinated and when the booster is due.
+          </p>
+        </div>
+
+        <div class="pt-home-step-card">
+          <div class="pt-home-step-num">3</div>
+          <h3 class="pt-home-card-title">Record treatments and notes</h3>
+          <p class="pt-home-card-text">
+            Veterinarians and authorized welfare staff update sterilisation records, wound treatments, and medication notes
+            so everyone working in that district sees the same history.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 2: Who it's for -->
+  <section class="pt-home-section">
+    <div class="pt-home-container">
+      <div class="pt-home-section-header">
+        <h2 class="pt-home-section-title">Who it's for</h2>
+        <p class="pt-home-section-intro">
+          Built for the practical needs of people working with animals on the ground.
+        </p>
+      </div>
+
+      <div class="pt-home-grid pt-home-grid--3">
+        <div class="pt-home-card">
+          <div class="pt-home-card-icon pt-home-card-icon--brand" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 0 0-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 0 1 5.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 0 1 9.288 0M15 7a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2 2 0 1 1-4 0 2 2 0 0 1 4 0ZM7 10a2 2 0 1 1-4 0 2 2 0 0 1 4 0Z" />
+            </svg>
+          </div>
+          <h3 class="pt-home-card-title">Field workers & welfare groups</h3>
+          <p class="pt-home-card-text">
+            Manage sterilisation drives, keep accurate counts of street dogs in your coverage area, and avoid duplicate
+            vaccinations during catch-neuter-vaccinate-release operations.
+          </p>
+        </div>
+
+        <div class="pt-home-card">
+          <div class="pt-home-card-icon pt-home-card-icon--accent" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 0 0-1.022-.547l-2.387-.477a6 6 0 0 0-3.86.517l-.318.158a6 6 0 0 1-3.86.517L6.05 15.21a2 2 0 0 0-1.806.547M8 4h8l-1 1v5.172a2 2 0 0 0 .586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 0 0 9 10.172V5L8 4Z" />
+            </svg>
+          </div>
+          <h3 class="pt-home-card-title">Veterinarians & clinics</h3>
+          <p class="pt-home-card-text">
+            Look up a dog's past medical interventions, log treatments and rabies batch certificates, and give rescuers
+            a reliable record when following up on surgeries.
+          </p>
+        </div>
+
+        <div class="pt-home-card">
+          <div class="pt-home-card-icon pt-home-card-icon--sun" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+            </svg>
+          </div>
+          <h3 class="pt-home-card-title">Community members & pet owners</h3>
+          <p class="pt-home-card-text">
+            Check if a neighborhood community dog has been vaccinated, reach the registered feeder or rescue team if a dog is sick,
+            or keep health records for adopted street dogs.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 3: Practical field benefits -->
+  <section class="pt-home-section pt-home-section--alt">
+    <div class="pt-home-container">
+      <div class="pt-home-section-header">
+        <h2 class="pt-home-section-title">Designed for real conditions</h2>
+        <p class="pt-home-section-intro">
+          Field work doesn't always happen with high-speed internet or desktop computers.
+        </p>
+      </div>
+
+      <div class="pt-home-grid pt-home-grid--2">
+        <div class="pt-home-feature-card">
+          <h3 class="pt-home-card-title">Instant public scanning</h3>
+          <p class="pt-home-card-text">
+            Anyone with a standard smartphone camera can scan a collar. The animal's public status loads in their mobile browser
+            without installing an app, creating an account, or waiting for approvals.
+          </p>
+        </div>
+
+        <div class="pt-home-feature-card">
+          <h3 class="pt-home-card-title">Offline support for field rounds</h3>
+          <p class="pt-home-card-text">
+            When teams are in areas with poor mobile signals, recently viewed records and cached animal data stay accessible
+            so vaccinations and IDs can still be checked.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="pt-home-footer">
+    <div class="pt-home-container pt-home-footer-inner">
+      <div class="pt-home-footer-brand">
+        <span class="pt-home-footer-name">PawTag Sri Lanka</span>
+        <span class="pt-home-footer-tagline">Street dog vaccination, sterilisation, and medical registry</span>
+      </div>
+
+      <div class="pt-home-footer-links">
+        <a routerLink="/scan">Scan a collar</a>
+        <a routerLink="/login">Sign in</a>
+        <a routerLink="/register">Register</a>
+      </div>
+    </div>
+  </footer>
+</div>

@@ -16,7 +16,10 @@ describe('Register', () => {
     TestBed.configureTestingModule({
       imports: [Register],
       providers: [
-        provideRouter([]),
+        provideRouter([
+          { path: '', component: Register },
+          { path: 'login', component: Register },
+        ]),
         provideHttpClient(),
         provideHttpClientTesting(),
         { provide: API_BASE_URL, useValue: baseUrl }
@@ -78,5 +81,20 @@ describe('Register', () => {
 
     expect(component.submitting()).toBe(false);
     expect(component.emailError()).toBe('This email is already registered.');
+  });
+
+  it('navigates to the home page when clicking the back button', async () => {
+    const fixture = TestBed.createComponent(Register);
+    fixture.detectChanges();
+
+    const backLink = fixture.nativeElement.querySelector('.auth-back-link') as HTMLAnchorElement;
+    expect(backLink).toBeTruthy();
+    expect(backLink.getAttribute('routerLink') ?? backLink.getAttribute('href')).toBe('/');
+
+    backLink.click();
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    expect(router.url).toBe('/');
   });
 });
