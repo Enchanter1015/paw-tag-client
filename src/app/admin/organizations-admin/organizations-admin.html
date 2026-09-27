@@ -1,0 +1,79 @@
+<div class="orgs-admin-screen">
+  <p class="orgs-admin-subtitle">Search, add, and edit vet hospitals and their members.</p>
+
+  <form class="orgs-admin-search" [formGroup]="searchForm">
+    <pt-input label="Search by name" placeholder="Organization name" formControlName="name"></pt-input>
+  </form>
+
+  @if (!creating()) {
+    <pt-button variant="secondary" type="button" (click)="startCreating()">Add organization</pt-button>
+  }
+
+  @if (creating()) {
+    <form class="orgs-admin-form" [formGroup]="createForm" (ngSubmit)="submitCreate()">
+      <h2 class="orgs-admin-form-title">New organization</h2>
+      <pt-input
+        label="Name"
+        formControlName="name"
+        [error]="fieldError(createForm.controls.name, 'Enter the organization name.')"
+      ></pt-input>
+
+      <div class="field-group">
+        <label class="field-label" for="createVetHospitalTypeId">Organization type</label>
+        <select id="createVetHospitalTypeId" class="field-select" formControlName="vetHospitalTypeId">
+          <option value="" disabled>Select a type</option>
+          @for (type of vetHospitalTypes(); track type.id) {
+            <option [value]="type.id">{{ type.name }}</option>
+          }
+        </select>
+        @if (fieldError(createForm.controls.vetHospitalTypeId, 'Select an organization type.'); as error) {
+          <p class="field-error">{{ error }}</p>
+        }
+      </div>
+
+      <pt-input label="Phone number (optional)" formControlName="phoneNo"></pt-input>
+      <pt-input label="Address (optional)" formControlName="address"></pt-input>
+      <pt-input
+        label="Business email (optional)"
+        type="email"
+        formControlName="businessEmail"
+        [error]="fieldError(createForm.controls.businessEmail, '')"
+      ></pt-input>
+
+      @if (createError()) {
+        <p class="orgs-admin-error">{{ createError() }}</p>
+      }
+
+      <div class="orgs-admin-form-actions">
+        <pt-button variant="secondary" type="button" (click)="cancelCreating()">Cancel</pt-button>
+        <pt-button type="submit" [disabled]="creatingInFlight()">
+          {{ creatingInFlight() ? 'Creating…' : 'Create organization' }}
+        </pt-button>
+      </div>
+    </form>
+  }
+
+  @if (loading()) {
+    <p class="orgs-admin-status">Loading…</p>
+  } @else if (loadError()) {
+    <p class="orgs-admin-status orgs-admin-status--error">{{ loadError() }}</p>
+  } @else if (organizations().length === 0) {
+    <p class="orgs-admin-status">No organizations found.</p>
+  } @else {
+    <ul class="orgs-admin-list">
+      @for (org of organizations(); track org.id) {
+        <li class="orgs-admin-row">
+          <a class="orgs-admin-row-btn" [routerLink]="['/admin/organizations', org.id]">
+            <div class="orgs-admin-info">
+              <span class="orgs-admin-name">{{ org.name }}</span>
+              <span class="orgs-admin-meta">{{ vetHospitalTypeName(org.vetHospitalTypeId) }}</span>
+            </div>
+            <pt-tag [variant]="org.isVerified ? 'success' : 'neutral'">
+              {{ org.isVerified ? 'Verified' : 'Unverified' }}
+            </pt-tag>
+          </a>
+        </li>
+      }
+    </ul>
+  }
+</div>

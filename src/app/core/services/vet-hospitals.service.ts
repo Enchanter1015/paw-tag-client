@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { API_BASE_URL } from './api-config';
 import {
   AddVetHospitalMemberInput,
+  Animal,
   CreateVetHospitalInput,
   UpdateVetHospitalInput,
   UpdateVetHospitalMemberInput,
@@ -46,6 +47,10 @@ export class VetHospitalsService {
 
   listMembers(id: string): Observable<VetHospitalMember[]> {
     return this.http.get<VetHospitalMember[]>(`${this.baseUrl}/vet-hospitals/${id}/members`);
+  }
+
+  listAnimals(id: string): Observable<Animal[]> {
+    return this.http.get<Animal[]>(`${this.baseUrl}/vet-hospitals/${id}/animals`);
   }
 
   updateMember(id: string, memberId: string, input: UpdateVetHospitalMemberInput): Observable<VetHospitalMember> {
