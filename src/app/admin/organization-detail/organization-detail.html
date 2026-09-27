@@ -1,169 +1,299 @@
 <div class="org-detail-screen">
   @if (loading()) {
-    <p class="org-detail-status">Loading…</p>
+    <div class="org-detail-loading">
+      <div class="loading-spinner" aria-hidden="true"></div>
+      <p class="org-detail-status">Loading organization…</p>
+    </div>
   } @else if (notFound()) {
-    <p class="org-detail-status org-detail-status--error">Organization not found.</p>
+    <div class="org-detail-error-card">
+      <div class="error-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="12" y1="8" x2="12" y2="12"/>
+          <line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+      </div>
+      <p class="org-detail-status org-detail-status--error">Organization not found.</p>
+    </div>
   } @else if (organization(); as org) {
     @if (!editing()) {
-      <div class="org-detail-header">
-        <h2 class="org-detail-title">{{ org.name }}</h2>
-        <span class="org-detail-meta">{{ vetHospitalTypeName(org.vetHospitalTypeId) }}</span>
-        <pt-tag [variant]="org.isVerified ? 'success' : 'neutral'">
-          {{ org.isVerified ? 'Verified' : 'Unverified' }}
-        </pt-tag>
+      <!-- Hero Header Card -->
+      <div class="org-detail-card org-detail-card--hero">
+        <div class="org-detail-header">
+          <div class="org-icon-badge" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 21h18M5 21V7l8-4 8 4v14M9 21v-6h6v6M9 9h.01M15 9h.01M9 13h.01M15 13h.01"/>
+            </svg>
+          </div>
+          <div class="org-detail-heading">
+            <div class="org-detail-title-row">
+              <h2 class="org-detail-title">{{ org.name }}</h2>
+              <pt-tag [variant]="org.isVerified ? 'success' : 'neutral'">
+                {{ org.isVerified ? 'Verified' : 'Unverified' }}
+              </pt-tag>
+            </div>
+            <span class="org-detail-meta">{{ vetHospitalTypeName(org.vetHospitalTypeId) }}</span>
+          </div>
+        </div>
+
+        <!-- Quick Stats Row -->
+        <div class="org-detail-stats">
+          <div class="stat-item">
+            <span class="stat-value">{{ members().length }}</span>
+            <span class="stat-label">Members</span>
+          </div>
+          <div class="stat-divider" aria-hidden="true"></div>
+          <div class="stat-item">
+            <span class="stat-value">{{ orgAnimals().length }}</span>
+            <span class="stat-label">Animals</span>
+          </div>
+          <div class="stat-divider" aria-hidden="true"></div>
+          <div class="stat-item">
+            <span class="stat-badge" [class.stat-badge--unverified]="!org.isVerified">
+              <span class="status-dot" [class.status-dot--unverified]="!org.isVerified" aria-hidden="true"></span>
+              {{ org.isVerified ? 'Verified' : 'Pending' }}
+            </span>
+            <span class="stat-label">Status</span>
+          </div>
+        </div>
       </div>
 
-      <dl class="org-detail-details">
-        <div class="detail-row">
-          <dt>Phone number</dt>
-          <dd>{{ org.phoneNo || 'Not recorded' }}</dd>
+      <!-- Contact Details Card -->
+      <div class="org-detail-card">
+        <div class="card-section-header">
+          <h3 class="org-detail-section-title">Organization details</h3>
         </div>
-        <div class="detail-row">
-          <dt>Address</dt>
-          <dd>{{ org.address || 'Not recorded' }}</dd>
-        </div>
-        <div class="detail-row">
-          <dt>Business email</dt>
-          <dd>{{ org.businessEmail || 'Not recorded' }}</dd>
-        </div>
-      </dl>
 
-      <div class="org-detail-tabs" role="tablist">
-        <button
-          type="button"
-          role="tab"
-          class="org-detail-tab"
-          [class.org-detail-tab--active]="activeTab() === 'members'"
-          [attr.aria-selected]="activeTab() === 'members'"
-          (click)="activeTab.set('members')"
-        >
-          Members
-        </button>
-        <button
-          type="button"
-          role="tab"
-          class="org-detail-tab"
-          [class.org-detail-tab--active]="activeTab() === 'animals'"
-          [attr.aria-selected]="activeTab() === 'animals'"
-          (click)="activeTab.set('animals')"
-        >
-          Animals
-        </button>
+        <dl class="org-detail-details">
+          <div class="detail-row">
+            <dt>
+              <svg class="detail-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+              </svg>
+              Phone number
+            </dt>
+            <dd>{{ org.phoneNo || 'Not recorded' }}</dd>
+          </div>
+          <div class="detail-row">
+            <dt>
+              <svg class="detail-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                <circle cx="12" cy="10" r="3"/>
+              </svg>
+              Address
+            </dt>
+            <dd>{{ org.address || 'Not recorded' }}</dd>
+          </div>
+          <div class="detail-row">
+            <dt>
+              <svg class="detail-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                <polyline points="22,6 12,13 2,6"/>
+              </svg>
+              Business email
+            </dt>
+            <dd>{{ org.businessEmail || 'Not recorded' }}</dd>
+          </div>
+        </dl>
       </div>
 
-      @if (activeTab() === 'members') {
-        @if (membersLoading()) {
-          <p class="org-detail-status">Loading members…</p>
-        } @else if (membersError()) {
-          <p class="org-detail-status org-detail-status--error">{{ membersError() }}</p>
-        } @else if (members().length === 0) {
-          <p class="org-detail-status">No members yet.</p>
-        } @else {
-          <ul class="org-detail-member-list">
-            @for (member of members(); track member.id) {
-              <li class="org-detail-member-row">
-                <pt-avatar [name]="memberName(member.userId)"></pt-avatar>
-                <span class="org-detail-member-name">{{ memberName(member.userId) }}</span>
-                <pt-tag variant="info">{{ roleName(member.roleId) }}</pt-tag>
-              </li>
-            }
-          </ul>
-        }
+      <!-- Main Tabs Section -->
+      <div class="org-detail-card org-detail-card--tabs">
+        <div class="org-detail-tabs" role="tablist">
+          <button
+            type="button"
+            role="tab"
+            class="org-detail-tab"
+            [class.org-detail-tab--active]="activeTab() === 'members'"
+            [attr.aria-selected]="activeTab() === 'members'"
+            (click)="activeTab.set('members')"
+          >
+            Members
+            <span class="tab-count-pill">{{ members().length }}</span>
+          </button>
+          <button
+            type="button"
+            role="tab"
+            class="org-detail-tab"
+            [class.org-detail-tab--active]="activeTab() === 'animals'"
+            [attr.aria-selected]="activeTab() === 'animals'"
+            (click)="activeTab.set('animals')"
+          >
+            Animals
+            <span class="tab-count-pill">{{ orgAnimals().length }}</span>
+          </button>
+        </div>
 
-        @if (authState.isAdministrator()) {
-          <form class="org-detail-add-member" [formGroup]="addMemberForm" (ngSubmit)="addMember()">
-            <pt-input
-              label="Add member by email"
-              type="email"
-              placeholder="member@example.com"
-              formControlName="email"
-              [error]="fieldError(addMemberForm.controls.email, 'Enter an email address.')"
-            ></pt-input>
+        @if (activeTab() === 'members') {
+          <!-- Add Member Form MOVED TO THE TOP of members list -->
+          @if (authState.isAdministrator()) {
+            <div class="org-detail-add-member-panel">
+              <div class="add-member-header">
+                <svg class="panel-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                  <circle cx="9" cy="7" r="4"/>
+                  <line x1="19" y1="8" x2="19" y2="14"/>
+                  <line x1="22" y1="11" x2="16" y2="11"/>
+                </svg>
+                <h4 class="add-member-title">Add member to organization</h4>
+              </div>
 
-            <div class="field-group">
-              <label class="field-label" for="addMemberRoleId">Role</label>
-              <select id="addMemberRoleId" class="field-select" formControlName="roleId">
-                <option value="" disabled>Select a role</option>
-                @for (role of assignableRoles(); track role.id) {
-                  <option [value]="role.id">{{ role.name }}</option>
+              <form class="org-detail-add-member" [formGroup]="addMemberForm" (ngSubmit)="addMember()">
+                <div class="add-member-inputs">
+                  <pt-input
+                    label="Member email"
+                    type="email"
+                    placeholder="member@example.com"
+                    formControlName="email"
+                    [error]="fieldError(addMemberForm.controls.email, 'Enter an email address.')"
+                  ></pt-input>
+
+                  <div class="field-group">
+                    <label class="field-label" for="addMemberRoleId">Role</label>
+                    <select id="addMemberRoleId" class="field-select" formControlName="roleId">
+                      <option value="" disabled>Select a role</option>
+                      @for (role of assignableRoles(); track role.id) {
+                        <option [value]="role.id">{{ role.name }}</option>
+                      }
+                    </select>
+                    @if (fieldError(addMemberForm.controls.roleId, 'Select a role.'); as error) {
+                      <p class="field-error">{{ error }}</p>
+                    }
+                  </div>
+                </div>
+
+                @if (addMemberError()) {
+                  <p class="org-detail-error" role="alert">{{ addMemberError() }}</p>
                 }
-              </select>
-              @if (fieldError(addMemberForm.controls.roleId, 'Select a role.'); as error) {
-                <p class="field-error">{{ error }}</p>
-              }
+
+                <div class="add-member-action">
+                  <pt-button type="submit" [sm]="true" [disabled]="addingMember()">
+                    <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <line x1="12" y1="5" x2="12" y2="19"/>
+                      <line x1="5" y1="12" x2="19" y2="12"/>
+                    </svg>
+                    {{ addingMember() ? 'Adding…' : 'Add member' }}
+                  </pt-button>
+                </div>
+              </form>
+            </div>
+          }
+
+          <!-- Member List -->
+          <div class="org-detail-member-section">
+            <div class="list-section-header">
+              <h4 class="list-section-title">Current members</h4>
+              <span class="count-pill">{{ members().length }}</span>
             </div>
 
-            @if (addMemberError()) {
-              <p class="org-detail-error">{{ addMemberError() }}</p>
+            @if (membersLoading()) {
+              <p class="org-detail-status">Loading members…</p>
+            } @else if (membersError()) {
+              <p class="org-detail-status org-detail-status--error">{{ membersError() }}</p>
+            } @else if (members().length === 0) {
+              <div class="org-detail-empty-card">
+                <p class="org-detail-status">No members yet.</p>
+              </div>
+            } @else {
+              <ul class="org-detail-member-list">
+                @for (member of members(); track member.id) {
+                  <li class="org-detail-member-row">
+                    <pt-avatar [name]="memberName(member.userId)"></pt-avatar>
+                    <div class="member-info">
+                      <span class="org-detail-member-name">{{ memberName(member.userId) }}</span>
+                    </div>
+                    <pt-tag variant="info">{{ roleName(member.roleId) }}</pt-tag>
+                  </li>
+                }
+              </ul>
             }
-
-            <pt-button type="submit" [sm]="true" [disabled]="addingMember()">
-              {{ addingMember() ? 'Adding…' : 'Add member' }}
-            </pt-button>
-          </form>
-        }
-      } @else {
-        @if (animalsLoading()) {
-          <p class="org-detail-status">Loading animals…</p>
-        } @else if (animalsError()) {
-          <p class="org-detail-status org-detail-status--error">{{ animalsError() }}</p>
-        } @else if (orgAnimals().length === 0) {
-          <p class="org-detail-status">No animals registered by this organization's members.</p>
+          </div>
         } @else {
-          <ul class="org-detail-animal-list">
-            @for (animal of orgAnimals(); track animal.id) {
-              <li class="org-detail-animal-row">
-                <a class="org-detail-animal-link" [routerLink]="['/animals', animal.id]">
-                  <pt-avatar [name]="animal.name"></pt-avatar>
-                  <span class="org-detail-member-name">{{ animal.name }}</span>
-                  <span class="org-detail-meta">{{ animal.id }}</span>
-                </a>
-              </li>
-            }
-          </ul>
-        }
-      }
-    } @else {
-      <form class="org-detail-form" [formGroup]="editForm" (ngSubmit)="saveEdit()">
-        <pt-input
-          label="Name"
-          formControlName="name"
-          [error]="fieldError(editForm.controls.name, 'Enter the organization name.')"
-        ></pt-input>
+          <!-- Animals Tab -->
+          <div class="org-detail-animals-section">
+            <div class="list-section-header">
+              <h4 class="list-section-title">Animals registered by members</h4>
+              <span class="count-pill">{{ orgAnimals().length }}</span>
+            </div>
 
-        <div class="field-group">
-          <label class="field-label" for="editVetHospitalTypeId">Organization type</label>
-          <select id="editVetHospitalTypeId" class="field-select" formControlName="vetHospitalTypeId">
-            <option value="" disabled>Select a type</option>
-            @for (type of vetHospitalTypes(); track type.id) {
-              <option [value]="type.id">{{ type.name }}</option>
+            @if (animalsLoading()) {
+              <p class="org-detail-status">Loading animals…</p>
+            } @else if (animalsError()) {
+              <p class="org-detail-status org-detail-status--error">{{ animalsError() }}</p>
+            } @else if (orgAnimals().length === 0) {
+              <div class="org-detail-empty-card">
+                <p class="org-detail-status">No animals registered by this organization's members.</p>
+              </div>
+            } @else {
+              <ul class="org-detail-animal-list">
+                @for (animal of orgAnimals(); track animal.id) {
+                  <li class="org-detail-animal-row">
+                    <a class="org-detail-animal-link" [routerLink]="['/animals', animal.id]">
+                      <pt-avatar [name]="animal.name"></pt-avatar>
+                      <div class="animal-info">
+                        <span class="org-detail-member-name">{{ animal.name }}</span>
+                        <span class="org-detail-meta">{{ animal.id }}</span>
+                      </div>
+                      <svg class="row-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <polyline points="9 18 15 12 9 6"/>
+                      </svg>
+                    </a>
+                  </li>
+                }
+              </ul>
             }
-          </select>
-          @if (fieldError(editForm.controls.vetHospitalTypeId, 'Select an organization type.'); as error) {
-            <p class="field-error">{{ error }}</p>
-          }
+          </div>
+        }
+      </div>
+    } @else {
+      <!-- Edit Organization Form -->
+      <div class="org-detail-card">
+        <div class="card-section-header">
+          <h3 class="org-detail-section-title">Edit organization</h3>
         </div>
 
-        <pt-input label="Phone number (optional)" formControlName="phoneNo"></pt-input>
-        <pt-input label="Address (optional)" formControlName="address"></pt-input>
-        <pt-input
-          label="Business email (optional)"
-          type="email"
-          formControlName="businessEmail"
-          [error]="fieldError(editForm.controls.businessEmail, '')"
-        ></pt-input>
+        <form class="org-detail-form" [formGroup]="editForm" (ngSubmit)="saveEdit()">
+          <pt-input
+            label="Name"
+            formControlName="name"
+            [error]="fieldError(editForm.controls.name, 'Enter the organization name.')"
+          ></pt-input>
 
-        <label class="field-checkbox">
-          <input type="checkbox" formControlName="isVerified" />
-          Verified organization
-        </label>
+          <div class="field-group">
+            <label class="field-label" for="editVetHospitalTypeId">Organization type</label>
+            <select id="editVetHospitalTypeId" class="field-select" formControlName="vetHospitalTypeId">
+              <option value="" disabled>Select a type</option>
+              @for (type of vetHospitalTypes(); track type.id) {
+                <option [value]="type.id">{{ type.name }}</option>
+              }
+            </select>
+            @if (fieldError(editForm.controls.vetHospitalTypeId, 'Select an organization type.'); as error) {
+              <p class="field-error">{{ error }}</p>
+            }
+          </div>
 
-        @if (formError()) {
-          <p class="org-detail-error">{{ formError() }}</p>
-        }
+          <pt-input label="Phone number (optional)" formControlName="phoneNo"></pt-input>
+          <pt-input label="Address (optional)" formControlName="address"></pt-input>
+          <pt-input
+            label="Business email (optional)"
+            type="email"
+            formControlName="businessEmail"
+            [error]="fieldError(editForm.controls.businessEmail, '')"
+          ></pt-input>
 
-        <button type="submit" hidden [disabled]="saving()"></button>
-      </form>
+          <label class="field-checkbox">
+            <input type="checkbox" formControlName="isVerified" />
+            Verified organization
+          </label>
+
+          @if (formError()) {
+            <p class="org-detail-error">{{ formError() }}</p>
+          }
+
+          <button type="submit" hidden [disabled]="saving()"></button>
+        </form>
+      </div>
     }
   }
 </div>
+
