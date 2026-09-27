@@ -5,6 +5,7 @@ import { VetHospitalsService } from './vet-hospitals.service';
 import { API_BASE_URL } from './api-config';
 import {
   AddVetHospitalMemberInput,
+  Animal,
   CreateVetHospitalInput,
   UpdateVetHospitalInput,
   UpdateVetHospitalMemberInput,
@@ -120,6 +121,24 @@ describe('VetHospitalsService', () => {
     const req = httpMock.expectOne(`${baseUrl}/vet-hospitals/uuid-1/members`);
     expect(req.request.method).toBe('GET');
     req.flush([member]);
+  });
+
+  it("lists a vet hospital's members' registered animals", () => {
+    const animal: Animal = {
+      id: 'a1111111',
+      name: 'Bruno',
+      animalTypeId: 1,
+      isStreet: false,
+      createdBy: 'uuid-user',
+      createdAt: '2026-01-01T00:00:00.000Z',
+      updatedAt: '2026-01-01T00:00:00.000Z'
+    };
+
+    service.listAnimals('uuid-1').subscribe((result) => expect(result).toEqual([animal]));
+
+    const req = httpMock.expectOne(`${baseUrl}/vet-hospitals/uuid-1/animals`);
+    expect(req.request.method).toBe('GET');
+    req.flush([animal]);
   });
 
   it('updates a member role', () => {

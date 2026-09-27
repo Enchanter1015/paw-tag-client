@@ -1,0 +1,167 @@
+<div class="org-detail-screen">
+  @if (loading()) {
+    <p class="org-detail-status">Loading…</p>
+  } @else if (notFound()) {
+    <p class="org-detail-status org-detail-status--error">Organization not found.</p>
+  } @else if (organization(); as org) {
+    @if (!editing()) {
+      <div class="org-detail-header">
+        <h2 class="org-detail-title">{{ org.name }}</h2>
+        <span class="org-detail-meta">{{ vetHospitalTypeName(org.vetHospitalTypeId) }}</span>
+        <pt-tag [variant]="org.isVerified ? 'success' : 'neutral'">
+          {{ org.isVerified ? 'Verified' : 'Unverified' }}
+        </pt-tag>
+      </div>
+
+      <dl class="org-detail-details">
+        <div class="detail-row">
+          <dt>Phone number</dt>
+          <dd>{{ org.phoneNo || 'Not recorded' }}</dd>
+        </div>
+        <div class="detail-row">
+          <dt>Address</dt>
+          <dd>{{ org.address || 'Not recorded' }}</dd>
+        </div>
+        <div class="detail-row">
+          <dt>Business email</dt>
+          <dd>{{ org.businessEmail || 'Not recorded' }}</dd>
+        </div>
+      </dl>
+
+      <div class="org-detail-tabs" role="tablist">
+        <button
+          type="button"
+          role="tab"
+          class="org-detail-tab"
+          [class.org-detail-tab--active]="activeTab() === 'members'"
+          [attr.aria-selected]="activeTab() === 'members'"
+          (click)="activeTab.set('members')"
+        >
+          Members
+        </button>
+        <button
+          type="button"
+          role="tab"
+          class="org-detail-tab"
+          [class.org-detail-tab--active]="activeTab() === 'animals'"
+          [attr.aria-selected]="activeTab() === 'animals'"
+          (click)="activeTab.set('animals')"
+        >
+          Animals
+        </button>
+      </div>
+
+      @if (activeTab() === 'members') {
+        @if (membersLoading()) {
+          <p class="org-detail-status">Loading members…</p>
+        } @else if (membersError()) {
+          <p class="org-detail-status org-detail-status--error">{{ membersError() }}</p>
+        } @else if (members().length === 0) {
+          <p class="org-detail-status">No members yet.</p>
+        } @else {
+          <ul class="org-detail-member-list">
+            @for (member of members(); track member.id) {
+              <li class="org-detail-member-row">
+                <pt-avatar [name]="memberName(member.userId)"></pt-avatar>
+                <span class="org-detail-member-name">{{ memberName(member.userId) }}</span>
+                <pt-tag variant="info">{{ roleName(member.roleId) }}</pt-tag>
+              </li>
+            }
+          </ul>
+        }
+
+        <form class="org-detail-add-member" [formGroup]="addMemberForm" (ngSubmit)="addMember()">
+          <pt-input
+            label="Add member by email"
+            type="email"
+            placeholder="member@example.com"
+            formControlName="email"
+            [error]="fieldError(addMemberForm.controls.email, 'Enter an email address.')"
+          ></pt-input>
+
+          <div class="field-group">
+            <label class="field-label" for="addMemberRoleId">Role</label>
+            <select id="addMemberRoleId" class="field-select" formControlName="roleId">
+              <option value="" disabled>Select a role</option>
+              @for (role of roles(); track role.id) {
+                <option [value]="role.id">{{ role.name }}</option>
+              }
+            </select>
+            @if (fieldError(addMemberForm.controls.roleId, 'Select a role.'); as error) {
+              <p class="field-error">{{ error }}</p>
+            }
+          </div>
+
+          @if (addMemberError()) {
+            <p class="org-detail-error">{{ addMemberError() }}</p>
+          }
+
+          <pt-button type="submit" [sm]="true" [disabled]="addingMember()">
+            {{ addingMember() ? 'Adding…' : 'Add member' }}
+          </pt-button>
+        </form>
+      } @else {
+        @if (animalsLoading()) {
+          <p class="org-detail-status">Loading animals…</p>
+        } @else if (animalsError()) {
+          <p class="org-detail-status org-detail-status--error">{{ animalsError() }}</p>
+        } @else if (orgAnimals().length === 0) {
+          <p class="org-detail-status">No animals registered by this organization's members.</p>
+        } @else {
+          <ul class="org-detail-animal-list">
+            @for (animal of orgAnimals(); track animal.id) {
+              <li class="org-detail-animal-row">
+                <a class="org-detail-animal-link" [routerLink]="['/animals', animal.id]">
+                  <pt-avatar [name]="animal.name"></pt-avatar>
+                  <span class="org-detail-member-name">{{ animal.name }}</span>
+                  <span class="org-detail-meta">{{ animal.id }}</span>
+                </a>
+              </li>
+            }
+          </ul>
+        }
+      }
+    } @else {
+      <form class="org-detail-form" [formGroup]="editForm" (ngSubmit)="saveEdit()">
+        <pt-input
+          label="Name"
+          formControlName="name"
+          [error]="fieldError(editForm.controls.name, 'Enter the organization name.')"
+        ></pt-input>
+
+        <div class="field-group">
+          <label class="field-label" for="editVetHospitalTypeId">Organization type</label>
+          <select id="editVetHospitalTypeId" class="field-select" formControlName="vetHospitalTypeId">
+            <option value="" disabled>Select a type</option>
+            @for (type of vetHospitalTypes(); track type.id) {
+              <option [value]="type.id">{{ type.name }}</option>
+            }
+          </select>
+          @if (fieldError(editForm.controls.vetHospitalTypeId, 'Select an organization type.'); as error) {
+            <p class="field-error">{{ error }}</p>
+          }
+        </div>
+
+        <pt-input label="Phone number (optional)" formControlName="phoneNo"></pt-input>
+        <pt-input label="Address (optional)" formControlName="address"></pt-input>
+        <pt-input
+          label="Business email (optional)"
+          type="email"
+          formControlName="businessEmail"
+          [error]="fieldError(editForm.controls.businessEmail, '')"
+        ></pt-input>
+
+        <label class="field-checkbox">
+          <input type="checkbox" formControlName="isVerified" />
+          Verified organization
+        </label>
+
+        @if (formError()) {
+          <p class="org-detail-error">{{ formError() }}</p>
+        }
+
+        <button type="submit" hidden [disabled]="saving()"></button>
+      </form>
+    }
+  }
+</div>

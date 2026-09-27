@@ -24,36 +24,35 @@
 
     <div class="pt-topbar-end">
       <!-- Theme Toggle Button -->
-      <button
-        type="button"
-        class="pt-topbar-theme-toggle"
-        (click)="themeService.toggleTheme()"
+      <button type="button" class="pt-topbar-theme-toggle" (click)="themeService.toggleTheme()"
         [attr.aria-label]="themeService.isDarkMode() ? 'Switch to light theme' : 'Switch to dark theme'"
-        [title]="themeService.isDarkMode() ? 'Switch to light theme' : 'Switch to dark theme'"
-      >
+        [title]="themeService.isDarkMode() ? 'Switch to light theme' : 'Switch to dark theme'">
         @if (themeService.isDarkMode()) {
-          <svg class="pt-topbar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <circle cx="12" cy="12" r="5" />
-            <line x1="12" y1="1" x2="12" y2="3" />
-            <line x1="12" y1="21" x2="12" y2="23" />
-            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
-            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
-            <line x1="1" y1="12" x2="3" y2="12" />
-            <line x1="21" y1="12" x2="23" y2="12" />
-            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
-            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
-          </svg>
+        <svg class="pt-topbar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="5" />
+          <line x1="12" y1="1" x2="12" y2="3" />
+          <line x1="12" y1="21" x2="12" y2="23" />
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+          <line x1="1" y1="12" x2="3" y2="12" />
+          <line x1="21" y1="12" x2="23" y2="12" />
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+        </svg>
         } @else {
-          <svg class="pt-topbar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-          </svg>
+        <svg class="pt-topbar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+        </svg>
         }
       </button>
 
       @if (pageHeader.config().action; as action) {
       @if (action.kind === 'edit') {
       <button type="button" class="pt-topbar-action" (click)="action.onClick()" aria-label="Edit">
-        <svg class="pt-topbar-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <svg class="pt-topbar-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"
+          aria-hidden="true">
           <path d="M4 20h4l10.5-10.5a2 2 0 0 0 0-2.83l-1.17-1.17a2 2 0 0 0-2.83 0L4 16v4Z" stroke="currentColor"
             stroke-width="1.6" stroke-linejoin="round" />
         </svg>
@@ -73,7 +72,8 @@
 
   <aside class="pt-sidebar">
     <nav class="pt-nav" aria-label="Primary">
-      @if (authState.isGuest()) {
+      <!-- @if (authState.isGuest()) { -->
+
       <a routerLink="/scan" routerLinkActive="is-active">
         <svg class="pt-nav-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
           <rect x="3" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8" />
@@ -83,18 +83,19 @@
         </svg>
         <span>Scan</span>
       </a>
-      }
+      <!-- } -->
       @if (authState.isAuthenticated()) {
       @if (authState.isAdministrator()) {
-      <a routerLink="/" routerLinkActive="is-active" [routerLinkActiveOptions]="{ exact: true }">
+      <a routerLink="/dashboard" routerLinkActive="is-active" [routerLinkActiveOptions]="{ exact: true }">
         <svg class="pt-nav-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
           <path d="M4 11.5 12 4l8 7.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
             stroke-linejoin="round" />
           <path d="M6 10v8.5a1 1 0 0 0 1 1h3v-5h4v5h3a1 1 0 0 0 1-1V10" stroke="currentColor" stroke-width="1.8"
             stroke-linecap="round" stroke-linejoin="round" />
         </svg>
-        <span>Home</span>
+        <span>Dashboard</span>
       </a>
+
       <a routerLink="/admin/animals" routerLinkActive="is-active">
         <svg class="pt-nav-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
           <path
@@ -103,7 +104,6 @@
         </svg>
         <span>Animals</span>
       </a>
-      }
       <a routerLink="/admin/users" routerLinkActive="is-active">
         <svg class="pt-nav-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
           <path
@@ -112,6 +112,15 @@
         </svg>
         <span>User management</span>
       </a>
+      <a routerLink="/admin/organizations" routerLinkActive="is-active">
+        <svg class="pt-nav-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M4 21V7l8-4 8 4v14M9 21v-6h6v6M4 21h16" stroke="currentColor" stroke-width="1.8"
+            stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+        <span>Organizations</span>
+      </a>
+      }
+
       <a routerLink="/profile" routerLinkActive="is-active">
         <svg class="pt-nav-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
           <circle cx="12" cy="8" r="3.25" stroke="currentColor" stroke-width="1.8" />
