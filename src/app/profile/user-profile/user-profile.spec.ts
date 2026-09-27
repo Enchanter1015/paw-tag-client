@@ -7,7 +7,7 @@ import { UserProfile } from './user-profile';
 import { API_BASE_URL } from '../../core/services/api-config';
 import { AuthStateService } from '../../core/services/auth-state.service';
 import { TokenStorageService } from '../../core/services/token-storage.service';
-import { Animal, MedicalRecord, User } from '../../core/models/models';
+import { Animal, MedicalRecord, User, VetHospital } from '../../core/models/models';
 import { OfflineCacheKeys, OfflineCacheService } from '../../core/services/offline-cache.service';
 
 function makeToken(role = 'User'): { token: string; sub: string } {
@@ -49,6 +49,17 @@ describe('UserProfile', () => {
     updatedAt: '2026-01-01T00:00:00Z',
   };
 
+  const organization: VetHospital = {
+    id: 'org-1',
+    name: 'Central Vet Clinic',
+    vetHospitalTypeId: 1,
+    isVerified: true,
+    isArchived: false,
+    createdBy: 'someone-else',
+    createdAt: '2026-01-01T00:00:00Z',
+    updatedAt: '2026-01-01T00:00:00Z',
+  };
+
   const networkDown = () => new ProgressEvent('error');
 
   // The connectivity service may be created after the event fires, so stub navigator.onLine too —
@@ -75,6 +86,9 @@ describe('UserProfile', () => {
     httpMock.expectOne((r) => r.url === `${baseUrl}/animals`).flush(
       animals.map((a) => (a.createdBy === '' ? { ...a, createdBy: sub } : a))
     );
+    httpMock
+      .expectOne((r) => r.url === `${baseUrl}/vet-hospitals` && r.params.get('memberUserId') === sub)
+      .flush([organization]);
     flushPrefetch();
     fixture.detectChanges();
     return fixture;
@@ -86,6 +100,7 @@ describe('UserProfile', () => {
     fixture.detectChanges();
     httpMock.expectOne(`${baseUrl}/users/${sub}`).error(networkDown());
     httpMock.expectOne((r) => r.url === `${baseUrl}/animals`).error(networkDown());
+    httpMock.expectOne((r) => r.url === `${baseUrl}/vet-hospitals`).error(networkDown());
     fixture.detectChanges();
     return fixture;
   }
@@ -140,9 +155,35 @@ describe('UserProfile', () => {
     fixture.detectChanges();
     httpMock.expectOne(`${baseUrl}/users/${sub}`).flush({ ...user, id: sub });
     httpMock.expectOne((r) => r.url === `${baseUrl}/animals`).flush([]);
+    httpMock.expectOne((r) => r.url === `${baseUrl}/vet-hospitals`).flush([]);
     fixture.detectChanges();
 
     expect(fixture.nativeElement.textContent).toContain('No animals registered yet.');
+  });
+
+  it('shows the organizations the user is a member of, linking to each one', () => {
+    const fixture = createComponent();
+
+    expect(fixture.componentInstance.myOrganizations()).toEqual([organization]);
+    expect(fixture.nativeElement.textContent).toContain('Central Vet Clinic');
+
+    const router = TestBed.inject(Router);
+    const navigateSpy = vi.spyOn(router, 'navigateByUrl').mockResolvedValue(true);
+    const button = fixture.nativeElement.querySelector('.user-profile-organizations button') as HTMLButtonElement;
+    button.click();
+
+    expect(navigateSpy.mock.calls[0][0].toString()).toBe('/admin/organizations/org-1');
+  });
+
+  it('shows no organizations section when the user belongs to none', () => {
+    const fixture = TestBed.createComponent(UserProfile);
+    fixture.detectChanges();
+    httpMock.expectOne(`${baseUrl}/users/${sub}`).flush({ ...user, id: sub });
+    httpMock.expectOne((r) => r.url === `${baseUrl}/animals`).flush([]);
+    httpMock.expectOne((r) => r.url === `${baseUrl}/vet-hospitals`).flush([]);
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.querySelector('.user-profile-organizations')).toBeNull();
   });
 
   it('signs out and navigates to /login', () => {

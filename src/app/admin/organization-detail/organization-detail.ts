@@ -1,8 +1,9 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { forkJoin } from 'rxjs';
+import { AuthStateService } from '../../core/services/auth-state.service';
 import { LookupsService } from '../../core/services/lookups.service';
 import { PageHeaderService } from '../../core/services/page-header.service';
 import { UsersService } from '../../core/services/users.service';
@@ -22,18 +23,24 @@ type OrgTab = 'members' | 'animals';
   templateUrl: './organization-detail.html',
   styleUrl: './organization-detail.scss',
 })
-export class OrganizationDetail {
+export class OrganizationDetail { 
   private readonly fb = inject(FormBuilder);
   private readonly route = inject(ActivatedRoute);
   private readonly vetHospitalsService = inject(VetHospitalsService);
   private readonly usersService = inject(UsersService);
   private readonly lookupsService = inject(LookupsService);
   private readonly pageHeader = inject(PageHeaderService);
+  protected readonly authState = inject(AuthStateService);
 
   readonly orgId = this.route.snapshot.paramMap.get('id') ?? '';
 
   readonly vetHospitalTypes = signal<Lookup[]>([]);
   readonly roles = signal<Lookup[]>([]);
+  // Platform-level roles ('Admin', 'User') live in the same table but don't apply to org membership.
+  private static readonly NON_MEMBER_ROLES = new Set(['admin', 'user']);
+  readonly assignableRoles = computed(() =>
+    this.roles().filter((role) => !OrganizationDetail.NON_MEMBER_ROLES.has(role.name.toLowerCase()))
+  );
 
   readonly organization = signal<VetHospital | null>(null);
   readonly loading = signal(true);
@@ -125,7 +132,7 @@ export class OrganizationDetail {
 
   startEditing(): void {
     const org = this.organization();
-    if (!org) {
+    if (!org || !this.authState.isAdministrator()) {
       return;
     }
     this.editForm.setValue({
@@ -186,7 +193,7 @@ export class OrganizationDetail {
 
   addMember(): void {
     const org = this.organization();
-    if (!org || this.addMemberForm.invalid) {
+    if (!org || !this.authState.isAdministrator() || this.addMemberForm.invalid) {
       this.addMemberForm.markAllAsTouched();
       return;
     }
@@ -279,7 +286,10 @@ export class OrganizationDetail {
     this.pageHeader.set({
       title: () => this.organization()?.name ?? 'Organization',
       left: { kind: 'back' },
-      action: this.organization() ? { kind: 'edit', onClick: () => this.startEditing() } : undefined,
+      action:
+        this.organization() && this.authState.isAdministrator()
+          ? { kind: 'edit', onClick: () => this.startEditing() }
+          : undefined,
     });
   }
 

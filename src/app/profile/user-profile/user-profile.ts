@@ -11,7 +11,8 @@ import { OfflinePrefetchService } from '../../core/services/offline-prefetch.ser
 import { PageHeaderService } from '../../core/services/page-header.service';
 import { TokenStorageService } from '../../core/services/token-storage.service';
 import { UsersService } from '../../core/services/users.service';
-import { Animal, ApiError, User } from '../../core/models/models';
+import { VetHospitalsService } from '../../core/services/vet-hospitals.service';
+import { Animal, ApiError, User, VetHospital } from '../../core/models/models';
 import { OfflineNotice } from '../../shared/offline-notice/offline-notice';
 import { PtAvatar } from '../../shared/pt-avatar/pt-avatar';
 import { PtButton } from '../../shared/pt-button/pt-button';
@@ -30,6 +31,7 @@ export class UserProfile {
   private readonly tokenStorage = inject(TokenStorageService);
   private readonly usersService = inject(UsersService);
   private readonly animalsService = inject(AnimalsService);
+  private readonly vetHospitalsService = inject(VetHospitalsService);
   private readonly offlineCache = inject(OfflineCacheService);
   private readonly offlinePrefetch = inject(OfflinePrefetchService);
   private readonly offlineIndicator = inject(OfflineIndicatorService);
@@ -45,6 +47,9 @@ export class UserProfile {
   readonly myAnimals = signal<Animal[]>([]);
   readonly animalsLoading = signal(true);
 
+  readonly myOrganizations = signal<VetHospital[]>([]);
+  readonly organizationsLoading = signal(true);
+
   readonly roleLabel = (() => {
     const role = this.authState.currentUser?.role;
     return role ? role.charAt(0).toUpperCase() + role.slice(1) : null;
@@ -57,6 +62,7 @@ export class UserProfile {
     if (!id) {
       this.loading.set(false);
       this.animalsLoading.set(false);
+      this.organizationsLoading.set(false);
       return;
     }
 
@@ -93,6 +99,14 @@ export class UserProfile {
         }
       },
       error: () => this.animalsLoading.set(false),
+    });
+
+    this.offlineCache.fetch(OfflineCacheKeys.myOrganizations(id), this.vetHospitalsService.search(undefined, id)).subscribe({
+      next: ({ data: organizations }) => {
+        this.myOrganizations.set(organizations);
+        this.organizationsLoading.set(false);
+      },
+      error: () => this.organizationsLoading.set(false),
     });
   }
 

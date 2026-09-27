@@ -4,13 +4,19 @@ import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting, HttpTestingController } from '@angular/common/http/testing';
 import { OrganizationDetail } from './organization-detail';
 import { API_BASE_URL } from '../../core/services/api-config';
+import { AuthStateService } from '../../core/services/auth-state.service';
 import { PageHeaderService } from '../../core/services/page-header.service';
 import { Animal, Lookup, User, VetHospital, VetHospitalMember } from '../../core/models/models';
 
 describe('OrganizationDetail', () => {
   const baseUrl = 'http://localhost:3000/api/v1';
   const vetHospitalTypes: Lookup[] = [{ id: 1, name: 'Clinic' }];
-  const roles: Lookup[] = [{ id: 1, name: 'Vet' }, { id: 2, name: 'Assistant' }];
+  const roles: Lookup[] = [
+    { id: 1, name: 'Vet' },
+    { id: 2, name: 'Assistant' },
+    { id: 3, name: 'Admin' },
+    { id: 4, name: 'User' },
+  ];
 
   const org: VetHospital = {
     id: 'org-1',
@@ -52,14 +58,17 @@ describe('OrganizationDetail', () => {
   };
 
   let httpMock: HttpTestingController;
+  let authState: { isAdministrator: () => boolean };
 
-  function createComponent() {
+  function createComponent(isAdmin = true) {
+    authState = { isAdministrator: () => isAdmin };
     TestBed.configureTestingModule({
       imports: [OrganizationDetail],
       providers: [
         provideHttpClient(),
         provideHttpClientTesting(),
         { provide: API_BASE_URL, useValue: baseUrl },
+        { provide: AuthStateService, useValue: authState },
         {
           provide: ActivatedRoute,
           useValue: { snapshot: { paramMap: convertToParamMap({ id: 'org-1' }) } },
@@ -132,6 +141,29 @@ describe('OrganizationDetail', () => {
 
     expect(fixture.componentInstance.notFound()).toBe(true);
     expect(fixture.nativeElement.textContent).toContain('Organization not found.');
+  });
+
+  it('excludes platform Admin/User roles from the assignable member roles', () => {
+    const fixture = createComponent();
+    const component = fixture.componentInstance;
+
+    expect(component.assignableRoles().map((role) => role.name)).toEqual(['Vet', 'Assistant']);
+
+    const options = Array.from(
+      fixture.nativeElement.querySelectorAll('#addMemberRoleId option')
+    ) as HTMLOptionElement[];
+    expect(options.map((o) => o.textContent?.trim())).toEqual(['Select a role', 'Vet', 'Assistant']);
+  });
+
+  it('hides the edit action and add-member form for a non-admin org member', () => {
+    const fixture = createComponent(false);
+    const pageHeader = TestBed.inject(PageHeaderService);
+
+    expect(pageHeader.config().action).toBeUndefined();
+    expect(fixture.nativeElement.querySelector('.org-detail-add-member')).toBeNull();
+
+    fixture.componentInstance.startEditing();
+    expect(fixture.componentInstance.editing()).toBe(false);
   });
 
   it('switches between the members and animals tabs', () => {

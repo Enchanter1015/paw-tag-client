@@ -132,7 +132,7 @@
 .org-detail-add-member {
   display: flex;
   flex-wrap: wrap;
-  align-items: flex-end;
+  align-items: baseline;
   gap: var(--pt-space-3);
   margin-top: var(--pt-space-3);
   padding-top: var(--pt-space-3);

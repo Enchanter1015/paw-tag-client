@@ -58,6 +58,27 @@
       }
     </section>
 
+    @if (!organizationsLoading() && myOrganizations().length > 0) {
+      <section class="user-profile-organizations">
+        <h2 class="user-profile-section-title">My organizations</h2>
+        <ul class="user-profile-org-list">
+          @for (org of myOrganizations(); track org.id) {
+            <li class="user-profile-org-row">
+              <div class="user-profile-org-info">
+                <span class="user-profile-org-name">{{ org.name }}</span>
+                <pt-tag [variant]="org.isVerified ? 'success' : 'neutral'">
+                  {{ org.isVerified ? 'Verified' : 'Unverified' }}
+                </pt-tag>
+              </div>
+              <pt-button variant="secondary" [sm]="true" [routerLink]="['/admin/organizations', org.id]">
+                Go to organization
+              </pt-button>
+            </li>
+          }
+        </ul>
+      </section>
+    }
+
     @if (signOutError()) {
       <p class="user-profile-status user-profile-status--error" role="alert">{{ signOutError() }}</p>
     }

@@ -168,3 +168,36 @@
   font-family: ui-monospace, 'SFMono-Regular', Menlo, monospace;
   color: var(--pt-ink-muted);
 }
+
+.user-profile-org-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--pt-space-2);
+}
+
+.user-profile-org-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--pt-space-3);
+  padding: var(--pt-space-3);
+  background: var(--pt-surface-100);
+  border: 1px solid var(--pt-border);
+  border-radius: var(--pt-radius-md);
+}
+
+.user-profile-org-info {
+  display: flex;
+  align-items: center;
+  gap: var(--pt-space-2);
+  min-width: 0;
+}
+
+.user-profile-org-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--pt-ink);
+}

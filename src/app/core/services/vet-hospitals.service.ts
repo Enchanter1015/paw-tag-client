@@ -23,9 +23,10 @@ export class VetHospitalsService {
     return this.http.post<VetHospital>(`${this.baseUrl}/vet-hospitals`, input);
   }
 
-  search(name?: string): Observable<VetHospital[]> {
+  search(name?: string, memberUserId?: string): Observable<VetHospital[]> {
     let params = new HttpParams();
     if (name) params = params.set('name', name);
+    if (memberUserId) params = params.set('memberUserId', memberUserId);
     return this.http.get<VetHospital[]>(`${this.baseUrl}/vet-hospitals`, { params });
   }
 
