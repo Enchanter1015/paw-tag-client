@@ -1,79 +1,160 @@
 <div class="orgs-admin-screen">
-  <p class="orgs-admin-subtitle">Search, add, and edit vet hospitals and their members.</p>
+  <!-- Search & Actions Bar Card -->
+  <div class="orgs-admin-card orgs-admin-card--header">
+    <div class="orgs-admin-header-row">
+      <div class="header-text-group">
+        <h2 class="orgs-admin-title">Organizations</h2>
+        <p class="orgs-admin-subtitle">Search, add, and manage veterinary clinics, hospitals, and their members.</p>
+      </div>
+      @if (!creating()) {
+        <pt-button variant="primary" type="button" [sm]="true" (click)="startCreating()">
+          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <line x1="12" y1="5" x2="12" y2="19"/>
+            <line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+          Add organization
+        </pt-button>
+      }
+    </div>
 
-  <form class="orgs-admin-search" [formGroup]="searchForm">
-    <pt-input label="Search by name" placeholder="Organization name" formControlName="name"></pt-input>
-  </form>
+    <form class="orgs-admin-search" [formGroup]="searchForm">
+      <pt-input label="Search by name" placeholder="Search organization by name…" formControlName="name"></pt-input>
+    </form>
+  </div>
 
-  @if (!creating()) {
-    <pt-button variant="secondary" type="button" (click)="startCreating()">Add organization</pt-button>
+  <!-- Create Form Panel -->
+  @if (creating()) {
+    <div class="orgs-admin-card orgs-admin-card--create">
+      <div class="card-section-header">
+        <div class="title-with-icon">
+          <div class="section-icon-badge" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 21h18M5 21V7l8-4 8 4v14M9 21v-6h6v6M9 9h.01M15 9h.01M9 13h.01M15 13h.01"/>
+            </svg>
+          </div>
+          <h2 class="orgs-admin-form-title">New organization</h2>
+        </div>
+      </div>
+
+      <form class="orgs-admin-form" [formGroup]="createForm" (ngSubmit)="submitCreate()">
+        <pt-input
+          label="Organization name"
+          placeholder="e.g. Colombo Veterinary Care"
+          formControlName="name"
+          [error]="fieldError(createForm.controls.name, 'Enter the organization name.')"
+        ></pt-input>
+
+        <div class="field-group">
+          <label class="field-label" for="createVetHospitalTypeId">Organization type</label>
+          <select id="createVetHospitalTypeId" class="field-select" formControlName="vetHospitalTypeId">
+            <option value="" disabled>Select a type</option>
+            @for (type of vetHospitalTypes(); track type.id) {
+              <option [value]="type.id">{{ type.name }}</option>
+            }
+          </select>
+          @if (fieldError(createForm.controls.vetHospitalTypeId, 'Select an organization type.'); as error) {
+            <p class="field-error">{{ error }}</p>
+          }
+        </div>
+
+        <div class="form-grid-2">
+          <pt-input label="Phone number (optional)" placeholder="e.g. 011 234 5678" formControlName="phoneNo"></pt-input>
+          <pt-input
+            label="Business email (optional)"
+            type="email"
+            placeholder="clinic@example.com"
+            formControlName="businessEmail"
+            [error]="fieldError(createForm.controls.businessEmail, '')"
+          ></pt-input>
+        </div>
+
+        <pt-input label="Address (optional)" placeholder="Street address and city" formControlName="address"></pt-input>
+
+        @if (createError()) {
+          <div class="orgs-admin-error-banner" role="alert">
+            <svg class="error-banner-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="12" y1="8" x2="12" y2="12"/>
+              <line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+            <p class="orgs-admin-error">{{ createError() }}</p>
+          </div>
+        }
+
+        <div class="orgs-admin-form-actions">
+          <pt-button variant="secondary" type="button" (click)="cancelCreating()">Cancel</pt-button>
+          <pt-button type="submit" [disabled]="creatingInFlight()">
+            {{ creatingInFlight() ? 'Creating…' : 'Create organization' }}
+          </pt-button>
+        </div>
+      </form>
+    </div>
   }
 
-  @if (creating()) {
-    <form class="orgs-admin-form" [formGroup]="createForm" (ngSubmit)="submitCreate()">
-      <h2 class="orgs-admin-form-title">New organization</h2>
-      <pt-input
-        label="Name"
-        formControlName="name"
-        [error]="fieldError(createForm.controls.name, 'Enter the organization name.')"
-      ></pt-input>
-
-      <div class="field-group">
-        <label class="field-label" for="createVetHospitalTypeId">Organization type</label>
-        <select id="createVetHospitalTypeId" class="field-select" formControlName="vetHospitalTypeId">
-          <option value="" disabled>Select a type</option>
-          @for (type of vetHospitalTypes(); track type.id) {
-            <option [value]="type.id">{{ type.name }}</option>
-          }
-        </select>
-        @if (fieldError(createForm.controls.vetHospitalTypeId, 'Select an organization type.'); as error) {
-          <p class="field-error">{{ error }}</p>
+  <!-- Organizations List Section -->
+  <div class="orgs-admin-card">
+    <div class="card-section-header">
+      <div class="section-title-group">
+        <h3 class="orgs-admin-section-title">Registered organizations</h3>
+        @if (!loading() && organizations().length > 0) {
+          <span class="count-pill">{{ organizations().length }}</span>
         }
       </div>
+    </div>
 
-      <pt-input label="Phone number (optional)" formControlName="phoneNo"></pt-input>
-      <pt-input label="Address (optional)" formControlName="address"></pt-input>
-      <pt-input
-        label="Business email (optional)"
-        type="email"
-        formControlName="businessEmail"
-        [error]="fieldError(createForm.controls.businessEmail, '')"
-      ></pt-input>
-
-      @if (createError()) {
-        <p class="orgs-admin-error">{{ createError() }}</p>
-      }
-
-      <div class="orgs-admin-form-actions">
-        <pt-button variant="secondary" type="button" (click)="cancelCreating()">Cancel</pt-button>
-        <pt-button type="submit" [disabled]="creatingInFlight()">
-          {{ creatingInFlight() ? 'Creating…' : 'Create organization' }}
-        </pt-button>
+    @if (loading()) {
+      <div class="orgs-admin-loading">
+        <div class="loading-spinner" aria-hidden="true"></div>
+        <p class="orgs-admin-status">Loading organizations…</p>
       </div>
-    </form>
-  }
-
-  @if (loading()) {
-    <p class="orgs-admin-status">Loading…</p>
-  } @else if (loadError()) {
-    <p class="orgs-admin-status orgs-admin-status--error">{{ loadError() }}</p>
-  } @else if (organizations().length === 0) {
-    <p class="orgs-admin-status">No organizations found.</p>
-  } @else {
-    <ul class="orgs-admin-list">
-      @for (org of organizations(); track org.id) {
-        <li class="orgs-admin-row">
-          <a class="orgs-admin-row-btn" [routerLink]="['/admin/organizations', org.id]">
-            <div class="orgs-admin-info">
-              <span class="orgs-admin-name">{{ org.name }}</span>
-              <span class="orgs-admin-meta">{{ vetHospitalTypeName(org.vetHospitalTypeId) }}</span>
-            </div>
-            <pt-tag [variant]="org.isVerified ? 'success' : 'neutral'">
-              {{ org.isVerified ? 'Verified' : 'Unverified' }}
-            </pt-tag>
-          </a>
-        </li>
-      }
-    </ul>
-  }
+    } @else if (loadError()) {
+      <div class="orgs-admin-error-card">
+        <svg class="error-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="12" y1="8" x2="12" y2="12"/>
+          <line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+        <p class="orgs-admin-status orgs-admin-status--error">{{ loadError() }}</p>
+      </div>
+    } @else if (organizations().length === 0) {
+      <div class="orgs-admin-empty-card">
+        <div class="empty-icon-wrap" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 21h18M5 21V7l8-4 8 4v14M9 21v-6h6v6M9 9h.01M15 9h.01M9 13h.01M15 13h.01"/>
+          </svg>
+        </div>
+        <p class="orgs-admin-status">No organizations found.</p>
+        <p class="empty-subtext">Add a new clinic or hospital to get started.</p>
+      </div>
+    } @else {
+      <ul class="orgs-admin-list">
+        @for (org of organizations(); track org.id) {
+          <li class="orgs-admin-row">
+            <a class="orgs-admin-row-btn" [routerLink]="['/admin/organizations', org.id]">
+              <div class="org-row-start">
+                <div class="org-icon-badge-sm" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 21h18M5 21V7l8-4 8 4v14M9 21v-6h6v6M9 9h.01M15 9h.01M9 13h.01M15 13h.01"/>
+                  </svg>
+                </div>
+                <div class="orgs-admin-info">
+                  <span class="orgs-admin-name">{{ org.name }}</span>
+                  <span class="orgs-admin-meta">{{ vetHospitalTypeName(org.vetHospitalTypeId) }}</span>
+                </div>
+              </div>
+              <div class="org-row-end">
+                <pt-tag [variant]="org.isVerified ? 'success' : 'neutral'">
+                  {{ org.isVerified ? 'Verified' : 'Unverified' }}
+                </pt-tag>
+                <svg class="row-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <polyline points="9 18 15 12 9 6"/>
+                </svg>
+              </div>
+            </a>
+          </li>
+        }
+      </ul>
+    }
+  </div>
 </div>
+
