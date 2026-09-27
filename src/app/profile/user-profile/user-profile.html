@@ -1,42 +1,127 @@
 <div class="user-profile-screen">
   @if (loading()) {
-    <p class="user-profile-status">Loading…</p>
+    <div class="user-profile-loading">
+      <div class="loading-spinner" aria-hidden="true"></div>
+      <p class="user-profile-status">Loading profile…</p>
+    </div>
   } @else if (loadError()) {
-    <p class="user-profile-status user-profile-status--error">{{ loadError() }}</p>
+    <div class="user-profile-error-card">
+      <div class="error-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="12" y1="8" x2="12" y2="12"/>
+          <line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+      </div>
+      <p class="user-profile-status user-profile-status--error">{{ loadError() }}</p>
+    </div>
   } @else if (user(); as user) {
     <pt-offline-notice [cachedAt]="cachedAt()"></pt-offline-notice>
 
-    <div class="user-profile-header">
-      <pt-avatar size="lg" [name]="user.name"></pt-avatar>
-      <div class="user-profile-heading">
-        <h3 class="user-profile-name">{{ user.name }}</h3>
-        <span class="user-profile-email">{{ user.email }}</span>
-        @if (roleLabel) {
-          <pt-tag variant="info">{{ roleLabel }}</pt-tag>
-        }
+    <!-- Profile Hero Card -->
+    <div class="user-profile-card user-profile-card--hero">
+      <div class="user-profile-header">
+        <div class="user-profile-avatar-wrapper">
+          <pt-avatar size="lg" [name]="user.name"></pt-avatar>
+        </div>
+        <div class="user-profile-heading">
+          <div class="user-profile-title-row">
+            <h3 class="user-profile-name">{{ user.name }}</h3>
+            @if (roleLabel) {
+              <pt-tag variant="info">{{ roleLabel }}</pt-tag>
+            }
+          </div>
+          <span class="user-profile-email">{{ user.email }}</span>
+        </div>
+      </div>
+
+      <!-- Quick Stats Row -->
+      <div class="user-profile-stats">
+        <div class="stat-item">
+          <span class="stat-value">{{ myAnimals().length }}</span>
+          <span class="stat-label">Animals registered</span>
+        </div>
+        <div class="stat-divider" aria-hidden="true"></div>
+        <div class="stat-item">
+          <span class="stat-value">{{ myOrganizations().length }}</span>
+          <span class="stat-label">Organizations</span>
+        </div>
+        <div class="stat-divider" aria-hidden="true"></div>
+        <div class="stat-item">
+          <span class="stat-badge">
+            <span class="status-dot" aria-hidden="true"></span>
+            Active
+          </span>
+          <span class="stat-label">Account status</span>
+        </div>
       </div>
     </div>
 
-    <dl class="user-profile-details">
-      <div class="detail-row">
-        <dt>Contact number</dt>
-        <dd>{{ user.phoneNo || 'Not recorded' }}</dd>
+    <!-- Contact & Personal Details Card -->
+    <div class="user-profile-card">
+      <div class="card-section-header">
+        <h2 class="user-profile-section-title">Contact information</h2>
       </div>
-      <div class="detail-row">
-        <dt>Address</dt>
-        <dd>{{ user.address || 'Not recorded' }}</dd>
-      </div>
-    </dl>
 
-    <section class="user-profile-animals">
+      <dl class="user-profile-details">
+        <div class="detail-row">
+          <dt>
+            <svg class="detail-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+            </svg>
+            Contact number
+          </dt>
+          <dd>{{ user.phoneNo || 'Not recorded' }}</dd>
+        </div>
+        <div class="detail-row">
+          <dt>
+            <svg class="detail-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+              <circle cx="12" cy="10" r="3"/>
+            </svg>
+            Address
+          </dt>
+          <dd>{{ user.address || 'Not recorded' }}</dd>
+        </div>
+      </dl>
+    </div>
+
+    <!-- My Animals Section -->
+    <section class="user-profile-animals user-profile-card">
       <div class="user-profile-animals-header">
-        <h2 class="user-profile-section-title">My animals</h2>
-        <a class="user-profile-link" routerLink="/animals/register">Add animal</a>
+        <div class="section-title-group">
+          <h2 class="user-profile-section-title">My animals</h2>
+          @if (!animalsLoading() && myAnimals().length > 0) {
+            <span class="count-pill">{{ myAnimals().length }}</span>
+          }
+        </div>
+        <a class="user-profile-link" routerLink="/animals/register">
+          <svg class="link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <line x1="12" y1="5" x2="12" y2="19"/>
+            <line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+          Add animal
+        </a>
       </div>
 
       @if (!animalsLoading()) {
         @if (myAnimals().length === 0) {
-          <p class="user-profile-empty">No animals registered yet.</p>
+          <div class="user-profile-empty-card">
+            <div class="empty-icon-wrap" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 14c2.2 0 4-1.8 4-4a4 4 0 0 0-8 0c0 2.2 1.8 4 4 4z"/>
+                <circle cx="6" cy="8" r="2"/>
+                <circle cx="18" cy="8" r="2"/>
+                <circle cx="9" cy="4" r="1.8"/>
+                <circle cx="15" cy="4" r="1.8"/>
+              </svg>
+            </div>
+            <p class="user-profile-empty">No animals registered yet.</p>
+            <p class="empty-subtext">Animals and street dogs you register in the field will appear here.</p>
+            <pt-button variant="secondary" [sm]="true" [routerLink]="['/animals/register']">
+              Register an animal
+            </pt-button>
+          </div>
         } @else {
           <ul class="user-profile-animal-list">
             @for (animal of myAnimals(); track animal.id) {
@@ -47,9 +132,14 @@
                     <span class="user-profile-animal-name">{{ animal.name }}</span>
                     <span class="user-profile-animal-id">{{ animal.id }}</span>
                   </div>
-                  <pt-tag [variant]="animal.isStreet ? 'info' : 'neutral'">
-                    {{ animal.isStreet ? 'Street animal' : 'Registered pet' }}
-                  </pt-tag>
+                  <div class="animal-row-end">
+                    <pt-tag [variant]="animal.isStreet ? 'info' : 'neutral'">
+                      {{ animal.isStreet ? 'Street animal' : 'Registered pet' }}
+                    </pt-tag>
+                    <svg class="row-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <polyline points="9 18 15 12 9 6"/>
+                    </svg>
+                  </div>
                 </a>
               </li>
             }
@@ -58,17 +148,31 @@
       }
     </section>
 
+    <!-- My Organizations Section -->
     @if (!organizationsLoading() && myOrganizations().length > 0) {
-      <section class="user-profile-organizations">
-        <h2 class="user-profile-section-title">My organizations</h2>
+      <section class="user-profile-organizations user-profile-card">
+        <div class="card-section-header">
+          <div class="section-title-group">
+            <h2 class="user-profile-section-title">My organizations</h2>
+            <span class="count-pill">{{ myOrganizations().length }}</span>
+          </div>
+        </div>
+
         <ul class="user-profile-org-list">
           @for (org of myOrganizations(); track org.id) {
             <li class="user-profile-org-row">
               <div class="user-profile-org-info">
-                <span class="user-profile-org-name">{{ org.name }}</span>
-                <pt-tag [variant]="org.isVerified ? 'success' : 'neutral'">
-                  {{ org.isVerified ? 'Verified' : 'Unverified' }}
-                </pt-tag>
+                <div class="org-icon-badge" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 21h18M5 21V7l8-4 8 4v14M9 21v-6h6v6M9 9h.01M15 9h.01M9 13h.01M15 13h.01"/>
+                  </svg>
+                </div>
+                <div class="org-name-group">
+                  <span class="user-profile-org-name">{{ org.name }}</span>
+                  <pt-tag [variant]="org.isVerified ? 'success' : 'neutral'">
+                    {{ org.isVerified ? 'Verified' : 'Unverified' }}
+                  </pt-tag>
+                </div>
               </div>
               <pt-button variant="secondary" [sm]="true" [routerLink]="['/admin/organizations', org.id]">
                 Go to organization
@@ -79,9 +183,27 @@
       </section>
     }
 
-    @if (signOutError()) {
-      <p class="user-profile-status user-profile-status--error" role="alert">{{ signOutError() }}</p>
-    }
-    <pt-button variant="secondary" [full]="true" (click)="signOut()">Sign out</pt-button>
+    <!-- Sign Out & Session Card -->
+    <div class="user-profile-card user-profile-card--actions">
+      @if (signOutError()) {
+        <div class="user-profile-error-banner" role="alert">
+          <svg class="error-banner-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="8" x2="12" y2="12"/>
+            <line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+          <span class="user-profile-status user-profile-status--error">{{ signOutError() }}</span>
+        </div>
+      }
+      <pt-button variant="secondary" [full]="true" (click)="signOut()">
+        <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+          <polyline points="16 17 21 12 16 7"/>
+          <line x1="21" y1="12" x2="9" y2="12"/>
+        </svg>
+        Sign out
+      </pt-button>
+    </div>
   }
 </div>
+
