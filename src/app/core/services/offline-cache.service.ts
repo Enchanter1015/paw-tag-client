@@ -16,6 +16,7 @@ export const OfflineCacheKeys = {
   medicalRecord: (id: string) => `medical-record:${id}`,
   user: (id: string) => `user:${id}`,
   myAnimals: (userId: string) => `my-animals:${userId}`,
+  myOrganizations: (userId: string) => `my-organizations:${userId}`,
   animalTypes: 'animal-types',
   medicalRecordTypes: 'medical-record-types',
 } as const;

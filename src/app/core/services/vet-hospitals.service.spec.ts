@@ -77,6 +77,15 @@ describe('VetHospitalsService', () => {
     req.flush([hospital]);
   });
 
+  it('searches vet hospitals by member user id', () => {
+    service.search(undefined, 'uuid-user').subscribe((result) => expect(result).toEqual([hospital]));
+
+    const req = httpMock.expectOne(
+      (r) => r.url === `${baseUrl}/vet-hospitals` && r.params.get('memberUserId') === 'uuid-user' && !r.params.has('name')
+    );
+    req.flush([hospital]);
+  });
+
   it('gets a vet hospital by id', () => {
     service.getById('uuid-1').subscribe((result) => expect(result).toEqual(hospital));
 

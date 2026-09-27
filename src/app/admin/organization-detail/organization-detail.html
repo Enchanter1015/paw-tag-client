@@ -70,36 +70,38 @@
           </ul>
         }
 
-        <form class="org-detail-add-member" [formGroup]="addMemberForm" (ngSubmit)="addMember()">
-          <pt-input
-            label="Add member by email"
-            type="email"
-            placeholder="member@example.com"
-            formControlName="email"
-            [error]="fieldError(addMemberForm.controls.email, 'Enter an email address.')"
-          ></pt-input>
+        @if (authState.isAdministrator()) {
+          <form class="org-detail-add-member" [formGroup]="addMemberForm" (ngSubmit)="addMember()">
+            <pt-input
+              label="Add member by email"
+              type="email"
+              placeholder="member@example.com"
+              formControlName="email"
+              [error]="fieldError(addMemberForm.controls.email, 'Enter an email address.')"
+            ></pt-input>
 
-          <div class="field-group">
-            <label class="field-label" for="addMemberRoleId">Role</label>
-            <select id="addMemberRoleId" class="field-select" formControlName="roleId">
-              <option value="" disabled>Select a role</option>
-              @for (role of roles(); track role.id) {
-                <option [value]="role.id">{{ role.name }}</option>
+            <div class="field-group">
+              <label class="field-label" for="addMemberRoleId">Role</label>
+              <select id="addMemberRoleId" class="field-select" formControlName="roleId">
+                <option value="" disabled>Select a role</option>
+                @for (role of assignableRoles(); track role.id) {
+                  <option [value]="role.id">{{ role.name }}</option>
+                }
+              </select>
+              @if (fieldError(addMemberForm.controls.roleId, 'Select a role.'); as error) {
+                <p class="field-error">{{ error }}</p>
               }
-            </select>
-            @if (fieldError(addMemberForm.controls.roleId, 'Select a role.'); as error) {
-              <p class="field-error">{{ error }}</p>
+            </div>
+
+            @if (addMemberError()) {
+              <p class="org-detail-error">{{ addMemberError() }}</p>
             }
-          </div>
 
-          @if (addMemberError()) {
-            <p class="org-detail-error">{{ addMemberError() }}</p>
-          }
-
-          <pt-button type="submit" [sm]="true" [disabled]="addingMember()">
-            {{ addingMember() ? 'Adding…' : 'Add member' }}
-          </pt-button>
-        </form>
+            <pt-button type="submit" [sm]="true" [disabled]="addingMember()">
+              {{ addingMember() ? 'Adding…' : 'Add member' }}
+            </pt-button>
+          </form>
+        }
       } @else {
         @if (animalsLoading()) {
           <p class="org-detail-status">Loading animals…</p>
